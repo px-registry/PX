@@ -1561,6 +1561,108 @@ Draft is fully functional for internal use today.
   log();
 }
 
+// ── px check ─────────────────────────────
+
+function cmdCheck(args) {
+  const separatorIndex = args.indexOf('--');
+  const flagArgs = separatorIndex >= 0 ? args.slice(0, separatorIndex) : args;
+  const collectorArgs = separatorIndex >= 0 ? args.slice(separatorIndex + 1) : [];
+
+  const flags = parseFlags(flagArgs);
+
+  if (!flags.profile) {
+    fail('Usage: px check --profile=<profile-file> [-- collector args]');
+    log();
+    process.exit(1);
+  }
+
+  const profilePath = path.resolve(process.cwd(), flags.profile);
+  if (!fileExists(profilePath)) {
+    fail(`Profile not found: ${flags.profile}`);
+    log();
+    process.exit(1);
+  }
+
+  let profileData;
+  try {
+    profileData = readJSON(profilePath);
+  } catch (e) {
+    fail(`Profile is not valid JSON: ${flags.profile}`);
+    info(e.message);
+    log();
+    process.exit(1);
+  }
+
+  const sourceType = profileData.source_type;
+  if (!sourceType) {
+    fail('Profile has no source_type field. Use verify --profile --evidence instead.');
+    log();
+    process.exit(1);
+  }
+
+  const collectorPath = path.resolve(process.cwd(), 'collectors', `${sourceType}.sh`);
+  if (!fileExists(collectorPath)) {
+    fail(`Collector not found: collectors/${sourceType}.sh`);
+    info('Fallback:');
+    info(`  node cli.js verify --profile=${flags.profile} --evidence=<your-evidence.json>`);
+    log();
+    process.exit(1);
+  }
+
+  heading('Collecting evidence...');
+  info(`Running collectors/${sourceType}.sh`);
+
+  let collectorOutput;
+  try {
+    const { execFileSync } = require('child_process');
+    collectorOutput = execFileSync('bash', [collectorPath, ...collectorArgs], {
+      encoding: 'utf8',
+      timeout: 60000,
+      stdio: ['ignore', 'pipe', 'inherit'],
+    });
+  } catch (e) {
+    fail(`Collector failed: ${e.message}`);
+    info('Fallback:');
+    info(`  node cli.js verify --profile=${flags.profile} --evidence=<your-evidence.json>`);
+    log();
+    process.exit(1);
+  }
+
+  let evidenceData;
+  try {
+    evidenceData = JSON.parse(collectorOutput);
+  } catch (e) {
+    fail('Collector output is not valid JSON.');
+    info(e.message);
+    log();
+    process.exit(1);
+  }
+
+  const evidenceDir = path.join(process.cwd(), '.px', 'evidence');
+  if (!fs.existsSync(evidenceDir)) fs.mkdirSync(evidenceDir, { recursive: true });
+
+  const stamp = new Date().toISOString().replace(/[:]/g, '-');
+  const evidenceFile = path.join(evidenceDir, `${sourceType}-${stamp}.json`);
+  fs.writeFileSync(evidenceFile, JSON.stringify(evidenceData, null, 2));
+
+  success(`Evidence saved: ${path.relative(process.cwd(), evidenceFile)}`);
+
+  const result = runCustomVerify(profileData, evidenceData);
+  const allPass = printCustomVerifyResults(result, profileData);
+
+  log();
+  if (allPass) {
+    info('To pack:');
+    info(`  node cli.js pack --profile=${flags.profile} --evidence=${path.relative(process.cwd(), evidenceFile)}`);
+    log();
+    process.exit(0);
+  } else {
+    info('Pack not generated.');
+    log();
+    process.exit(1);
+  }
+}
+
 // ── px status ────────────────────────────
 
 function cmdStatus(args) {
@@ -1650,6 +1752,7 @@ function cmdHelp() {
   log(`  ${CLR.bold}Custom Profiles:${CLR.reset}`);
   log(`    verify --profile=<file> --evidence=<file>   Verify evidence against a custom profile`);
   log(`    pack   --profile=<file> --evidence=<file>   Pack after custom verification`);
+  log(`    check  --profile=<file>                     Collect evidence + verify in one step`);
   log();
   log(`  ${CLR.bold}Examples:${CLR.reset}`);
   log(`    ${CLR.cyan}px init --demo${CLR.reset}     Set up a demo workspace and explore`);
@@ -1672,6 +1775,7 @@ const COMMANDS = {
   'generate': cmdGenerate,
   'verify':   cmdVerify,
   'pack':     cmdPack,
+  'check':    cmdCheck,
   'status':   cmdStatus,
   'help':     cmdHelp,
   '--help':   cmdHelp,

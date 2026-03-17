@@ -3,6 +3,7 @@
   "profile_version": "1.0.0",
   "name": "GitHub Organization Security",
   "description": "Security checks for GitHub organization and repository settings.",
+  "source_type": "github-org",
   "rules": [
     {
       "id": "org.two_factor_required",

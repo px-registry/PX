@@ -3,6 +3,7 @@
   "profile_version": "1.0.0",
   "name": "AWS Core Controls",
   "description": "Basic security checks for AWS infrastructure: IAM, RDS, S3, CloudTrail.",
+  "source_type": "aws-account",
   "rules": [
     {
       "id": "iam.mfa_enforced",

@@ -29,6 +29,28 @@ node cli.js verify --profile=profiles/github-org-security-v1.json --evidence=exa
 
 See `docs/github-export-guide.md` for how to export your GitHub settings.
 
+## One-Command Verification
+
+If you already have the source CLI installed, PX can collect and verify in one step.
+
+```bash
+# AWS
+node cli.js check --profile=profiles/aws-core-controls-v1.json
+
+# GitHub
+node cli.js check --profile=profiles/github-org-security-v1.json -- myorg myrepo
+```
+
+Evidence is saved to `.px/evidence/` so you can reuse it with `pack`.
+
+**No collector available?** No problem. Use:
+
+```bash
+node cli.js verify --profile=<profile-file> --evidence=<your-exported-json>
+```
+
+PX still works with manual exported JSON. `source_type` is optional and only used by `check`. `verify` and `pack` ignore it.
+
 ## Genesis Draft
 
 This repository contains PX's first Draft Packet.

@@ -2,3 +2,6 @@
 *.md text eol=lf
 *.html text eol=lf
 *.js text eol=lf
+
+*.sh text eol=lf
+.gitignore text eol=lf
