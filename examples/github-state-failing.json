@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "source": "gh api export — intentional failures",
+    "exported_at": "2026-03-18T10:00:00Z",
+    "org": "example-org",
+    "repo": "example-org/main-app"
+  },
+  "org": {
+    "two_factor_requirement_enabled": false,
+    "default_repository_permission": "write"
+  },
+  "repo": {
+    "default_branch_protection": {
+      "enabled": true,
+      "required_pull_request_reviews": true,
+      "required_status_checks": true,
+      "enforce_admins": true
+    },
+    "delete_branch_on_merge": true
+  },
+  "security": {
+    "secret_scanning": true,
+    "secret_scanning_push_protection": true,
+    "dependabot_alerts": true
+  }
+}

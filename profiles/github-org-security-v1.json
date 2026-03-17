@@ -1,0 +1,68 @@
+{
+  "profile_id": "github-org-security-v1",
+  "profile_version": "1.0.0",
+  "name": "GitHub Organization Security",
+  "description": "Security checks for GitHub organization and repository settings.",
+  "rules": [
+    {
+      "id": "org.two_factor_required",
+      "description": "Two-factor authentication is required for all org members",
+      "path": "org.two_factor_requirement_enabled",
+      "expected": true
+    },
+    {
+      "id": "org.default_permissions_read",
+      "description": "Default repository permission for org members is read (not write/admin)",
+      "path": "org.default_repository_permission",
+      "expected": "read"
+    },
+    {
+      "id": "repo.branch_protection_enabled",
+      "description": "Branch protection is enabled on the default branch",
+      "path": "repo.default_branch_protection.enabled",
+      "expected": true
+    },
+    {
+      "id": "repo.require_pull_request_reviews",
+      "description": "Pull request reviews are required before merging",
+      "path": "repo.default_branch_protection.required_pull_request_reviews",
+      "expected": true
+    },
+    {
+      "id": "repo.require_status_checks",
+      "description": "Status checks are required before merging",
+      "path": "repo.default_branch_protection.required_status_checks",
+      "expected": true
+    },
+    {
+      "id": "repo.enforce_admins",
+      "description": "Branch protection rules are enforced for admins too",
+      "path": "repo.default_branch_protection.enforce_admins",
+      "expected": true
+    },
+    {
+      "id": "repo.delete_branch_on_merge",
+      "description": "Branches are automatically deleted after merge",
+      "path": "repo.delete_branch_on_merge",
+      "expected": true
+    },
+    {
+      "id": "security.secret_scanning_enabled",
+      "description": "Secret scanning is enabled",
+      "path": "security.secret_scanning",
+      "expected": true
+    },
+    {
+      "id": "security.secret_scanning_push_protection",
+      "description": "Secret scanning push protection is enabled",
+      "path": "security.secret_scanning_push_protection",
+      "expected": true
+    },
+    {
+      "id": "security.dependabot_alerts_enabled",
+      "description": "Dependabot security alerts are enabled",
+      "path": "security.dependabot_alerts",
+      "expected": true
+    }
+  ]
+}

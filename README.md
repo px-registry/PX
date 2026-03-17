@@ -21,6 +21,14 @@ node cli.js pack --profile=profiles/aws-core-controls-v1.json --evidence=example
 
 Replace `examples/aws-state-passing.json` with your own AWS state. See `docs/aws-export-guide.md` for how to export.
 
+### Or verify GitHub org security:
+
+```bash
+node cli.js verify --profile=profiles/github-org-security-v1.json --evidence=examples/github-state-passing.json
+```
+
+See `docs/github-export-guide.md` for how to export your GitHub settings.
+
 ## Genesis Draft
 
 This repository contains PX's first Draft Packet.
@@ -120,17 +128,25 @@ This generates `draft-manifest.json` and `draft-packet.json` alongside the evide
 
 If any rule fails, packing is blocked (fail-close). Fix the evidence and re-run.
 
+### Available profiles
+
+| Profile | Rules | Domain |
+|---------|-------|--------|
+| `profiles/aws-core-controls-v1.json` | 10 | IAM, RDS, S3, CloudTrail, VPC |
+| `profiles/github-org-security-v1.json` | 10 | Org settings, branch protection, secret scanning, Dependabot |
+
 ### Examples
 
-The `examples/` directory contains two sample evidence files for the AWS Security Baseline profile:
+Each profile ships with passing and failing sample evidence:
 
 | File | Purpose |
 |------|---------|
-| `examples/aws-state-passing.json` | Passes all 10 rules. Replace with your own AWS state. |
-| `examples/aws-state-failing.json` | Fails 2 rules (MFA disabled, weak password policy). For testing fail-close. |
-| `profiles/aws-core-controls-v1.json` | The profile definition. 10 rules covering IAM, RDS, S3, CloudTrail, VPC. |
+| `examples/aws-state-passing.json` | Passes all 10 AWS rules |
+| `examples/aws-state-failing.json` | Fails 2 AWS rules (MFA disabled, weak password policy) |
+| `examples/github-state-passing.json` | Passes all 10 GitHub rules |
+| `examples/github-state-failing.json` | Fails 2 GitHub rules (2FA not required, default permissions too broad) |
 
-Create your own evidence file by exporting your AWS state. See `docs/aws-export-guide.md` for instructions.
+Create your own evidence file by exporting your state. See `docs/aws-export-guide.md` or `docs/github-export-guide.md` for instructions.
 
 ### Write your own profile
 
