@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "source": "Example with intentional failures",
+    "exported_at": "2026-03-17T10:00:00Z",
+    "account_id": "123456789012",
+    "region": "ap-northeast-1"
+  },
+  "iam": {
+    "mfa_enabled": false,
+    "root_access_key_active": false,
+    "password_policy": {
+      "minimum_length": 8,
+      "require_symbols": false,
+      "require_numbers": true,
+      "require_uppercase": false,
+      "require_lowercase": true,
+      "max_age_days": 365
+    }
+  },
+  "rds": {
+    "storage_encrypted": true,
+    "publicly_accessible": false,
+    "engine": "postgres",
+    "engine_version": "15.4"
+  },
+  "s3": {
+    "public_access_blocked": true,
+    "versioning": true
+  },
+  "cloudtrail": {
+    "is_logging": true,
+    "is_multi_region": true
+  },
+  "vpc": {
+    "flow_logs_enabled": true
+  }
+}

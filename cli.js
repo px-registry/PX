@@ -743,7 +743,142 @@ function cmdGenerate(args) {
 }
 
 // ══════════════════════════════════════════
-// Verification engine
+// Custom profile verification engine
+// ══════════════════════════════════════════
+
+/**
+ * Parse --key=value flags from args array.
+ */
+function parseFlags(args) {
+  const flags = {};
+  for (const arg of args) {
+    const m = arg.match(/^--([^=]+)=(.+)$/);
+    if (m) flags[m[1]] = m[2];
+  }
+  return flags;
+}
+
+/**
+ * Resolve a dot-notation path against a nested object.
+ * e.g. resolveDotPath(obj, "iam.password_policy.minimum_length")
+ * Returns undefined if any segment is missing.
+ */
+function resolveDotPath(obj, dotPath) {
+  const segments = dotPath.split('.');
+  let current = obj;
+  for (const seg of segments) {
+    if (current === null || current === undefined || typeof current !== 'object') {
+      return undefined;
+    }
+    current = current[seg];
+  }
+  return current;
+}
+
+/**
+ * Verify a single custom-profile rule against an evidence value.
+ * Operators: eq (default), gte, lte.
+ * Returns { pass: boolean, reason: string }
+ */
+function verifyCustomRule(value, rule) {
+  if (value === undefined || value === null) {
+    return { pass: false, reason: `path "${rule.path}" not found in evidence` };
+  }
+
+  const op = rule.operator || 'eq';
+
+  if (op === 'eq') {
+    if (value === rule.expected) {
+      return { pass: true, reason: 'ok' };
+    }
+    return { pass: false, reason: `got: ${JSON.stringify(value)}, expected: ${JSON.stringify(rule.expected)}` };
+  }
+
+  if (op === 'gte') {
+    if (typeof value !== 'number') {
+      return { pass: false, reason: `expected number for gte, got ${typeof value}` };
+    }
+    if (value >= rule.expected) {
+      return { pass: true, reason: 'ok' };
+    }
+    return { pass: false, reason: `got: ${value}, expected: >= ${rule.expected}` };
+  }
+
+  if (op === 'lte') {
+    if (typeof value !== 'number') {
+      return { pass: false, reason: `expected number for lte, got ${typeof value}` };
+    }
+    if (value <= rule.expected) {
+      return { pass: true, reason: 'ok' };
+    }
+    return { pass: false, reason: `got: ${value}, expected: <= ${rule.expected}` };
+  }
+
+  return { pass: false, reason: `unknown operator: ${op}` };
+}
+
+/**
+ * Run custom profile verification.
+ * Returns { passed: number, failed: number, total: number, results: [] }
+ */
+function runCustomVerify(profileData, evidenceData) {
+  const results = [];
+
+  for (const rule of profileData.rules) {
+    const value = resolveDotPath(evidenceData, rule.path);
+    const check = verifyCustomRule(value, rule);
+
+    results.push({
+      id: rule.id,
+      description: rule.description,
+      path: rule.path,
+      value,
+      pass: check.pass,
+      reason: check.reason,
+    });
+  }
+
+  const passed = results.filter(r => r.pass).length;
+  const failed = results.filter(r => !r.pass).length;
+
+  return { passed, failed, total: results.length, results };
+}
+
+/**
+ * Print custom verification results to terminal.
+ * Returns true if all passed.
+ */
+function printCustomVerifyResults(result, profileData) {
+  log();
+  log(`  ${CLR.bold}Profile:${CLR.reset} ${profileData.name || profileData.profile_id}`);
+  log(`  ${CLR.bold}Version:${CLR.reset} ${profileData.profile_version}`);
+  log();
+
+  // Find max id length for alignment
+  const maxLen = Math.max(...result.results.map(r => r.id.length));
+
+  for (const r of result.results) {
+    const padded = r.id.padEnd(maxLen + 2);
+    if (r.pass) {
+      log(`  ${CLR.green}✓${CLR.reset} Checking ${padded} ${CLR.green}PASS${CLR.reset}`);
+    } else {
+      log(`  ${CLR.red}✗${CLR.reset} Checking ${padded} ${CLR.red}FAIL${CLR.reset}  ${CLR.dim}(${r.reason})${CLR.reset}`);
+    }
+  }
+
+  log();
+  if (result.failed === 0) {
+    log(`  ${CLR.bold}${CLR.green}■ ALL PASS${CLR.reset} — ${result.passed}/${result.total} rules verified`);
+  } else {
+    log(`  ${CLR.bold}${CLR.red}■ FAILED${CLR.reset} — ${result.passed}/${result.total} rules passed, ${result.failed} failed`);
+  }
+  log();
+
+  return result.failed === 0;
+}
+
+// ══════════════════════════════════════════
+// Workspace verification engine (Genesis / Demo)
 // ══════════════════════════════════════════
 
 /**
@@ -843,6 +978,52 @@ function verifyEvidence(evidence, profile) {
 // ── px verify ────────────────────────────
 
 function cmdVerify(args) {
+  const flags = parseFlags(args);
+
+  // ── Custom profile mode: --profile + --evidence ──
+  if (flags.profile && flags.evidence) {
+    heading('Verifying evidence against custom profile...');
+
+    const profilePath = path.resolve(process.cwd(), flags.profile);
+    const evidencePath = path.resolve(process.cwd(), flags.evidence);
+
+    if (!fileExists(profilePath)) {
+      fail(`Profile not found: ${flags.profile}`);
+      log();
+      process.exit(1);
+    }
+    if (!fileExists(evidencePath)) {
+      fail(`Evidence not found: ${flags.evidence}`);
+      log();
+      process.exit(1);
+    }
+
+    const profileData = readJSON(profilePath);
+    const evidenceData = readJSON(evidencePath);
+
+    if (!profileData.rules || !Array.isArray(profileData.rules)) {
+      fail('Profile has no rules array.');
+      log();
+      process.exit(1);
+    }
+
+    const result = runCustomVerify(profileData, evidenceData);
+    const allPass = printCustomVerifyResults(result, profileData);
+
+    if (!allPass) {
+      info('Pack not generated.');
+      log();
+    }
+    process.exit(allPass ? 0 : 1);
+  }
+
+  if (flags.profile || flags.evidence) {
+    fail('Both --profile and --evidence are required for custom verification.');
+    log();
+    process.exit(1);
+  }
+
+  // ── Workspace mode (Genesis / Demo) ──
   heading('Verifying evidence against profiles...');
 
   // Guard: workspace must exist
@@ -958,6 +1139,140 @@ function cmdVerify(args) {
 // ── px pack ──────────────────────────────
 
 function cmdPack(args) {
+  const flags = parseFlags(args);
+
+  // ── Custom profile mode: --profile + --evidence ──
+  if (flags.profile && flags.evidence) {
+    heading('Packing custom evidence...');
+
+    const profilePath = path.resolve(process.cwd(), flags.profile);
+    const evidencePath = path.resolve(process.cwd(), flags.evidence);
+
+    if (!fileExists(profilePath)) {
+      fail(`Profile not found: ${flags.profile}`);
+      log();
+      process.exit(1);
+    }
+    if (!fileExists(evidencePath)) {
+      fail(`Evidence not found: ${flags.evidence}`);
+      log();
+      process.exit(1);
+    }
+
+    const profileData = readJSON(profilePath);
+    const evidenceData = readJSON(evidencePath);
+
+    if (!profileData.rules || !Array.isArray(profileData.rules)) {
+      fail('Profile has no rules array.');
+      log();
+      process.exit(1);
+    }
+
+    // ── FAIL-CLOSE: verify first ──
+    const result = runCustomVerify(profileData, evidenceData);
+    const allPass = printCustomVerifyResults(result, profileData);
+
+    if (!allPass) {
+      fail('FAIL-CLOSE: Cannot pack evidence with failing rules.');
+      info('Pack not generated.');
+      log();
+      process.exit(1);
+    }
+
+    // ── All rules pass. Build packet. ──
+    const now = new Date();
+    const packetId = `draft-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getTime()).slice(-4)}`;
+    const manifestRef = `mf-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getTime()).slice(-4)}`;
+
+    const profileContent = fs.readFileSync(profilePath);
+    const evidenceContent = fs.readFileSync(evidencePath);
+    const profileHash = 'sha256:' + crypto.createHash('sha256').update(profileContent).digest('hex');
+    const evidenceHash = 'sha256:' + crypto.createHash('sha256').update(evidenceContent).digest('hex');
+
+    const evidenceRefs = [{
+      evidence_id: `ev-${now.toISOString().slice(0, 10).replace(/-/g, '')}-custom`,
+      evidence_class: profileData.profile_id,
+      profile_ref: profileData.profile_id,
+      profile_hash: profileHash,
+      artifact_hash: evidenceHash,
+      schema_conformance: 'PASS',
+      fields_checked: result.total,
+      fields_passed: result.passed,
+      verified_at: now.toISOString(),
+    }];
+
+    const packet = {
+      packet_type: 'DRAFT',
+      packet_id: packetId,
+      created_at: now.toISOString(),
+      generator: `px-cli/${VERSION}`,
+      project: profileData.profile_id,
+      framework: 'CUSTOM_PROFILE',
+      evidence_count: evidenceRefs.length,
+      verification_result: 'ALL_PASS',
+      submission_state: 'NOT_SUBMITTED',
+      evidence_refs: evidenceRefs,
+    };
+
+    const packetContent = JSON.stringify(packet);
+    const packetHash = 'sha256:' + crypto.createHash('sha256').update(packetContent).digest('hex');
+
+    const manifest = {
+      manifest_type: 'DRAFT_MANIFEST',
+      manifest_ref: manifestRef,
+      packet_ref: packetId,
+      created_at: now.toISOString(),
+      generator: `px-cli/${VERSION}`,
+      project: profileData.profile_id,
+      framework: 'CUSTOM_PROFILE',
+      evidence_summary: {
+        total: evidenceRefs.length,
+        passed: evidenceRefs.length,
+        failed: 0,
+        profiles: evidenceRefs.map(e => ({
+          profile_ref: e.profile_ref,
+          evidence_class: e.evidence_class,
+          fields_checked: e.fields_checked,
+          fields_passed: e.fields_passed,
+          conformance: 'PASS',
+        })),
+      },
+      packet_hash: packetHash,
+      submission_state: 'NOT_SUBMITTED',
+      submission_id: null,
+      sct: null,
+      acceptance_receipt: null,
+      recipient_binding: null,
+      parent_manifest_refs: [],
+      clearing_batch_ref: null,
+    };
+
+    // Write to output directory beside the evidence file
+    const outputDir = path.dirname(evidencePath);
+    writeJSON(path.join(outputDir, 'draft-manifest.json'), manifest);
+    success(`Created ${path.join(path.relative(process.cwd(), outputDir), 'draft-manifest.json')}`);
+
+    writeJSON(path.join(outputDir, 'draft-packet.json'), packet);
+    success(`Created ${path.join(path.relative(process.cwd(), outputDir), 'draft-packet.json')}`);
+
+    log();
+    info(`Packet ID:  ${packetId}`);
+    info(`Evidence:   ${result.total} rules, all verified`);
+    info(`Hash:       ${packetHash.slice(0, 20)}...`);
+    log();
+    log(`  ${CLR.bold}${CLR.green}Your proof is ready for internal review.${CLR.reset}`);
+    log(`  ${CLR.dim}Open draft-manifest.json in Lens to see your verification badge.${CLR.reset}`);
+    log();
+    process.exit(0);
+  }
+
+  if (flags.profile || flags.evidence) {
+    fail('Both --profile and --evidence are required for custom packing.');
+    log();
+    process.exit(1);
+  }
+
+  // ── Workspace mode (Genesis / Demo) ──
   heading('Creating Draft Packet...');
 
   // ── Guard: workspace ──
@@ -1302,12 +1617,17 @@ function cmdHelp() {
   log(`    pack              Create a Draft Packet`);
   log(`    status            Show workspace state`);
   log();
+  log(`  ${CLR.bold}Custom Profiles:${CLR.reset}`);
+  log(`    verify --profile=<file> --evidence=<file>   Verify evidence against a custom profile`);
+  log(`    pack   --profile=<file> --evidence=<file>   Pack after custom verification`);
+  log();
   log(`  ${CLR.bold}Examples:${CLR.reset}`);
   log(`    ${CLR.cyan}px init --demo${CLR.reset}     Set up a demo workspace and explore`);
   log(`    ${CLR.cyan}px init --genesis${CLR.reset}  Verify PX's own governance files`);
   log(`    ${CLR.cyan}px generate${CLR.reset}        Generate evidence (after init)`);
   log(`    ${CLR.cyan}px verify${CLR.reset}          Check evidence against rules`);
   log(`    ${CLR.cyan}px pack${CLR.reset}            Bundle into a Draft Packet`);
+  log(`    ${CLR.cyan}px verify --profile=profiles/aws-core-controls-v1.json --evidence=my-state.json${CLR.reset}`);
   log();
   log(`  ${dimText('Draft is free. Submission is when it leaves the building.')}`);
   log();

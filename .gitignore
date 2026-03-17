@@ -1,2 +1,4 @@
 px/
 node_modules/
+examples/draft-manifest.json
+examples/draft-packet.json

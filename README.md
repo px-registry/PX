@@ -79,6 +79,50 @@ When PX Authority is established, these fields will be populated. The same packe
 
 **PX Authority is in progress. Draft is fully functional today.**
 
+## Custom Evidence Profiles
+
+PX can verify any structured evidence against any declared rules. No workspace setup required.
+
+### Verify
+
+```bash
+node cli.js verify --profile=profiles/aws-core-controls-v1.json --evidence=your-aws-state.json
+```
+
+### Pack
+
+If all checks pass, package the result:
+
+```bash
+node cli.js pack --profile=profiles/aws-core-controls-v1.json --evidence=your-aws-state.json
+```
+
+This generates `draft-manifest.json` and `draft-packet.json` alongside the evidence file. Open the manifest in `lens.html` to see your verification badge.
+
+If any rule fails, packing is blocked (fail-close). Fix the evidence and re-run.
+
+### Examples
+
+The `examples/` directory contains two sample evidence files for the AWS Security Baseline profile:
+
+| File | Purpose |
+|------|---------|
+| `examples/aws-state-passing.json` | Passes all 10 rules. Replace with your own AWS state. |
+| `examples/aws-state-failing.json` | Fails 2 rules (MFA disabled, weak password policy). For testing fail-close. |
+| `profiles/aws-core-controls-v1.json` | The profile definition. 10 rules covering IAM, RDS, S3, CloudTrail, VPC. |
+
+Create your own evidence file by exporting your AWS state. See `docs/aws-export-guide.md` for instructions.
+
+### Write your own profile
+
+A profile is a JSON file with a `rules` array. Each rule has:
+
+- `id` — unique rule identifier
+- `description` — human-readable explanation
+- `path` — dot-notation path into the evidence JSON (e.g. `iam.password_policy.minimum_length`)
+- `expected` — the value to check against
+- `operator` — `eq` (default), `gte`, or `lte`
+
 ## Try the demo
 
 To see PX verify sample SOC 2 evidence instead:
