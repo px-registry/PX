@@ -2,6 +2,25 @@
 
 PX makes proof you can hand off.
 
+## Quick Start: Verify AWS Controls
+
+```bash
+# Clone the repo
+git clone https://github.com/px-registry/PX.git
+cd PX
+
+# Run verification against the sample passing evidence
+node cli.js verify --profile=profiles/aws-core-controls-v1.json --evidence=examples/aws-state-passing.json
+
+# See what failure looks like
+node cli.js verify --profile=profiles/aws-core-controls-v1.json --evidence=examples/aws-state-failing.json
+
+# If all pass, package the result
+node cli.js pack --profile=profiles/aws-core-controls-v1.json --evidence=examples/aws-state-passing.json
+```
+
+Replace `examples/aws-state-passing.json` with your own AWS state. See `docs/aws-export-guide.md` for how to export.
+
 ## Genesis Draft
 
 This repository contains PX's first Draft Packet.

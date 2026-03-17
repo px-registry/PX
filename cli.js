@@ -998,8 +998,23 @@ function cmdVerify(args) {
       process.exit(1);
     }
 
-    const profileData = readJSON(profilePath);
-    const evidenceData = readJSON(evidencePath);
+    let profileData, evidenceData;
+    try {
+      profileData = readJSON(profilePath);
+    } catch (e) {
+      fail(`Profile is not valid JSON: ${flags.profile}`);
+      info(e.message);
+      log();
+      process.exit(1);
+    }
+    try {
+      evidenceData = readJSON(evidencePath);
+    } catch (e) {
+      fail(`Evidence is not valid JSON: ${flags.evidence}`);
+      info(e.message);
+      log();
+      process.exit(1);
+    }
 
     if (!profileData.rules || !Array.isArray(profileData.rules)) {
       fail('Profile has no rules array.');
@@ -1159,8 +1174,23 @@ function cmdPack(args) {
       process.exit(1);
     }
 
-    const profileData = readJSON(profilePath);
-    const evidenceData = readJSON(evidencePath);
+    let profileData, evidenceData;
+    try {
+      profileData = readJSON(profilePath);
+    } catch (e) {
+      fail(`Profile is not valid JSON: ${flags.profile}`);
+      info(e.message);
+      log();
+      process.exit(1);
+    }
+    try {
+      evidenceData = readJSON(evidencePath);
+    } catch (e) {
+      fail(`Evidence is not valid JSON: ${flags.evidence}`);
+      info(e.message);
+      log();
+      process.exit(1);
+    }
 
     if (!profileData.rules || !Array.isArray(profileData.rules)) {
       fail('Profile has no rules array.');
