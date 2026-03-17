@@ -20,8 +20,8 @@ It will show **amber** (internal only). All checks pass, but the proof has not b
 Note: The `genesis/` directory contains our committed reference output. When you run the CLI locally, your reproduced output will be generated in `./px/output/`.
 
 ```
-git clone https://github.com/anthropics/px
-cd px
+git clone https://github.com/px-registry/PX
+cd PX
 
 node cli.js init --genesis
 node cli.js generate
