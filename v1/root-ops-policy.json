@@ -1,0 +1,57 @@
+{
+  "payload": {
+    "version": "root-ops-policy/v1",
+    "policy_id": "ROOT_OPS_POLICY_SEED",
+    "policy_epoch": "1",
+    "generated_at_utc": "2026-03-07T00:00:00.000Z",
+    "canonicalization": "RFC8785_JCS",
+    "status_projection_policy": {
+      "projection_id": "STATUS_PROJECTION_V1",
+      "allowed_public_field_ids": [
+        "current_trust_store_epoch",
+        "current_canon_payload_sha256_b64u",
+        "current_release_manifest_payload_sha256_b64u",
+        "active_issuer_count",
+        "active_lane_count",
+        "current_pricing_policy_payload_sha256_b64u"
+      ],
+      "forbidden_public_classes": [
+        "CUSTOMER_IDENTIFIER",
+        "BILLING_ACCOUNT_DETAIL",
+        "INCIDENT_IDENTIFIER",
+        "PROOF_PATH",
+        "INTERNAL_FILE_PATH",
+        "PRIVATE_KEY_MATERIAL"
+      ]
+    },
+    "future_extension_hooks": {
+      "must_use_governance_vocabulary_ref": {
+        "path": "/v1/governance-vocabulary.json",
+        "payload_sha256_b64u": "i4HTG5rwJw63ioQKIm8Aq18NuYHrjQxQQ6wqSUJ1ZHM"
+      },
+      "must_use_verification_basis_registry_ref": {
+        "path": "/v1/verification-basis-registry.json",
+        "payload_sha256_b64u": "LCkoOc9rq28G0Epe0COYd7UhWonexeZxWkKn_gwh_sE"
+      },
+      "must_use_evidence_profile_registry_ref": {
+        "path": "/v1/evidence-profile-registry.json",
+        "payload_sha256_b64u": "vIosQOPpmLIGjJtMk1NWlTBqe8cxZ-HXPgvwTeoVS04"
+      },
+      "reserved_attestor_receipt_classes": [
+        "ATTESTOR_RECEIPT_RESERVED"
+      ],
+      "reserved_witness_receipt_classes": [
+        "WITNESS_RECEIPT_RESERVED"
+      ],
+      "reserved_agentic_namespaces": [
+        "urn:px:agentic:",
+        "urn:px:mcp:"
+      ]
+    }
+  },
+  "signature": {
+    "sig_alg": "ed25519",
+    "root_key_id": "urn:px:root-key:2026-45a",
+    "signature_b64u": "jnQZok1Gmj2hHkBrw5KMudbB_RaL8lVzvCobxIOQCWtsTvouNV7RQcf0td0Mu3weWnj2Ol24VrnpsEF1OwpbDg"
+  }
+}

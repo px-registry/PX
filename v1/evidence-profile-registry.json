@@ -1,0 +1,46 @@
+{
+  "payload": {
+    "version": "evidence-profile-registry/v1",
+    "root_anchor_id": "urn:px:root:v1",
+    "generated_at_utc": "2026-03-07T00:00:00.000Z",
+    "canonicalization": "RFC8785_JCS",
+    "registry_epoch": "1",
+    "evidence_profiles": [
+      {
+        "id": "INTERNAL_CONTROL_BASIC_V1",
+        "title": "Internal Control Basic v1",
+        "summary": "Evidence profile for operations under internal organizational controls with standard audit trail"
+      },
+      {
+        "id": "EXTERNAL_SUBMISSION_SCT_V1",
+        "title": "External Submission SCT v1",
+        "summary": "Evidence profile for externally submitted credentials requiring signed credential token verification"
+      },
+      {
+        "id": "AUDITOR_WORKPAPER_V1",
+        "title": "Auditor Workpaper v1",
+        "summary": "Evidence profile for auditor workpaper packages supporting compliance and assurance reviews"
+      },
+      {
+        "id": "SETTLEMENT_CLEARING_V1",
+        "title": "Settlement Clearing v1",
+        "summary": "Evidence profile for settlement and clearing operations requiring financial reconciliation evidence"
+      },
+      {
+        "id": "RELEASE_REPRODUCIBILITY_V1",
+        "title": "Release Reproducibility v1",
+        "summary": "Evidence profile for software release verification requiring build reproducibility evidence"
+      },
+      {
+        "id": "ISSUER_ADMISSION_V1",
+        "title": "Issuer Admission v1",
+        "summary": "Evidence profile for issuer admission process requiring onboarding and compliance evidence"
+      }
+    ]
+  },
+  "signature": {
+    "sig_alg": "ed25519",
+    "root_key_id": "urn:px:root-key:2026-45a",
+    "signature_b64u": "GA_59kxMbF3FFVdM4JR67962e1NcjkwpK9JLBmceZZK2w1ENVKADwvosj7LwOurB4oF6D3pLfLEWettvzY7aAQ"
+  }
+}

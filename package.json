@@ -1,0 +1,25 @@
+{
+  "name": "px",
+  "version": "0.1.0",
+  "description": "PX makes proof you can hand off.",
+  "main": "cli.js",
+  "bin": {
+    "px": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js"
+  },
+  "keywords": [
+    "proof",
+    "audit",
+    "compliance",
+    "evidence",
+    "verification",
+    "soc2"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

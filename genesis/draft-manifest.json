@@ -1,0 +1,59 @@
+{
+  "manifest_type": "DRAFT_MANIFEST",
+  "manifest_ref": "mf-20260317-3719",
+  "packet_ref": "draft-20260317-3719",
+  "created_at": "2026-03-17T02:36:33.719Z",
+  "generator": "px-cli/0.1.0",
+  "project": "px-genesis",
+  "framework": "PX_SELF_VERIFICATION",
+  "evidence_summary": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "profiles": [
+      {
+        "profile_ref": "px-delegation-policy",
+        "evidence_class": "delegation-policy",
+        "fields_checked": 6,
+        "fields_passed": 6,
+        "conformance": "PASS"
+      },
+      {
+        "profile_ref": "px-evidence-profile-registry",
+        "evidence_class": "evidence-profile-registry",
+        "fields_checked": 6,
+        "fields_passed": 6,
+        "conformance": "PASS"
+      },
+      {
+        "profile_ref": "px-governance-vocabulary",
+        "evidence_class": "governance-vocabulary",
+        "fields_checked": 6,
+        "fields_passed": 6,
+        "conformance": "PASS"
+      },
+      {
+        "profile_ref": "px-root-ops-policy",
+        "evidence_class": "root-ops-policy",
+        "fields_checked": 6,
+        "fields_passed": 6,
+        "conformance": "PASS"
+      },
+      {
+        "profile_ref": "px-verification-basis",
+        "evidence_class": "verification-basis",
+        "fields_checked": 6,
+        "fields_passed": 6,
+        "conformance": "PASS"
+      }
+    ]
+  },
+  "packet_hash": "sha256:9584aa9cedb2fdb7f96592fa7724d5c9b1639e1ebaab176e66a09e450cd2d7a6",
+  "submission_state": "NOT_SUBMITTED",
+  "submission_id": null,
+  "sct": null,
+  "acceptance_receipt": null,
+  "recipient_binding": null,
+  "parent_manifest_refs": [],
+  "clearing_batch_ref": null
+}

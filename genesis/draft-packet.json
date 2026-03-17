@@ -1,0 +1,63 @@
+{
+  "packet_type": "DRAFT",
+  "packet_id": "draft-20260317-3719",
+  "created_at": "2026-03-17T02:36:33.719Z",
+  "generator": "px-cli/0.1.0",
+  "project": "px-genesis",
+  "framework": "PX_SELF_VERIFICATION",
+  "evidence_count": 5,
+  "verification_result": "ALL_PASS",
+  "submission_state": "NOT_SUBMITTED",
+  "evidence_refs": [
+    {
+      "evidence_id": "ev-20260317-px-delegation-policy",
+      "evidence_class": "delegation-policy",
+      "profile_ref": "px-delegation-policy",
+      "artifact_hash": "sha256:60e79ef8cf26ae99c5bf8e9651d12de2ea801d914209470e41db35c9f11ff32b",
+      "schema_conformance": "PASS",
+      "fields_checked": 6,
+      "fields_passed": 6,
+      "verified_at": "2026-03-17T02:35:28.160Z"
+    },
+    {
+      "evidence_id": "ev-20260317-px-evidence-profile-registry",
+      "evidence_class": "evidence-profile-registry",
+      "profile_ref": "px-evidence-profile-registry",
+      "artifact_hash": "sha256:9c50b2a9996e4ea3796e5c3dc7d27a87ccef39dc336c07852a56faccf82f62ee",
+      "schema_conformance": "PASS",
+      "fields_checked": 6,
+      "fields_passed": 6,
+      "verified_at": "2026-03-17T02:35:28.167Z"
+    },
+    {
+      "evidence_id": "ev-20260317-px-governance-vocabulary",
+      "evidence_class": "governance-vocabulary",
+      "profile_ref": "px-governance-vocabulary",
+      "artifact_hash": "sha256:62c5b3ad33e2f840039dff3187f610d3daed3e0e2d9e17ad89a59dba77edfa2b",
+      "schema_conformance": "PASS",
+      "fields_checked": 6,
+      "fields_passed": 6,
+      "verified_at": "2026-03-17T02:35:28.170Z"
+    },
+    {
+      "evidence_id": "ev-20260317-px-root-ops-policy",
+      "evidence_class": "root-ops-policy",
+      "profile_ref": "px-root-ops-policy",
+      "artifact_hash": "sha256:76464046ec0000b64793ca84dc86d44f1d4f24b6d7b5567baf3f3eed964d987c",
+      "schema_conformance": "PASS",
+      "fields_checked": 6,
+      "fields_passed": 6,
+      "verified_at": "2026-03-17T02:35:28.172Z"
+    },
+    {
+      "evidence_id": "ev-20260317-px-verification-basis",
+      "evidence_class": "verification-basis",
+      "profile_ref": "px-verification-basis",
+      "artifact_hash": "sha256:a9c0f07dd22b7b56b3c46d846e5f028d0760696e9f917f4f93ce87949fd7d4b1",
+      "schema_conformance": "PASS",
+      "fields_checked": 6,
+      "fields_passed": 6,
+      "verified_at": "2026-03-17T02:35:28.174Z"
+    }
+  ]
+}

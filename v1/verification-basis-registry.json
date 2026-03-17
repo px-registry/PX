@@ -1,0 +1,41 @@
+{
+  "payload": {
+    "version": "verification-basis-registry/v1",
+    "root_anchor_id": "urn:px:root:v1",
+    "generated_at_utc": "2026-03-07T00:00:00.000Z",
+    "canonicalization": "RFC8785_JCS",
+    "registry_epoch": "1",
+    "basis_entries": [
+      {
+        "id": "EVENT_PACK_INTERNAL_V1",
+        "title": "Event Pack Internal v1",
+        "summary": "Verification basis for internally generated event packs within a single operator boundary"
+      },
+      {
+        "id": "EVENT_PACK_EXTERNAL_SCT_V1",
+        "title": "Event Pack External SCT v1",
+        "summary": "Verification basis for event packs containing externally issued signed credential tokens"
+      },
+      {
+        "id": "RELEASE_ATTESTATION_V1",
+        "title": "Release Attestation v1",
+        "summary": "Verification basis for software release attestation with build reproducibility evidence"
+      },
+      {
+        "id": "SETTLEMENT_STATEMENT_V1",
+        "title": "Settlement Statement v1",
+        "summary": "Verification basis for settlement statements with debit proof chain verification"
+      },
+      {
+        "id": "ISSUER_ONBOARDING_PACK_V1",
+        "title": "Issuer Onboarding Pack v1",
+        "summary": "Verification basis for issuer onboarding documentation and admission evidence"
+      }
+    ]
+  },
+  "signature": {
+    "sig_alg": "ed25519",
+    "root_key_id": "urn:px:root-key:2026-45a",
+    "signature_b64u": "xyRwNPYRBc3i3SCNbo5cdce7i0Hq_kVyLpIX8mq4MmDl6rDBmGHpZKNd4bgzhOCquNZkTuwFeaty2MpdLZrVAg"
+  }
+}

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PX Lens</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FFFFFF;--warm:#F7F6F3;--cool:#F2F3F5;
+  --ink:#1A1A1A;--ink70:rgba(26,26,26,.7);--ink45:rgba(26,26,26,.45);--ink20:rgba(26,26,26,.2);--ink08:rgba(26,26,26,.08);--ink04:rgba(26,26,26,.04);
+  --green:#16A34A;--green-bg:#F0FDF4;--green-bdr:#BBF7D0;
+  --amber:#D97706;--amber-bg:#FFFBEB;--amber-bdr:#FDE68A;
+  --red:#DC2626;--red-bg:#FEF2F2;--red-bdr:#FECACA;
+  --grey:#9CA3AF;
+  --fd:'Segoe UI',system-ui,sans-serif;--fm:'SF Mono','Cascadia Code','Consolas',monospace;
+  --r:12px;--rs:8px;
+}
+html{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--fd);line-height:1.6;min-height:100%;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:0 24px;width:100%}
+
+/* header */
+.hd{padding:16px 0;border-bottom:1px solid var(--ink08)}
+.hd__inner{display:flex;align-items:center;gap:12px}
+.hd__logo{font-weight:800;font-size:16px;letter-spacing:-.02em}
+.hd__sep{color:var(--ink20);font-weight:300}
+.hd__label{font-size:14px;color:var(--ink45);font-weight:500}
+.hd__privacy{margin-left:auto;font-size:11px;color:var(--ink45);display:flex;align-items:center;gap:4px}
+.hd__privacy svg{flex-shrink:0}
+
+/* drop zone */
+.drop{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;text-align:center;transition:background .15s}
+.drop--over{background:var(--ink04)}
+.drop__icon{font-size:48px;color:var(--ink20);margin-bottom:20px}
+.drop__title{font-size:18px;font-weight:700;margin-bottom:6px}
+.drop__sub{font-size:14px;color:var(--ink45);margin-bottom:24px;max-width:360px}
+.drop__btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;background:var(--ink);color:#fff;border:none;border-radius:var(--rs);font-family:var(--fd);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.drop__btn:hover{background:#333}
+.drop__or{font-size:12px;color:var(--ink20);margin-top:10px}
+.drop__hint{font-size:12px;color:var(--ink20);margin-top:24px}
+#file-input{display:none}
+
+/* result container */
+.result{padding:40px 0 80px;display:none}
+.result--visible{display:block}
+
+/* badge */
+.badge-wrap{display:flex;flex-direction:column;align-items:center;padding:32px 0 24px}
+.badge{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.badge--green{background:var(--green);box-shadow:0 0 0 6px var(--green-bg),0 6px 24px rgba(22,163,74,.12)}
+.badge--amber{background:var(--amber);box-shadow:0 0 0 6px var(--amber-bg),0 6px 24px rgba(217,119,6,.12)}
+.badge--red{background:var(--red);box-shadow:0 0 0 6px var(--red-bg),0 6px 24px rgba(220,38,38,.12)}
+.badge__icon{font-size:36px;color:#fff}
+.badge-label{margin-top:14px;font-weight:700;font-size:17px;text-align:center}
+.badge-meaning{margin-top:4px;font-size:14px;color:var(--ink45);text-align:center;max-width:400px;line-height:1.55}
+.badge-action{margin-top:14px;padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:500;text-align:center}
+.badge-action--green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bdr)}
+.badge-action--amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bdr)}
+
+/* meta table */
+.meta{margin-top:32px;border:1px solid var(--ink08);border-radius:var(--r);overflow:hidden}
+.meta__header{padding:12px 20px;background:var(--warm);font-size:13px;font-weight:700;border-bottom:1px solid var(--ink08)}
+.meta__row{display:flex;align-items:baseline;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--ink04);gap:16px}
+.meta__row:last-child{border-bottom:none}
+.meta__key{font-size:13px;color:var(--ink45);flex-shrink:0}
+.meta__val{font-size:13px;font-family:var(--fm);text-align:right;word-break:break-all}
+.meta__val--null{color:var(--ink20)}
+.meta__val--green{color:var(--green);font-weight:600}
+
+/* evidence table */
+.evidence{margin-top:20px;border:1px solid var(--ink08);border-radius:var(--r);overflow:hidden}
+.ev__header{padding:12px 20px;background:var(--warm);font-size:13px;font-weight:700;border-bottom:1px solid var(--ink08);display:flex;justify-content:space-between}
+.ev__row{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--ink04);gap:12px}
+.ev__row:last-child{border-bottom:none}
+.ev__name{font-size:13px;font-weight:500;flex:1}
+.ev__class{font-size:11px;font-family:var(--fm);color:var(--ink45);flex-shrink:0;margin-right:12px}
+.ev__fields{font-size:12px;color:var(--ink45);flex-shrink:0;margin-right:12px;font-family:var(--fm)}
+.ev__result{font-size:12px;font-family:var(--fm);font-weight:600;flex-shrink:0}
+.ev__result--pass{color:var(--green)}
+.ev__result--fail{color:var(--red)}
+
+/* boundary section */
+.boundary{margin-top:20px;border:1px solid var(--ink08);border-radius:var(--r);overflow:hidden}
+.boundary__header{padding:12px 20px;background:var(--warm);font-size:13px;font-weight:700;border-bottom:1px solid var(--ink08)}
+.boundary__row{display:flex;align-items:baseline;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--ink04);gap:16px}
+.boundary__row:last-child{border-bottom:none}
+.boundary__key{font-size:13px;color:var(--ink45);flex-shrink:0}
+.boundary__val{font-size:13px;font-family:var(--fm);text-align:right;word-break:break-all}
+.boundary__val--null{color:var(--ink20)}
+.boundary__val--present{color:var(--green);font-weight:600}
+
+/* reload */
+.reload{margin-top:32px;text-align:center}
+.reload__btn{background:none;border:1px solid var(--ink08);border-radius:var(--rs);padding:8px 18px;font-family:var(--fd);font-size:13px;color:var(--ink45);cursor:pointer;transition:all .15s}
+.reload__btn:hover{border-color:var(--ink20);color:var(--ink70)}
+
+/* error state */
+.error-detail{margin-top:12px;padding:16px 20px;background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:var(--r);font-size:13px;color:var(--red);font-family:var(--fm);word-break:break-all}
+
+/* responsive */
+@media(max-width:480px){
+  .meta__row,.boundary__row{flex-direction:column;gap:2px}
+  .meta__val,.boundary__val{text-align:left}
+  .ev__class{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="hd"><div class="wrap">
+  <div class="hd__inner">
+    <span class="hd__logo">PX</span>
+    <span class="hd__sep">/</span>
+    <span class="hd__label">Lens</span>
+    <span class="hd__privacy">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      Runs entirely in your browser. No data leaves your machine.
+    </span>
+  </div>
+</div></header>
+
+<!-- Drop zone (initial state) -->
+<div class="drop" id="drop-zone">
+  <div class="drop__icon">&#9673;</div>
+  <div class="drop__title">Open a PX manifest</div>
+  <div class="drop__sub">Drop a <strong>draft-manifest.json</strong> here, or click to select a file.</div>
+  <button class="drop__btn" onclick="document.getElementById('file-input').click()">Select manifest file</button>
+  <div class="drop__or">or drag and drop</div>
+  <input type="file" id="file-input" accept=".json">
+  <div class="drop__hint">Accepts draft-manifest.json or submission-manifest.json</div>
+</div>
+
+<!-- Result view (after loading) -->
+<div class="result" id="result">
+  <div class="wrap">
+
+    <!-- Badge -->
+    <div class="badge-wrap">
+      <div class="badge" id="badge"><span class="badge__icon" id="badge-icon"></span></div>
+      <div class="badge-label" id="badge-label"></div>
+      <div class="badge-meaning" id="badge-meaning"></div>
+      <div class="badge-action" id="badge-action"></div>
+    </div>
+
+    <!-- Manifest metadata -->
+    <div class="meta">
+      <div class="meta__header">Manifest</div>
+      <div class="meta__row"><span class="meta__key">Reference</span><span class="meta__val" id="m-ref"></span></div>
+      <div class="meta__row"><span class="meta__key">Packet</span><span class="meta__val" id="m-packet"></span></div>
+      <div class="meta__row"><span class="meta__key">Project</span><span class="meta__val" id="m-project"></span></div>
+      <div class="meta__row"><span class="meta__key">Framework</span><span class="meta__val" id="m-framework"></span></div>
+      <div class="meta__row"><span class="meta__key">Created</span><span class="meta__val" id="m-created"></span></div>
+      <div class="meta__row"><span class="meta__key">Packet hash</span><span class="meta__val" id="m-hash"></span></div>
+    </div>
+
+    <!-- Evidence summary -->
+    <div class="evidence" id="evidence-section">
+      <div class="ev__header">
+        <span>Evidence</span>
+        <span id="ev-summary"></span>
+      </div>
+      <div id="ev-rows"></div>
+    </div>
+
+    <!-- Submission boundary -->
+    <div class="boundary">
+      <div class="boundary__header">Submission state</div>
+      <div class="boundary__row"><span class="boundary__key">Submission ID</span><span class="boundary__val" id="b-subid"></span></div>
+      <div class="boundary__row"><span class="boundary__key">Sealed timestamp (SCT)</span><span class="boundary__val" id="b-sct"></span></div>
+      <div class="boundary__row"><span class="boundary__key">Acceptance receipt</span><span class="boundary__val" id="b-receipt"></span></div>
+      <div class="boundary__row"><span class="boundary__key">Recipient binding</span><span class="boundary__val" id="b-recipient"></span></div>
+    </div>
+
+    <!-- Reload -->
+    <div class="reload">
+      <button class="reload__btn" onclick="reset()">Load another manifest</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// THE SINGLE DERIVATION FUNCTION
+// ══════════════════════════════════════════
+//
+// This is the only place where state is determined.
+// No separate code paths for Draft vs Submission.
+// The JSON data dictates the UI.
+
+function deriveManifestState(manifest) {
+  // Structural validation first
+  if (!manifest || typeof manifest !== 'object') {
+    return { state: 'INVALID', reason: 'Not a valid JSON object.' };
+  }
+  if (!manifest.manifest_type) {
+    return { state: 'INVALID', reason: 'Missing manifest_type field.' };
+  }
+  if (!manifest.evidence_summary) {
+    return { state: 'INVALID', reason: 'Missing evidence_summary field.' };
+  }
+  if (!manifest.packet_ref) {
+    return { state: 'INVALID', reason: 'Missing packet_ref field.' };
+  }
+
+  // State derivation: check the 4 boundary fields
+  var hasSubmissionId = manifest.submission_id !== null && manifest.submission_id !== undefined;
+  var hasSct = manifest.sct !== null && manifest.sct !== undefined;
+  var hasReceipt = manifest.acceptance_receipt !== null && manifest.acceptance_receipt !== undefined;
+  var hasRecipient = manifest.recipient_binding !== null && manifest.recipient_binding !== undefined;
+
+  if (hasSubmissionId && hasSct && hasReceipt && hasRecipient) {
+    return { state: 'GREEN' };
+  }
+
+  return { state: 'AMBER' };
+}
+
+// ══════════════════════════════════════════
+// Rendering
+// ══════════════════════════════════════════
+
+function renderManifest(manifest) {
+  var derived = deriveManifestState(manifest);
+
+  // Hide drop zone, show result
+  document.getElementById('drop-zone').style.display = 'none';
+  var result = document.getElementById('result');
+  result.classList.add('result--visible');
+
+  if (derived.state === 'INVALID') {
+    renderError(derived.reason);
+    return;
+  }
+
+  if (derived.state === 'GREEN') {
+    renderGreen(manifest);
+  } else {
+    renderAmber(manifest);
+  }
+
+  renderMeta(manifest);
+  renderEvidence(manifest);
+  renderBoundary(manifest, derived.state);
+}
+
+function renderGreen(manifest) {
+  var badge = document.getElementById('badge');
+  badge.className = 'badge badge--green';
+  document.getElementById('badge-icon').textContent = '\u2713';
+  document.getElementById('badge-label').textContent = 'Verified';
+  document.getElementById('badge-meaning').textContent =
+    'This submission is verified, sealed, and ready for external review.';
+  var action = document.getElementById('badge-action');
+  action.className = 'badge-action badge-action--green';
+  action.textContent = 'Proceed to external review.';
+}
+
+function renderAmber(manifest) {
+  var badge = document.getElementById('badge');
+  badge.className = 'badge badge--amber';
+  document.getElementById('badge-icon').textContent = '\u25CF';
+  document.getElementById('badge-label').textContent = 'Internal only';
+  document.getElementById('badge-meaning').textContent =
+    'The evidence is verified internally, but the formal submission step has not happened yet.';
+  var action = document.getElementById('badge-action');
+  action.className = 'badge-action badge-action--amber';
+  action.textContent = 'Review internally or move to Submission when PX Authority is available.';
+}
+
+function renderError(reason) {
+  var badge = document.getElementById('badge');
+  badge.className = 'badge badge--red';
+  document.getElementById('badge-icon').textContent = '\u2717';
+  document.getElementById('badge-label').textContent = 'Invalid Manifest';
+  document.getElementById('badge-meaning').textContent =
+    'This file could not be read as a valid PX manifest.';
+  var action = document.getElementById('badge-action');
+  action.className = '';
+  action.textContent = '';
+
+  // Show error detail below badge
+  var errorDiv = document.createElement('div');
+  errorDiv.className = 'error-detail';
+  errorDiv.textContent = reason;
+  document.querySelector('.badge-wrap').appendChild(errorDiv);
+
+  // Hide other sections
+  document.querySelector('.meta').style.display = 'none';
+  document.getElementById('evidence-section').style.display = 'none';
+  document.querySelector('.boundary').style.display = 'none';
+}
+
+function renderMeta(manifest) {
+  document.getElementById('m-ref').textContent = manifest.manifest_ref || '—';
+  document.getElementById('m-packet').textContent = manifest.packet_ref || '—';
+  document.getElementById('m-project').textContent = manifest.project || '—';
+  document.getElementById('m-framework').textContent = manifest.framework || '—';
+  document.getElementById('m-created').textContent = formatDate(manifest.created_at);
+  document.getElementById('m-hash').textContent = manifest.packet_hash || '—';
+}
+
+function renderEvidence(manifest) {
+  var summary = manifest.evidence_summary;
+  if (!summary) return;
+
+  var summaryEl = document.getElementById('ev-summary');
+  summaryEl.textContent = summary.passed + '/' + summary.total + ' passed';
+  summaryEl.style.color = summary.failed > 0 ? 'var(--red)' : 'var(--green)';
+  summaryEl.style.fontWeight = '600';
+  summaryEl.style.fontSize = '12px';
+  summaryEl.style.fontFamily = 'var(--fm)';
+
+  var container = document.getElementById('ev-rows');
+  container.innerHTML = '';
+
+  var profiles = summary.profiles || [];
+  for (var i = 0; i < profiles.length; i++) {
+    var p = profiles[i];
+    var row = document.createElement('div');
+    row.className = 'ev__row';
+
+    var pass = p.conformance === 'PASS';
+    row.innerHTML =
+      '<span class="ev__name">' + escapeHtml(p.profile_ref) + '</span>' +
+      '<span class="ev__class">' + escapeHtml(p.evidence_class || '') + '</span>' +
+      '<span class="ev__fields">' + p.fields_passed + '/' + p.fields_checked + '</span>' +
+      '<span class="ev__result ' + (pass ? 'ev__result--pass' : 'ev__result--fail') + '">' +
+        (pass ? 'PASS' : 'FAIL') +
+      '</span>';
+
+    container.appendChild(row);
+  }
+}
+
+function renderBoundary(manifest, state) {
+  setBoundaryField('b-subid', manifest.submission_id, state);
+  setBoundaryField('b-sct', manifest.sct, state);
+  setBoundaryField('b-receipt', manifest.acceptance_receipt, state);
+  setBoundaryField('b-recipient', manifest.recipient_binding, state);
+}
+
+function setBoundaryField(id, value, state) {
+  var el = document.getElementById(id);
+  if (value !== null && value !== undefined) {
+    el.textContent = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    el.className = 'boundary__val boundary__val--present';
+  } else {
+    el.textContent = '\u2014  (not submitted)';
+    el.className = 'boundary__val boundary__val--null';
+  }
+}
+
+// ══════════════════════════════════════════
+// File handling
+// ══════════════════════════════════════════
+
+function handleFile(file) {
+  if (!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result;
+    var manifest;
+
+    try {
+      manifest = JSON.parse(text);
+    } catch (err) {
+      renderManifest(null);
+      // Re-render with parse error
+      reset();
+      document.getElementById('drop-zone').style.display = 'none';
+      var result = document.getElementById('result');
+      result.classList.add('result--visible');
+      renderError('Failed to parse JSON: ' + err.message);
+      return;
+    }
+
+    renderManifest(manifest);
+  };
+
+  reader.onerror = function() {
+    renderManifest(null);
+  };
+
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════════
+// Drag and drop
+// ══════════════════════════════════════════
+
+var dropZone = document.getElementById('drop-zone');
+
+dropZone.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  dropZone.classList.add('drop--over');
+});
+
+dropZone.addEventListener('dragleave', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  dropZone.classList.remove('drop--over');
+});
+
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  dropZone.classList.remove('drop--over');
+  var files = e.dataTransfer.files;
+  if (files.length > 0) handleFile(files[0]);
+});
+
+// File input
+document.getElementById('file-input').addEventListener('change', function(e) {
+  if (e.target.files.length > 0) handleFile(e.target.files[0]);
+});
+
+// ══════════════════════════════════════════
+// Reset
+// ══════════════════════════════════════════
+
+function reset() {
+  document.getElementById('drop-zone').style.display = '';
+  var result = document.getElementById('result');
+  result.classList.remove('result--visible');
+
+  // Clear dynamic content
+  document.getElementById('ev-rows').innerHTML = '';
+  document.getElementById('badge-icon').textContent = '';
+  document.getElementById('badge-label').textContent = '';
+  document.getElementById('badge-meaning').textContent = '';
+  document.getElementById('badge-action').textContent = '';
+  document.getElementById('badge-action').className = 'badge-action';
+
+  // Remove any error details
+  var errors = document.querySelectorAll('.error-detail');
+  for (var i = 0; i < errors.length; i++) errors[i].remove();
+
+  // Restore hidden sections
+  document.querySelector('.meta').style.display = '';
+  document.getElementById('evidence-section').style.display = '';
+  document.querySelector('.boundary').style.display = '';
+
+  // Reset file input
+  document.getElementById('file-input').value = '';
+}
+
+// ══════════════════════════════════════════
+// Helpers
+// ══════════════════════════════════════════
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  try {
+    var d = new Date(iso);
+    return d.toLocaleDateString(undefined, {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  } catch (e) {
+    return iso;
+  }
+}
+</script>
+
+</body>
+</html>

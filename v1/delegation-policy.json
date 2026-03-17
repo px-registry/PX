@@ -1,0 +1,36 @@
+{
+  "payload": {
+    "version": "delegation-policy/v1",
+    "policy_id": "DELEGATION_POLICY_SEED",
+    "policy_epoch": "1",
+    "generated_at_utc": "2026-03-07T00:00:00.000Z",
+    "canonicalization": "RFC8785_JCS",
+    "reserved_delegation_scopes": [
+      {
+        "id": "ATTESTOR_REGISTRY_SIGNING",
+        "title": "Attestor Registry Signing",
+        "summary": "Reserved delegation scope for future attestor registry signing authority"
+      },
+      {
+        "id": "STATUS_SIGNING",
+        "title": "Status Signing",
+        "summary": "Reserved delegation scope for future status document signing authority"
+      },
+      {
+        "id": "CLEARING_STATEMENT_SIGNING",
+        "title": "Clearing Statement Signing",
+        "summary": "Reserved delegation scope for future clearing statement signing authority"
+      },
+      {
+        "id": "CLAUSE_REGISTRY_SIGNING",
+        "title": "Clause Registry Signing",
+        "summary": "Reserved delegation scope for future clause registry signing authority"
+      }
+    ]
+  },
+  "signature": {
+    "sig_alg": "ed25519",
+    "root_key_id": "urn:px:root-key:2026-45a",
+    "signature_b64u": "dtwDHlxScKvjFalC9qLbzc-VO17g8Xeu6gF3AS_3sccoUuTCLetd3KqXk2mNZiu_pKCk8c5VMfBjUZj6KjXoDw"
+  }
+}

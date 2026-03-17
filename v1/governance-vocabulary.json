@@ -1,0 +1,289 @@
+{
+  "payload": {
+    "version": "governance-vocabulary/v1",
+    "root_anchor_id": "urn:px:root:v1",
+    "generated_at_utc": "2026-03-07T00:00:00.000Z",
+    "canonicalization": "RFC8785_JCS",
+    "vocabulary_epoch": "1",
+    "role_classes": [
+      {
+        "id": "ROOT_OPERATOR",
+        "title": "Root Operator",
+        "summary": "Holder of the root signing key with authority over all trust anchors and canonical documents"
+      },
+      {
+        "id": "POLICY_APPROVER",
+        "title": "Policy Approver",
+        "summary": "Authorized to approve changes to governance policies and registry contents"
+      },
+      {
+        "id": "REGISTRY_MAINTAINER",
+        "title": "Registry Maintainer",
+        "summary": "Authorized to maintain and update registry contents within approved policy bounds"
+      },
+      {
+        "id": "ISSUER_OPERATOR",
+        "title": "Issuer Operator",
+        "summary": "Operator of an issuer node authorized to issue and manage credentials within assigned lanes"
+      },
+      {
+        "id": "ATTESTOR_RESERVED",
+        "title": "Attestor (Reserved)",
+        "summary": "Reserved role class for future independent attestation services"
+      },
+      {
+        "id": "WITNESS_RESERVED",
+        "title": "Witness (Reserved)",
+        "summary": "Reserved role class for future independent witness services"
+      }
+    ],
+    "authority_scopes": [
+      {
+        "id": "POLICY_SIGNING",
+        "title": "Policy Signing",
+        "summary": "Authority to sign governance policy documents"
+      },
+      {
+        "id": "REGISTRY_SIGNING",
+        "title": "Registry Signing",
+        "summary": "Authority to sign registry documents including vocabulary, basis, and profile registries"
+      },
+      {
+        "id": "STATUS_PROJECTION_RESERVED",
+        "title": "Status Projection (Reserved)",
+        "summary": "Reserved scope for future status projection authority"
+      },
+      {
+        "id": "CLAUSE_REGISTRY_RESERVED",
+        "title": "Clause Registry (Reserved)",
+        "summary": "Reserved scope for future clause registry management authority"
+      },
+      {
+        "id": "ATTESTOR_REGISTRY_RESERVED",
+        "title": "Attestor Registry (Reserved)",
+        "summary": "Reserved scope for future attestor registry management authority"
+      },
+      {
+        "id": "CLEARING_STATEMENT_RESERVED",
+        "title": "Clearing Statement (Reserved)",
+        "summary": "Reserved scope for future clearing statement signing authority"
+      }
+    ],
+    "approval_classes": [
+      {
+        "id": "SINGLE_CONTROLLED",
+        "title": "Single Controlled",
+        "summary": "Approval requires authorization from a single authorized party"
+      },
+      {
+        "id": "DUAL_CONTROL",
+        "title": "Dual Control",
+        "summary": "Approval requires independent authorization from two or more authorized parties"
+      }
+    ],
+    "decision_basis_classes": [
+      {
+        "id": "CANON_REF",
+        "title": "Canon Reference",
+        "summary": "Decision based on the canonical document registry"
+      },
+      {
+        "id": "TRUST_STORE_REF",
+        "title": "Trust Store Reference",
+        "summary": "Decision based on the trust store containing authorized keys and document version prefixes"
+      },
+      {
+        "id": "VERIFICATION_BASIS_REF",
+        "title": "Verification Basis Reference",
+        "summary": "Decision based on a registered verification basis entry"
+      },
+      {
+        "id": "EVIDENCE_PROFILE_REF",
+        "title": "Evidence Profile Reference",
+        "summary": "Decision based on a registered evidence profile entry"
+      },
+      {
+        "id": "LANE_REGISTRY_REF",
+        "title": "Lane Registry Reference",
+        "summary": "Decision based on the lane registry for credential routing"
+      },
+      {
+        "id": "BILLING_POLICY_REF",
+        "title": "Billing Policy Reference",
+        "summary": "Decision based on the billing policy for fee and settlement terms"
+      },
+      {
+        "id": "ISSUER_REGISTRY_REF",
+        "title": "Issuer Registry Reference",
+        "summary": "Decision based on the issuer registry for authorized issuer information"
+      },
+      {
+        "id": "RELEASE_MANIFEST_REF",
+        "title": "Release Manifest Reference",
+        "summary": "Decision based on a release manifest for software artifact verification"
+      },
+      {
+        "id": "SETTLEMENT_PROOF_REF",
+        "title": "Settlement Proof Reference",
+        "summary": "Decision based on a settlement proof for financial reconciliation"
+      }
+    ],
+    "receipt_classes": [
+      {
+        "id": "PXTL_SCT_V1",
+        "title": "PXTL Signed Credential Token v1",
+        "summary": "Signed credential token issued as proof of credential lifecycle event"
+      },
+      {
+        "id": "RELEASE_ATTESTATION_V1",
+        "title": "Release Attestation v1",
+        "summary": "Attestation receipt for software release verification"
+      },
+      {
+        "id": "SETTLEMENT_DEBIT_PROOF_V1",
+        "title": "Settlement Debit Proof v1",
+        "summary": "Proof of debit entry in settlement processing"
+      },
+      {
+        "id": "SETTLEMENT_STATEMENT_V1",
+        "title": "Settlement Statement v1",
+        "summary": "Statement receipt for completed settlement cycle"
+      },
+      {
+        "id": "ATTESTOR_RECEIPT_RESERVED",
+        "title": "Attestor Receipt (Reserved)",
+        "summary": "Reserved receipt class for future attestor-issued receipts"
+      },
+      {
+        "id": "WITNESS_RECEIPT_RESERVED",
+        "title": "Witness Receipt (Reserved)",
+        "summary": "Reserved receipt class for future witness-issued receipts"
+      }
+    ],
+    "attestor_classes": [
+      {
+        "id": "INDEPENDENT_BUILD_ATTESTOR_RESERVED",
+        "title": "Independent Build Attestor (Reserved)",
+        "summary": "Reserved class for future independent build attestation services"
+      },
+      {
+        "id": "INDEPENDENT_EVIDENCE_ATTESTOR_RESERVED",
+        "title": "Independent Evidence Attestor (Reserved)",
+        "summary": "Reserved class for future independent evidence attestation services"
+      }
+    ],
+    "independence_classes": [
+      {
+        "id": "SAME_OPERATOR",
+        "title": "Same Operator",
+        "summary": "Operation performed by the same entity that originated the request"
+      },
+      {
+        "id": "SEPARATE_CONTROLLED",
+        "title": "Separate Controlled",
+        "summary": "Operation performed by a separately controlled entity within the same organization"
+      },
+      {
+        "id": "INDEPENDENT_THIRD_PARTY_RESERVED",
+        "title": "Independent Third Party (Reserved)",
+        "summary": "Reserved class for future independent third-party verification services"
+      }
+    ],
+    "witness_classes": [
+      {
+        "id": "COSIGN_WITNESS_RESERVED",
+        "title": "Co-sign Witness (Reserved)",
+        "summary": "Reserved class for future co-signing witness services"
+      }
+    ],
+    "revocation_reason_codes": [
+      {
+        "id": "KEY_COMPROMISE",
+        "title": "Key Compromise",
+        "summary": "Revocation due to confirmed or suspected compromise of a signing key"
+      },
+      {
+        "id": "POLICY_SUPERSEDED",
+        "title": "Policy Superseded",
+        "summary": "Revocation because the governing policy has been replaced by a newer version"
+      },
+      {
+        "id": "TRUST_WITHDRAWN",
+        "title": "Trust Withdrawn",
+        "summary": "Revocation due to explicit withdrawal of trust by the governing authority"
+      },
+      {
+        "id": "OPERATIONAL_SUSPENSION",
+        "title": "Operational Suspension",
+        "summary": "Temporary revocation due to operational requirements or incident response"
+      }
+    ],
+    "status_reason_codes": [
+      {
+        "id": "ACTIVE",
+        "title": "Active",
+        "summary": "Entity or credential is currently active and valid for use"
+      },
+      {
+        "id": "SUSPENDED",
+        "title": "Suspended",
+        "summary": "Entity or credential is temporarily suspended pending review or resolution"
+      },
+      {
+        "id": "REVOKED",
+        "title": "Revoked",
+        "summary": "Entity or credential has been permanently revoked and must not be accepted"
+      },
+      {
+        "id": "RESERVED_NOT_ENABLED",
+        "title": "Reserved Not Enabled",
+        "summary": "Capability is reserved in the governance vocabulary but not yet enabled for operational use"
+      }
+    ],
+    "assurance_classes": [
+      {
+        "id": "INTERNAL_CONTROL",
+        "title": "Internal Control",
+        "summary": "Assurance provided through internal organizational controls and processes"
+      },
+      {
+        "id": "EXTERNAL_SUBMISSION",
+        "title": "External Submission",
+        "summary": "Assurance based on externally submitted evidence subject to automated validation"
+      },
+      {
+        "id": "HIGH_ASSURANCE",
+        "title": "High Assurance",
+        "summary": "Assurance requiring multiple independent verification steps and elevated controls"
+      },
+      {
+        "id": "CLEARING_NETWORK",
+        "title": "Clearing Network",
+        "summary": "Assurance provided through participation in a clearing network with multilateral controls"
+      }
+    ],
+    "settlement_method_classes": [
+      {
+        "id": "PREPAID_LEDGER_ONLY",
+        "title": "Prepaid Ledger Only",
+        "summary": "Settlement method using prepaid balance deductions from an issuer ledger"
+      }
+    ],
+    "clearing_cycle_classes": [
+      {
+        "id": "MONTHLY_UTC",
+        "title": "Monthly UTC",
+        "summary": "Clearing cycle operating on calendar month boundaries in UTC timezone"
+      }
+    ],
+    "reserved_namespaces": [
+      "urn:px:agentic:",
+      "urn:px:mcp:"
+    ]
+  },
+  "signature": {
+    "sig_alg": "ed25519",
+    "root_key_id": "urn:px:root-key:2026-45a",
+    "signature_b64u": "t2n5SMsVOduxjtjKl_Ks-oqa6l1ZdgzcZCTAyJP_IZURWi5a3rQuW7yz0CY-VcbAhLt2uUO3qt3QvVyfXEEBAw"
+  }
+}
