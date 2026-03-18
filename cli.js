@@ -46,7 +46,7 @@ function generateSeal(evidenceHash, created, allPass, ruleCount) {
   const date = new Date(created);
   const quarter = 'Q' + (Math.floor(date.getMonth() / 3) + 1);
   const timePart = date.getFullYear() + quarter;
-  const resultPart = allPass ? 'PASS' : 'FAIL';
+  const resultPart = allPass ? 'PASS' : 'MIXED';
   return 'PX-' + hashPart + '-' + timePart + '-' + resultPart + '-' + ruleCount;
 }
 
@@ -204,6 +204,7 @@ document.addEventListener('DOMContentLoaded',function(){
   summaryHtml+='<div class="field"><div class="field-label">Purpose</div><div class="field-value">'+esc(MANIFEST.stated_purpose||'Not specified')+'</div></div>';
   summaryHtml+='<div class="field"><div class="field-label">Created</div><div class="field-value">'+esc(MANIFEST.created_at||'')+'</div></div>';
   summaryHtml+='<div class="field"><div class="field-label">Profile</div><div class="field-value">'+esc((PROFILE.name||PROFILE.profile_id||'')+' v'+(PROFILE.profile_version||''))+'</div></div>';
+  summaryHtml+='<div class="field"><div class="field-label">Artifact Kind</div><div class="field-value">'+esc(MANIFEST.artifact_kind||'proof-pack')+'</div></div>';
   summaryHtml+='<div class="field"><div class="field-label">Evidence Hash</div><div class="field-value mono">'+esc(MANIFEST.packet_hash||'')+'</div></div>';
   summaryHtml+='<div class="null-fields"><strong>Draft — internal only. Not a Submission.</strong><br>Reserved fields: <code>submission_id</code> <code>sct</code> <code>acceptance_receipt</code> <code>recipient_binding</code> — all <code>null</code>.</div>';
   summaryHtml+='<div class="one-liner">PX verified exported evidence against declared rules. Same input produces the same result.</div>';
@@ -218,7 +219,7 @@ document.addEventListener('DOMContentLoaded',function(){
   ctrlHtml+='<table><thead><tr><th>#</th><th>Rule ID</th><th>Description</th><th>Result</th></tr></thead><tbody>';
   for(var i=0;i<STORED_RESULTS.length;i++){
     var r=STORED_RESULTS[i];
-    ctrlHtml+='<tr><td>'+(i+1)+'</td><td style="font-family:var(--mono);font-size:13px">'+esc(r.id)+'</td><td>'+esc(r.description||'')+'</td>';
+    ctrlHtml+='<tr id="'+esc(r.id)+'"><td>'+(i+1)+'</td><td style="font-family:var(--mono);font-size:13px">'+esc(r.id)+'</td><td>'+esc(r.description||'')+'</td>';
     if(r.pass){ctrlHtml+='<td class="pass-cell">PASS</td>';}
     else{ctrlHtml+='<td class="fail-cell">FAIL<br><span class="fail-detail">'+esc(r.reason||'')+'</span></td>';}
     ctrlHtml+='</tr>';
@@ -275,6 +276,21 @@ document.addEventListener('DOMContentLoaded',function(){
       document.getElementById(this.getAttribute('data-tab')).classList.add('active');
     });
   }
+
+  // ── Hash-based anchor navigation ──
+  if(window.location.hash){
+    var target=document.getElementById(window.location.hash.slice(1));
+    if(target){
+      // Switch to Controls tab
+      for(var j=0;j<tabs.length;j++){tabs[j].classList.remove('active');}
+      document.querySelector('[data-tab="controls"]').classList.add('active');
+      var sections=document.querySelectorAll('main section');
+      for(var j=0;j<sections.length;j++){sections[j].classList.remove('active');}
+      document.getElementById('controls').classList.add('active');
+      target.scrollIntoView({behavior:'smooth'});
+      target.style.background='#fef9c3';
+    }
+  }
 });
 </script>
 </body>
@@ -286,6 +302,244 @@ function generateLensHtml(manifest, evidenceData, profileData, verifyResults) {
     .replace('/*__EVIDENCE__*/null', JSON.stringify(evidenceData))
     .replace('/*__PROFILE__*/null', JSON.stringify(profileData))
     .replace('/*__RESULTS__*/null', JSON.stringify(verifyResults));
+}
+
+// ══════════════════════════════════════════
+// Summary / Answer Pack generators
+// ══════════════════════════════════════════
+
+function generateSummaryTxt(seal, profileData, lensResults, manifest) {
+  const ts = manifest.created_at || new Date().toISOString();
+  const passCount = lensResults.filter(r => r.pass).length;
+  const totalCount = lensResults.length;
+  const allPass = passCount === totalCount;
+  const lines = [];
+  lines.push('PX Verification Summary');
+  lines.push('═'.repeat(60));
+  lines.push(`Seal:      ${seal}`);
+  lines.push(`Profile:   ${profileData.name || profileData.profile_id} v${profileData.profile_version}`);
+  lines.push(`Result:    ${allPass ? 'ALL PASS' : passCount + '/' + totalCount + ' PASS, ' + (totalCount - passCount) + ' FAIL'}`);
+  lines.push(`Recipient: ${manifest.intended_recipient || 'Not specified'}`);
+  lines.push(`Purpose:   ${manifest.stated_purpose || 'Not specified'}`);
+  lines.push(`Generated: ${ts}`);
+  lines.push(`Kind:      ${manifest.artifact_kind || 'proof-pack'}`);
+  lines.push('');
+  lines.push('Rules');
+  lines.push('─'.repeat(60));
+
+  const maxId = Math.max(...lensResults.map(r => r.id.length));
+  lensResults.forEach((r, i) => {
+    const num = String(i + 1).padStart(2);
+    const id = r.id.padEnd(maxId + 2);
+    const status = r.pass ? 'PASS' : 'FAIL';
+    const rule = profileData.rules.find(rl => rl.id === r.id) || {};
+    let refs = '';
+    if (rule.caiq_ref) refs += ` [CAIQ:${rule.caiq_ref}]`;
+    if (rule.sig_ref) refs += ` [SIG:${rule.sig_ref}]`;
+    lines.push(`  ${num}  ${id} ${status}${refs}  #${r.id}`);
+    if (!r.pass) {
+      lines.push(`      → ${r.reason || 'got: ' + JSON.stringify(r.got) + ', expected: ' + JSON.stringify(r.expected)}`);
+    }
+  });
+
+  lines.push('');
+  lines.push('─'.repeat(60));
+  lines.push(`[Verified offline via PX exported-state at ${ts}]`);
+  lines.push('');
+  return lines.join('\n');
+}
+
+function csvEscape(val) {
+  const s = String(val == null ? '' : val);
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
+function generateAnswersCsv(seal, profileData, lensResults, manifest) {
+  const ts = manifest.created_at || new Date().toISOString();
+  const disclaimer = `[Verified offline via PX exported-state at ${ts}]`;
+  const header = 'framework,question_ref,rule_id,verified_claim,status,suggested_answer,seal,slice_ref,replay_available,verified_at';
+  const rows = [header];
+
+  for (const r of lensResults) {
+    const rule = profileData.rules.find(rl => rl.id === r.id) || {};
+    const status = r.pass ? 'PASS' : 'FAIL';
+    const answer = r.pass
+      ? (rule.answer_template || rule.description || '') + ' ' + disclaimer
+      : (rule.exception_template || rule.description + ' — FAIL: ' + (r.reason || '')) + ' ' + disclaimer;
+    const sliceRef = seal + '#' + r.id;
+
+    if (rule.caiq_ref) {
+      rows.push([
+        csvEscape('CAIQ'), csvEscape(rule.caiq_ref), csvEscape(r.id),
+        csvEscape(rule.description || ''), csvEscape(status), csvEscape(answer),
+        csvEscape(seal), csvEscape(sliceRef), csvEscape('yes'), csvEscape(ts),
+      ].join(','));
+    }
+    if (rule.sig_ref) {
+      rows.push([
+        csvEscape('SIG'), csvEscape(rule.sig_ref), csvEscape(r.id),
+        csvEscape(rule.description || ''), csvEscape(status), csvEscape(answer),
+        csvEscape(seal), csvEscape(sliceRef), csvEscape('yes'), csvEscape(ts),
+      ].join(','));
+    }
+    // If no framework refs, still output one row
+    if (!rule.caiq_ref && !rule.sig_ref) {
+      rows.push([
+        csvEscape(''), csvEscape(''), csvEscape(r.id),
+        csvEscape(rule.description || ''), csvEscape(status), csvEscape(answer),
+        csvEscape(seal), csvEscape(sliceRef), csvEscape('yes'), csvEscape(ts),
+      ].join(','));
+    }
+  }
+
+  return '\uFEFF' + rows.join('\n') + '\n';
+}
+
+function generateQuestionMapCsv(seal, profileData) {
+  const header = 'caiq_ref,sig_ref,rule_id,profile_id,verified_claim,answer_template,lens_anchor,custom_keywords';
+  const rows = [header];
+
+  for (const rule of profileData.rules) {
+    const keywords = [];
+    // Auto-generate keywords from id and description
+    const idParts = rule.id.split('.').join(',');
+    const descWords = (rule.description || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(w => w.length > 3);
+    keywords.push(idParts);
+    keywords.push(...descWords.slice(0, 4));
+    rows.push([
+      csvEscape(rule.caiq_ref || ''), csvEscape(rule.sig_ref || ''), csvEscape(rule.id),
+      csvEscape(profileData.profile_id), csvEscape(rule.description || ''),
+      csvEscape(rule.answer_template || ''), csvEscape('lens.html#' + rule.id),
+      csvEscape(keywords.join(',')),
+    ].join(','));
+  }
+
+  return '\uFEFF' + rows.join('\n') + '\n';
+}
+
+function generateAnswersMd(seal, profileData, lensResults, manifest) {
+  const ts = manifest.created_at || new Date().toISOString();
+  const disclaimer = `[Verified offline via PX exported-state at ${ts}]`;
+  const lines = [];
+  lines.push(`# PX Answer Templates`);
+  lines.push(`Seal: ${seal} | ${profileData.name || profileData.profile_id} v${profileData.profile_version}`);
+  lines.push(`Generated: ${ts}`);
+  lines.push('');
+  lines.push('---');
+
+  lensResults.forEach((r, i) => {
+    const rule = profileData.rules.find(rl => rl.id === r.id) || {};
+    const status = r.pass ? 'PASS' : 'FAIL';
+    lines.push('');
+    lines.push(`## ${i + 1}. ${r.id} — ${status}`);
+    lines.push(`**Verified claim:** ${rule.description || r.description || ''}`);
+    if (rule.caiq_ref || rule.sig_ref) {
+      const refs = [];
+      if (rule.caiq_ref) refs.push(`**CAIQ ref:** ${rule.caiq_ref}`);
+      if (rule.sig_ref) refs.push(`**SIG ref:** ${rule.sig_ref}`);
+      lines.push(refs.join(' | '));
+    }
+    lines.push(`**Slice ref:** ${seal}#${r.id}`);
+    lines.push(`**Lens:** [lens.html#${r.id}](lens.html#${r.id})`);
+    lines.push('');
+    if (r.pass) {
+      lines.push('**Suggested answer:**');
+      lines.push(rule.answer_template || rule.description || '');
+    } else {
+      lines.push('**Suggested exception response:**');
+      lines.push(rule.exception_template || rule.description + ' — FAIL: ' + (r.reason || ''));
+    }
+    lines.push(disclaimer);
+    lines.push('');
+    lines.push('---');
+  });
+
+  return lines.join('\n') + '\n';
+}
+
+function generateExceptionsMd(seal, profileData, lensResults, manifest) {
+  const ts = manifest.created_at || new Date().toISOString();
+  const disclaimer = `[Verified offline via PX exported-state at ${ts}]`;
+  const failResults = lensResults.filter(r => !r.pass);
+  if (failResults.length === 0) return null;
+
+  const passCount = lensResults.filter(r => r.pass).length;
+  const lines = [];
+  lines.push('# PX Exception Report');
+  lines.push(`Seal: ${seal}`);
+  lines.push(`Generated: ${ts}`);
+  lines.push('');
+  lines.push('## Exceptions requiring attention');
+  lines.push('');
+  lines.push('---');
+
+  for (const r of failResults) {
+    const rule = profileData.rules.find(rl => rl.id === r.id) || {};
+    lines.push('');
+    lines.push(`### ${r.id} — FAIL`);
+    lines.push(`**Verified claim:** ${rule.description || r.description || ''}`);
+    lines.push(`**Current state:** ${JSON.stringify(r.got)}`);
+    lines.push(`**Expected:** ${JSON.stringify(r.expected)}`);
+    lines.push(`**Failure reason:** ${r.reason || ''}`);
+    lines.push(`**Slice ref:** ${seal}#${r.id}`);
+    lines.push('');
+    lines.push('**Compensating control:** [TO BE FILLED BY CONTROL OWNER]');
+    lines.push('**Remediation owner:** [TO BE FILLED]');
+    lines.push('**Target date:** [TO BE FILLED]');
+    lines.push('');
+    lines.push('**Suggested exception response:**');
+    lines.push(rule.exception_template || rule.description + ' is not met.');
+    lines.push(disclaimer);
+    lines.push('');
+    lines.push('---');
+  }
+
+  lines.push('');
+  lines.push('## Summary');
+  lines.push(`- Total rules: ${lensResults.length}`);
+  lines.push(`- Passed: ${passCount}`);
+  lines.push(`- Failed: ${failResults.length}`);
+  lines.push(`- Exception responses needed: ${failResults.length}`);
+  lines.push('');
+  return lines.join('\n');
+}
+
+function generateSendTheseFiles(files, artifactKind) {
+  const lines = [];
+  if (artifactKind === 'answer-pack') {
+    lines.push('PX Answer Pack — Send these files');
+  } else {
+    lines.push('PX Proof Pack — Send these files');
+  }
+  lines.push('');
+
+  if (artifactKind === 'answer-pack') {
+    lines.push('For non-technical reviewers:');
+    if (files.includes('summary.txt')) lines.push('  - summary.txt');
+    if (files.includes('lens.html')) lines.push('  - lens.html');
+    lines.push('');
+    lines.push('For questionnaire completion:');
+    if (files.includes('answers.csv')) lines.push('  - answers.csv');
+    if (files.includes('question-map.csv')) lines.push('  - question-map.csv');
+    if (files.includes('exceptions.md')) lines.push('  - exceptions.md');
+    lines.push('');
+    lines.push('For technical replay:');
+    if (files.includes('draft-manifest.json')) lines.push('  - draft-manifest.json');
+    if (files.includes('bundled-profile.json')) lines.push('  - bundled-profile.json');
+    if (files.includes('bundled-evidence.json')) lines.push('  - bundled-evidence.json');
+  } else {
+    lines.push('For non-technical reviewers:');
+    if (files.includes('summary.txt')) lines.push('  - summary.txt');
+    if (files.includes('lens.html')) lines.push('  - lens.html');
+    lines.push('');
+    lines.push('For technical replay:');
+    if (files.includes('draft-manifest.json')) lines.push('  - draft-manifest.json');
+    if (files.includes('bundled-profile.json')) lines.push('  - bundled-profile.json');
+    if (files.includes('bundled-evidence.json')) lines.push('  - bundled-evidence.json');
+  }
+
+  lines.push('');
+  return lines.join('\n');
 }
 
 // ══════════════════════════════════════════
@@ -1642,6 +1896,7 @@ function cmdPack(args) {
       manifest_ref: manifestRef,
       packet_ref: packetId,
       seal: seal,
+      artifact_kind: 'proof-pack',
       created_at: now.toISOString(),
       generator: `px-cli/${VERSION}`,
       project: profileData.profile_id,
@@ -1695,6 +1950,17 @@ function cmdPack(args) {
     const lensHtml = generateLensHtml(manifest, evidenceData, profileData, lensResults);
     fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
     success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
+
+    // Generate summary.txt
+    const summaryTxt = generateSummaryTxt(seal, profileData, lensResults, manifest);
+    fs.writeFileSync(path.join(outputDir, 'summary.txt'), summaryTxt, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'summary.txt')}`);
+
+    // Generate send-these-files.txt
+    const packFiles = ['summary.txt', 'lens.html', 'draft-manifest.json', 'bundled-profile.json', 'bundled-evidence.json'];
+    const sendTxt = generateSendTheseFiles(packFiles, 'proof-pack');
+    fs.writeFileSync(path.join(outputDir, 'send-these-files.txt'), sendTxt, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'send-these-files.txt')}`);
 
     log();
     info(`Packet ID:  ${packetId}`);
@@ -1989,6 +2255,178 @@ Draft is fully functional for internal use today.
   log();
 }
 
+// ── px answer-pack ──────────────────────────
+
+function cmdAnswerPack(args) {
+  const flags = parseFlags(args);
+
+  if (!flags.profile || !flags.evidence) {
+    fail('Both --profile and --evidence are required for answer-pack.');
+    log();
+    process.exit(1);
+  }
+
+  heading('Generating Answer Pack...');
+
+  const profilePath = path.resolve(process.cwd(), flags.profile);
+  const evidencePath = path.resolve(process.cwd(), flags.evidence);
+
+  if (!fileExists(profilePath)) {
+    fail(`Profile not found: ${flags.profile}`);
+    log();
+    process.exit(1);
+  }
+  if (!fileExists(evidencePath)) {
+    fail(`Evidence not found: ${flags.evidence}`);
+    log();
+    process.exit(1);
+  }
+
+  let profileData, evidenceData;
+  try { profileData = readJSON(profilePath); } catch (e) {
+    fail(`Profile is not valid JSON: ${flags.profile}`);
+    info(e.message);
+    log();
+    process.exit(1);
+  }
+  try { evidenceData = readJSON(evidencePath); } catch (e) {
+    fail(`Evidence is not valid JSON: ${flags.evidence}`);
+    info(e.message);
+    log();
+    process.exit(1);
+  }
+
+  if (!profileData.rules || !Array.isArray(profileData.rules)) {
+    fail('Profile has no rules array.');
+    log();
+    process.exit(1);
+  }
+
+  // Run verification (mixed results OK for answer-pack)
+  const result = runCustomVerify(profileData, evidenceData);
+  const allPass = printCustomVerifyResults(result, profileData);
+
+  const now = new Date();
+  const packetId = `draft-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getTime()).slice(-4)}`;
+  const manifestRef = `mf-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getTime()).slice(-4)}`;
+
+  const profileContent = fs.readFileSync(profilePath);
+  const evidenceContent = fs.readFileSync(evidencePath);
+  const profileHash = 'sha256:' + crypto.createHash('sha256').update(profileContent).digest('hex');
+  const evidenceHash = 'sha256:' + crypto.createHash('sha256').update(evidenceContent).digest('hex');
+
+  // Build per-rule results for lens/outputs
+  const lensResults = result.results.map(r => {
+    const rule = profileData.rules.find(rl => rl.id === r.id);
+    return {
+      id: r.id,
+      description: r.description || '',
+      pass: r.pass,
+      reason: r.reason || 'ok',
+      path: r.path,
+      expected: rule ? rule.expected : null,
+      got: r.value,
+    };
+  });
+
+  const seal = generateSeal(evidenceHash, now.toISOString(), allPass, result.total);
+
+  const manifest = {
+    manifest_type: 'DRAFT_MANIFEST',
+    manifest_ref: manifestRef,
+    packet_ref: packetId,
+    seal: seal,
+    artifact_kind: 'answer-pack',
+    created_at: now.toISOString(),
+    generator: `px-cli/${VERSION}`,
+    project: profileData.profile_id,
+    framework: 'CUSTOM_PROFILE',
+    verification_mode: 'custom',
+    evidence_summary: {
+      total: 1,
+      passed: allPass ? 1 : 0,
+      failed: allPass ? 0 : 1,
+      all_pass: allPass,
+      profiles: [{
+        profile_ref: profileData.profile_id,
+        evidence_class: profileData.profile_id,
+        fields_checked: result.total,
+        fields_passed: result.passed,
+        conformance: allPass ? 'PASS' : 'MIXED',
+      }],
+    },
+    packet_hash: evidenceHash,
+    intended_recipient: flags.recipient || null,
+    stated_purpose: flags.purpose || null,
+    bundled_profile: 'bundled-profile.json',
+    bundled_evidence: 'bundled-evidence.json',
+    submission_state: 'NOT_SUBMITTED',
+    submission_id: null,
+    sct: null,
+    acceptance_receipt: null,
+    recipient_binding: null,
+    parent_manifest_refs: [],
+    clearing_batch_ref: null,
+  };
+
+  const outputDir = pxPath(OUTPUT_DIR);
+  ensureDir(outputDir);
+
+  // Write core files
+  writeJSON(path.join(outputDir, 'draft-manifest.json'), manifest);
+  success(`Created ${relativePx(OUTPUT_DIR, 'draft-manifest.json')}`);
+
+  writeJSON(path.join(outputDir, 'bundled-profile.json'), profileData);
+  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-profile.json')}`);
+
+  writeJSON(path.join(outputDir, 'bundled-evidence.json'), evidenceData);
+  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
+
+  // Generate answer-pack specific files
+  const answersCsv = generateAnswersCsv(seal, profileData, lensResults, manifest);
+  fs.writeFileSync(path.join(outputDir, 'answers.csv'), answersCsv, 'utf8');
+  success(`Created ${relativePx(OUTPUT_DIR, 'answers.csv')}`);
+
+  const questionMapCsv = generateQuestionMapCsv(seal, profileData);
+  fs.writeFileSync(path.join(outputDir, 'question-map.csv'), questionMapCsv, 'utf8');
+  success(`Created ${relativePx(OUTPUT_DIR, 'question-map.csv')}`);
+
+  const answersMd = generateAnswersMd(seal, profileData, lensResults, manifest);
+  fs.writeFileSync(path.join(outputDir, 'answers.md'), answersMd, 'utf8');
+  success(`Created ${relativePx(OUTPUT_DIR, 'answers.md')}`);
+
+  const exceptionsMd = generateExceptionsMd(seal, profileData, lensResults, manifest);
+  const outputFiles = ['answers.csv', 'question-map.csv', 'answers.md', 'summary.txt', 'lens.html', 'draft-manifest.json', 'bundled-profile.json', 'bundled-evidence.json'];
+  if (exceptionsMd) {
+    fs.writeFileSync(path.join(outputDir, 'exceptions.md'), exceptionsMd, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'exceptions.md')}`);
+    outputFiles.push('exceptions.md');
+  }
+
+  const summaryTxt = generateSummaryTxt(seal, profileData, lensResults, manifest);
+  fs.writeFileSync(path.join(outputDir, 'summary.txt'), summaryTxt, 'utf8');
+  success(`Created ${relativePx(OUTPUT_DIR, 'summary.txt')}`);
+
+  const lensHtml = generateLensHtml(manifest, evidenceData, profileData, lensResults);
+  fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
+  success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
+
+  const sendTxt = generateSendTheseFiles(outputFiles, 'answer-pack');
+  fs.writeFileSync(path.join(outputDir, 'send-these-files.txt'), sendTxt, 'utf8');
+  success(`Created ${relativePx(OUTPUT_DIR, 'send-these-files.txt')}`);
+
+  log();
+  info(`Seal:       ${seal}`);
+  info(`Rules:      ${result.passed}/${result.total} passed${result.failed > 0 ? ', ' + result.failed + ' failed' : ''}`);
+  if (flags.recipient) info(`Recipient:  ${flags.recipient}`);
+  if (flags.purpose) info(`Purpose:    ${flags.purpose}`);
+  log();
+  log(`  ${CLR.bold}${CLR.green}Answer Pack ready.${CLR.reset}`);
+  log(`  ${CLR.dim}Open lens.html or answers.csv to review.${CLR.reset}`);
+  log();
+  process.exit(0);
+}
+
 // ── px check ─────────────────────────────
 
 function cmdCheck(args) {
@@ -2182,6 +2620,7 @@ function cmdHelp() {
   log(`    verify --manifest=<file>                    Replay verification from a packed Draft`);
   log(`    pack   --profile=<file> --evidence=<file>   Pack after custom verification`);
   log(`    pack   --recipient=<val> --purpose=<val>    Add metadata to Draft manifest (optional)`);
+  log(`    answer-pack --profile=<file> --evidence=<file>   Generate questionnaire-ready Answer Pack`);
   log(`    check  --profile=<file>                     Collect evidence + verify in one step`);
   log();
   log(`  ${CLR.bold}Examples:${CLR.reset}`);
@@ -2205,6 +2644,7 @@ const COMMANDS = {
   'generate': cmdGenerate,
   'verify':   cmdVerify,
   'pack':     cmdPack,
+  'answer-pack': cmdAnswerPack,
   'check':    cmdCheck,
   'status':   cmdStatus,
   'help':     cmdHelp,

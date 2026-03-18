@@ -228,6 +228,26 @@ Click "Export PDF" for a print-ready report. No CLI needed. No network needed.
 
 Each pack also gets a Verification Seal (e.g., `PX-A3F2-2026Q2-PASS-10`) — a short reference code for emails, tickets, and audit trails.
 
+## Answer Pack
+
+`answer-pack` generates questionnaire-ready outputs. Unlike `pack` (fail-close, all-pass only), `answer-pack` works with mixed results — PASS and FAIL.
+
+```bash
+node cli.js answer-pack --profile=profiles/aws-core-controls-v1.json \
+  --evidence=your-aws-state.json \
+  --recipient="Security Review" --purpose="Q2 vendor assessment"
+```
+
+Output:
+- `answers.csv` — one row per framework question (CAIQ/SIG), Excel-ready with UTF-8 BOM
+- `question-map.csv` — rule-to-framework mapping table with custom keywords for lookup
+- `answers.md` — human-readable answer templates with slice refs
+- `exceptions.md` — FAIL rules with compensating control placeholders (only if any fail)
+- `summary.txt` — plain text verification summary
+- `lens.html` — browser verification report (mixed results supported)
+
+Each answer row includes a slice ref (e.g., `PX-A3F2-2026Q2-PASS-10#iam.mfa_enforced`) linking directly to `lens.html#iam.mfa_enforced`.
+
 ## Try the demo
 
 To see PX verify sample SOC 2 evidence instead:
@@ -257,7 +277,7 @@ PX proves that evidence existed, was not altered, and conforms to rules. What th
 
 ## Technical
 
-- ~2240 lines of vanilla Node.js
+- ~2680 lines of vanilla Node.js
 - Zero external dependencies (`fs`, `path`, `crypto` only)
 - SHA-256 for hashing, Ed25519 for signing (when Authority is live)
 - No proprietary crypto, no blockchain
