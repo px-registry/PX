@@ -9,62 +9,102 @@
       "id": "iam.mfa_enforced",
       "description": "MFA is enforced for all IAM users",
       "path": "iam.mfa_enabled",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "IAM-02.1",
+      "sig_ref": "H.2.1",
+      "answer_template": "Multi-factor authentication (MFA) is enforced for all IAM users. Verified against exported AWS IAM account summary.",
+      "exception_template": "MFA enforcement is not currently active for all IAM users. Compensating control: [describe alternative]. Remediation planned for [date]."
     },
     {
       "id": "iam.root_access_key_disabled",
-      "description": "Root account access keys are disabled",
+      "description": "Root account access keys are not active",
       "path": "iam.root_access_key_active",
-      "expected": false
+      "expected": false,
+      "caiq_ref": "IAM-04.1",
+      "sig_ref": "H.2.3",
+      "answer_template": "Root account access keys are disabled. No active access keys exist for the root account.",
+      "exception_template": "Root account access keys are currently active. Remediation in progress: [describe]. Target completion: [date]."
     },
     {
       "id": "iam.password_policy_min_length",
-      "description": "Password minimum length is at least 14 characters",
+      "description": "Password policy requires minimum 14 characters",
       "path": "iam.password_policy.minimum_length",
       "operator": "gte",
-      "expected": 14
+      "expected": 14,
+      "caiq_ref": "IAM-12.1",
+      "sig_ref": "H.3.2",
+      "answer_template": "IAM password policy enforces a minimum length of 14 characters, exceeding the common baseline.",
+      "exception_template": "Password minimum length is below 14 characters. Current setting: [value]. Remediation planned for [date]."
     },
     {
       "id": "rds.encryption_at_rest",
       "description": "RDS storage encryption is enabled",
       "path": "rds.storage_encrypted",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "EKM-03.1",
+      "sig_ref": "G.18.1",
+      "answer_template": "RDS database storage encryption is enabled at rest using AWS-managed or customer-managed keys.",
+      "exception_template": "RDS storage encryption is not enabled. Compensating control: [describe]. Migration planned for [date]."
     },
     {
       "id": "rds.public_access_disabled",
       "description": "RDS instances are not publicly accessible",
       "path": "rds.publicly_accessible",
-      "expected": false
+      "expected": false,
+      "caiq_ref": "IVS-09.1",
+      "sig_ref": "G.4.1",
+      "answer_template": "RDS instances are configured as not publicly accessible. Database endpoints are restricted to VPC-internal access.",
+      "exception_template": "One or more RDS instances are publicly accessible. Remediation: [describe network restriction plan]. Target: [date]."
     },
     {
       "id": "s3.public_access_blocked",
-      "description": "S3 public access block is enabled",
+      "description": "S3 account-level public access block is enabled",
       "path": "s3.public_access_blocked",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "DSP-04.1",
+      "sig_ref": "G.8.1",
+      "answer_template": "S3 public access is blocked at the account level. The BlockPublicAcls setting is enabled.",
+      "exception_template": "S3 public access block is not enabled at the account level. Remediation: [describe]. Target: [date]."
     },
     {
       "id": "s3.versioning_enabled",
-      "description": "S3 versioning is enabled on primary bucket",
+      "description": "S3 bucket versioning is enabled",
       "path": "s3.versioning",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "DSP-16.1",
+      "sig_ref": "G.10.1",
+      "answer_template": "S3 bucket versioning is enabled, providing object-level recovery and audit trail.",
+      "exception_template": "S3 versioning is not enabled on one or more buckets. Compensating control: [describe backup strategy]. Target: [date]."
     },
     {
       "id": "cloudtrail.enabled",
-      "description": "CloudTrail is enabled",
+      "description": "CloudTrail is logging",
       "path": "cloudtrail.is_logging",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "LOG-01.1",
+      "sig_ref": "G.17.1",
+      "answer_template": "AWS CloudTrail is enabled and actively logging API activity across the account.",
+      "exception_template": "CloudTrail logging is not active. Remediation: [describe]. This is a critical control. Target: [date]."
     },
     {
       "id": "cloudtrail.multi_region",
       "description": "CloudTrail is multi-region",
       "path": "cloudtrail.is_multi_region",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "LOG-03.1",
+      "sig_ref": "G.17.3",
+      "answer_template": "CloudTrail is configured for multi-region logging, capturing API activity in all AWS regions.",
+      "exception_template": "CloudTrail is not configured for multi-region. Currently logging in [region] only. Remediation planned for [date]."
     },
     {
       "id": "vpc.flow_logs_enabled",
       "description": "VPC flow logs are enabled",
       "path": "vpc.flow_logs_enabled",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "LOG-05.1",
+      "sig_ref": "G.17.5",
+      "answer_template": "VPC Flow Logs are enabled, capturing network traffic metadata for monitoring and forensic analysis.",
+      "exception_template": "VPC Flow Logs are not enabled. Compensating control: [describe network monitoring alternative]. Target: [date]."
     }
   ]
 }

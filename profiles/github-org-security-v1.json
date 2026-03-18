@@ -9,61 +9,101 @@
       "id": "org.two_factor_required",
       "description": "Two-factor authentication is required for all org members",
       "path": "org.two_factor_requirement_enabled",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "IAM-02.2",
+      "sig_ref": "H.2.2",
+      "answer_template": "Two-factor authentication is required for all organization members. This is enforced at the organization level.",
+      "exception_template": "Two-factor authentication is not required at the organization level. Compensating control: [describe]. Remediation planned for [date]."
     },
     {
       "id": "org.default_permissions_read",
       "description": "Default repository permission for org members is read (not write/admin)",
       "path": "org.default_repository_permission",
-      "expected": "read"
+      "expected": "read",
+      "caiq_ref": "IAM-08.1",
+      "sig_ref": "H.4.1",
+      "answer_template": "Default repository permission for organization members is set to read-only, enforcing least privilege.",
+      "exception_template": "Default repository permission is set to [value] instead of read. Remediation: [describe permission reduction plan]. Target: [date]."
     },
     {
       "id": "repo.branch_protection_enabled",
       "description": "Branch protection is enabled on the default branch",
       "path": "repo.default_branch_protection.enabled",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "CCC-04.1",
+      "sig_ref": "I.2.1",
+      "answer_template": "Branch protection is enabled on the default branch, preventing direct pushes and enforcing review requirements.",
+      "exception_template": "Branch protection is not enabled on the default branch. Remediation: [describe]. Target: [date]."
     },
     {
       "id": "repo.require_pull_request_reviews",
       "description": "Pull request reviews are required before merging",
       "path": "repo.default_branch_protection.required_pull_request_reviews",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "CCC-04.2",
+      "sig_ref": "I.2.2",
+      "answer_template": "Pull request reviews are required before merging to the default branch.",
+      "exception_template": "Pull request reviews are not required. Compensating control: [describe]. Target: [date]."
     },
     {
       "id": "repo.require_status_checks",
       "description": "Status checks are required before merging",
       "path": "repo.default_branch_protection.required_status_checks",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "CCC-05.1",
+      "sig_ref": "I.2.3",
+      "answer_template": "Status checks (CI/CD) are required to pass before merging to the default branch.",
+      "exception_template": "Status checks are not required before merge. Compensating control: [describe]. Target: [date]."
     },
     {
       "id": "repo.enforce_admins",
       "description": "Branch protection rules are enforced for admins too",
       "path": "repo.default_branch_protection.enforce_admins",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "CCC-04.3",
+      "sig_ref": "I.2.4",
+      "answer_template": "Branch protection rules are enforced for administrators, preventing bypass of review and status check requirements.",
+      "exception_template": "Admin enforcement is not enabled. Administrators can bypass branch protection. Remediation: [describe]. Target: [date]."
     },
     {
       "id": "repo.delete_branch_on_merge",
       "description": "Branches are automatically deleted after merge",
       "path": "repo.delete_branch_on_merge",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "CCC-06.1",
+      "sig_ref": "I.2.5",
+      "answer_template": "Branches are automatically deleted after merge, reducing stale branch accumulation.",
+      "exception_template": "Automatic branch deletion is not enabled. Compensating control: [describe cleanup process]. Target: [date]."
     },
     {
       "id": "security.secret_scanning_enabled",
       "description": "Secret scanning is enabled",
       "path": "security.secret_scanning",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "TVM-01.1",
+      "sig_ref": "I.4.1",
+      "answer_template": "GitHub secret scanning is enabled, detecting committed secrets and credentials in the repository.",
+      "exception_template": "Secret scanning is not enabled. Compensating control: [describe alternative secret detection]. Target: [date]."
     },
     {
       "id": "security.secret_scanning_push_protection",
       "description": "Secret scanning push protection is enabled",
       "path": "security.secret_scanning_push_protection",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "TVM-01.2",
+      "sig_ref": "I.4.2",
+      "answer_template": "Secret scanning push protection is enabled, blocking pushes that contain detected secrets.",
+      "exception_template": "Push protection is not enabled. Secrets can be pushed to the repository. Remediation: [describe]. Target: [date]."
     },
     {
       "id": "security.dependabot_alerts_enabled",
       "description": "Dependabot security alerts are enabled",
       "path": "security.dependabot_alerts",
-      "expected": true
+      "expected": true,
+      "caiq_ref": "TVM-02.1",
+      "sig_ref": "I.5.1",
+      "answer_template": "Dependabot security alerts are enabled, providing automated vulnerability notifications for dependencies.",
+      "exception_template": "Dependabot alerts are not enabled. Compensating control: [describe vulnerability management process]. Target: [date]."
     }
   ]
 }
