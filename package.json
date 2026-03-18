@@ -6,6 +6,12 @@
   "bin": {
     "px": "./cli.js"
   },
+  "files": [
+    "cli.js",
+    "collectors/",
+    "profiles/",
+    "README.md"
+  ],
   "scripts": {
     "start": "node cli.js"
   },

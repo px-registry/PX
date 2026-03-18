@@ -203,6 +203,16 @@ node cli.js verify --manifest=px/output/draft-manifest.json
 
 This replays every rule against the bundled evidence and confirms the result matches the manifest's claim. Works for both Genesis workspace packs and custom profile packs.
 
+### Replay with npx
+
+The recipient does not need to clone the repo. If PX is published to npm:
+
+```bash
+npx px verify --manifest=./draft-manifest.json
+```
+
+Send the recipient `draft-manifest.json`, `bundled-profile.json`, and `bundled-evidence.json`. As long as these three files are in the same directory, replay works.
+
 ## Try the demo
 
 To see PX verify sample SOC 2 evidence instead:
