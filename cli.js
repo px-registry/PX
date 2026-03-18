@@ -980,6 +980,127 @@ function verifyEvidence(evidence, profile) {
 function cmdVerify(args) {
   const flags = parseFlags(args);
 
+  // ── Manifest replay mode: --manifest ──
+  if (flags.manifest) {
+    heading('Replaying verification from manifest...');
+
+    const manifestPath = path.resolve(process.cwd(), flags.manifest);
+    if (!fileExists(manifestPath)) {
+      fail(`Manifest not found: ${flags.manifest}`);
+      log();
+      process.exit(1);
+    }
+
+    let manifestData;
+    try {
+      manifestData = readJSON(manifestPath);
+    } catch (e) {
+      fail(`Manifest is not valid JSON: ${flags.manifest}`);
+      info(e.message);
+      log();
+      process.exit(1);
+    }
+
+    const manifestDir = path.dirname(manifestPath);
+
+    // Resolve bundled files
+    const bundledProfileName = manifestData.bundled_profile || 'bundled-profile.json';
+    const bundledEvidenceName = manifestData.bundled_evidence || 'bundled-evidence.json';
+    const bundledProfilePath = path.join(manifestDir, bundledProfileName);
+    const bundledEvidencePath = path.join(manifestDir, bundledEvidenceName);
+
+    if (!fileExists(bundledProfilePath)) {
+      fail(`Bundled profile not found: ${bundledProfileName}`);
+      info(`Expected at: ${path.relative(process.cwd(), bundledProfilePath)}`);
+      log();
+      process.exit(1);
+    }
+    if (!fileExists(bundledEvidencePath)) {
+      fail(`Bundled evidence not found: ${bundledEvidenceName}`);
+      info(`Expected at: ${path.relative(process.cwd(), bundledEvidencePath)}`);
+      log();
+      process.exit(1);
+    }
+
+    const bundledProfile = readJSON(bundledProfilePath);
+    const bundledEvidence = readJSON(bundledEvidencePath);
+
+    const mode = manifestData.verification_mode || (bundledProfile.mode === 'workspace' ? 'workspace' : 'custom');
+
+    let replayAllPass;
+
+    if (mode === 'workspace') {
+      // Workspace replay: re-verify each evidence against its matching profile
+      const profiles = bundledProfile.profiles || [];
+      const evidenceList = bundledEvidence.evidence || [];
+      const profileMap = {};
+      for (const p of profiles) profileMap[p.profile_id] = p;
+
+      let totalPassed = 0;
+      let totalFailed = 0;
+      let totalFields = 0;
+
+      for (const ev of evidenceList) {
+        const profile = profileMap[ev.profile_ref];
+        if (!profile) {
+          warn(`No profile found for ${ev.profile_ref} — skipping`);
+          continue;
+        }
+        const result = verifyEvidence(ev, profile);
+        const displayName = profile.profile_id.replace('soc2-', '').replace('px-', '');
+        const padded = displayName.padEnd(22);
+
+        if (result.failed === 0) {
+          log(`  ${CLR.green}✓${CLR.reset} ${padded} ${CLR.green}PASS${CLR.reset}  ${dimText(`(${result.passed}/${result.total} fields)`)}`);
+        } else {
+          log(`  ${CLR.red}✗${CLR.reset} ${padded} ${CLR.red}FAIL${CLR.reset}  ${dimText(`(${result.passed}/${result.total} fields)`)}`);
+          for (const r of result.results) {
+            if (!r.pass) {
+              log(`    ${CLR.red}→${CLR.reset} ${CLR.dim}${r.field}${CLR.reset}: ${r.reason}`);
+            }
+          }
+        }
+
+        totalPassed += result.passed;
+        totalFailed += result.failed;
+        totalFields += result.total;
+      }
+
+      replayAllPass = totalFailed === 0;
+      log();
+      if (replayAllPass) {
+        log(`  ${CLR.bold}${CLR.green}■ REPLAY PASS${CLR.reset} — ${totalPassed}/${totalFields} fields verified`);
+      } else {
+        log(`  ${CLR.bold}${CLR.red}■ REPLAY FAILED${CLR.reset} — ${totalPassed}/${totalFields} fields, ${totalFailed} failed`);
+      }
+    } else {
+      // Custom profile replay
+      const result = runCustomVerify(bundledProfile, bundledEvidence);
+      replayAllPass = printCustomVerifyResults(result, bundledProfile);
+    }
+
+    // Check consistency with manifest claim
+    const manifestClaim = manifestData.evidence_summary && manifestData.evidence_summary.all_pass;
+
+    log();
+    if (replayAllPass && manifestClaim) {
+      log(`  ${CLR.bold}${CLR.green}Replay matches manifest: ALL PASS${CLR.reset}`);
+    } else if (!replayAllPass && !manifestClaim) {
+      log(`  ${CLR.bold}${CLR.yellow}Replay matches manifest: FAILED${CLR.reset}`);
+    } else {
+      log(`  ${CLR.bold}${CLR.red}Replay DOES NOT match manifest claim${CLR.reset}`);
+    }
+
+    if (manifestData.intended_recipient) {
+      info(`Intended recipient: ${manifestData.intended_recipient}`);
+    }
+    if (manifestData.stated_purpose) {
+      info(`Stated purpose: ${manifestData.stated_purpose}`);
+    }
+    log();
+    process.exit(replayAllPass ? 0 : 1);
+  }
+
   // ── Custom profile mode: --profile + --evidence ──
   if (flags.profile && flags.evidence) {
     heading('Verifying evidence against custom profile...');
@@ -1255,10 +1376,12 @@ function cmdPack(args) {
       generator: `px-cli/${VERSION}`,
       project: profileData.profile_id,
       framework: 'CUSTOM_PROFILE',
+      verification_mode: 'custom',
       evidence_summary: {
         total: evidenceRefs.length,
         passed: evidenceRefs.length,
         failed: 0,
+        all_pass: true,
         profiles: evidenceRefs.map(e => ({
           profile_ref: e.profile_ref,
           evidence_class: e.evidence_class,
@@ -1268,6 +1391,10 @@ function cmdPack(args) {
         })),
       },
       packet_hash: packetHash,
+      intended_recipient: flags.recipient || null,
+      stated_purpose: flags.purpose || null,
+      bundled_profile: 'bundled-profile.json',
+      bundled_evidence: 'bundled-evidence.json',
       submission_state: 'NOT_SUBMITTED',
       submission_id: null,
       sct: null,
@@ -1277,21 +1404,35 @@ function cmdPack(args) {
       clearing_batch_ref: null,
     };
 
-    // Write to output directory beside the evidence file
-    const outputDir = path.dirname(evidencePath);
+    // Write to px/output/
+    const outputDir = pxPath(OUTPUT_DIR);
+    ensureDir(outputDir);
+
     writeJSON(path.join(outputDir, 'draft-manifest.json'), manifest);
-    success(`Created ${path.join(path.relative(process.cwd(), outputDir), 'draft-manifest.json')}`);
+    success(`Created ${relativePx(OUTPUT_DIR, 'draft-manifest.json')}`);
 
     writeJSON(path.join(outputDir, 'draft-packet.json'), packet);
-    success(`Created ${path.join(path.relative(process.cwd(), outputDir), 'draft-packet.json')}`);
+    success(`Created ${relativePx(OUTPUT_DIR, 'draft-packet.json')}`);
+
+    // Bundle exact inputs for recipient replay
+    writeJSON(path.join(outputDir, 'bundled-profile.json'), profileData);
+    success(`Created ${relativePx(OUTPUT_DIR, 'bundled-profile.json')}`);
+
+    writeJSON(path.join(outputDir, 'bundled-evidence.json'), evidenceData);
+    success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
 
     log();
     info(`Packet ID:  ${packetId}`);
     info(`Evidence:   ${result.total} rules, all verified`);
     info(`Hash:       ${packetHash.slice(0, 20)}...`);
+    if (flags.recipient) info(`Recipient:  ${flags.recipient}`);
+    if (flags.purpose) info(`Purpose:    ${flags.purpose}`);
     log();
     log(`  ${CLR.bold}${CLR.green}Your proof is ready for internal review.${CLR.reset}`);
     log(`  ${CLR.dim}Open draft-manifest.json in Lens to see your verification badge.${CLR.reset}`);
+    log();
+    log(`  ${CLR.dim}Recipient can replay:${CLR.reset}`);
+    log(`  ${CLR.cyan}node cli.js verify --manifest=${relativePx(OUTPUT_DIR, 'draft-manifest.json')}${CLR.reset}`);
     log();
     process.exit(0);
   }
@@ -1423,10 +1564,12 @@ function cmdPack(args) {
     generator: `px-cli/${VERSION}`,
     project: config.project,
     framework: config.target_framework,
+    verification_mode: 'workspace',
     evidence_summary: {
       total: evidenceRefs.length,
       passed: evidenceRefs.length,
       failed: 0,
+      all_pass: true,
       profiles: evidenceRefs.map(e => ({
         profile_ref: e.profile_ref,
         evidence_class: e.evidence_class,
@@ -1436,27 +1579,16 @@ function cmdPack(args) {
       })),
     },
     packet_hash: packetHash,
+    intended_recipient: flags.recipient || null,
+    stated_purpose: flags.purpose || null,
+    bundled_profile: 'bundled-profile.json',
+    bundled_evidence: 'bundled-evidence.json',
 
     // ═══════════════════════════════════════════════════════
     // THE BOUNDARY.
     //
     // These four fields are null in every Draft.
     // They are populated only in a Submission.
-    //
-    // sct:                  Sealed Certificate Timestamp.
-    //                       Proves this packet existed at a specific time.
-    //                       Signed by PX Authority with the production root key.
-    //
-    // acceptance_receipt:   Proof that the submission was received and recorded.
-    //                       Contains packet_hash + sct + recipient_ref.
-    //
-    // recipient_binding:    Who this submission is directed to.
-    //                       Prevents repurposing a submission across recipients.
-    //
-    // submission_id:        Unique, immutable identifier from PX Authority.
-    //
-    // Until these are populated, this manifest is DRAFT.
-    // It can be reviewed internally. It cannot be handed off externally.
     // ═══════════════════════════════════════════════════════
     submission_state: 'NOT_SUBMITTED',
     submission_id: null,
@@ -1533,6 +1665,24 @@ Draft is fully functional for internal use today.
   fs.writeFileSync(pxPath(OUTPUT_DIR, 'README.md'), readme);
   success(`Created ${relativePx(OUTPUT_DIR, 'README.md')}`);
 
+  // ── Bundle replay inputs ──
+  // Collect all profiles and evidence for recipient replay
+  const allProfileFiles = fs.readdirSync(pxPath(PROFILES_DIR)).filter(f => f.endsWith('.json'));
+  const allProfiles = allProfileFiles.map(pf => readJSON(pxPath(PROFILES_DIR, pf)));
+  const allEvidence = evidenceFiles.map(ef => readJSON(pxPath(EVIDENCE_DIR, ef)));
+
+  writeJSON(pxPath(OUTPUT_DIR, 'bundled-profile.json'), {
+    mode: 'workspace',
+    profiles: allProfiles,
+  });
+  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-profile.json')}`);
+
+  writeJSON(pxPath(OUTPUT_DIR, 'bundled-evidence.json'), {
+    mode: 'workspace',
+    evidence: allEvidence,
+  });
+  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
+
   // ── Summary ──
   log();
   log(`  ${CLR.bold}Draft Packet created.${CLR.reset}`);
@@ -1541,6 +1691,8 @@ Draft is fully functional for internal use today.
   info(`Evidence:   ${evidenceRefs.length} files, all verified`);
   info(`Fields:     ${evidenceRefs.reduce((a, e) => a + e.fields_checked, 0)} checked, all passed`);
   info(`Hash:       ${packetHash.slice(0, 20)}...`);
+  if (flags.recipient) info(`Recipient:  ${flags.recipient}`);
+  if (flags.purpose) info(`Purpose:    ${flags.purpose}`);
   log();
 
   // ── The Trojan Horse ──
@@ -1751,7 +1903,9 @@ function cmdHelp() {
   log();
   log(`  ${CLR.bold}Custom Profiles:${CLR.reset}`);
   log(`    verify --profile=<file> --evidence=<file>   Verify evidence against a custom profile`);
+  log(`    verify --manifest=<file>                    Replay verification from a packed Draft`);
   log(`    pack   --profile=<file> --evidence=<file>   Pack after custom verification`);
+  log(`    pack   --recipient=<val> --purpose=<val>    Add metadata to Draft manifest (optional)`);
   log(`    check  --profile=<file>                     Collect evidence + verify in one step`);
   log();
   log(`  ${CLR.bold}Examples:${CLR.reset}`);

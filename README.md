@@ -180,6 +180,29 @@ A profile is a JSON file with a `rules` array. Each rule has:
 - `expected` — the value to check against
 - `operator` — `eq` (default), `gte`, or `lte`
 
+## Recipient Replay
+
+When you pack, you can declare who the proof is for and why:
+
+```bash
+node cli.js pack --profile=profiles/aws-core-controls-v1.json \
+  --evidence=your-aws-state.json \
+  --recipient=auditor@example.com \
+  --purpose="Q1 compliance review"
+```
+
+The manifest records the recipient and purpose. The exact profile and evidence used are bundled as `bundled-profile.json` and `bundled-evidence.json` alongside the manifest in `px/output/`.
+
+### Replay verification
+
+The recipient can re-run verification against the bundled inputs:
+
+```bash
+node cli.js verify --manifest=px/output/draft-manifest.json
+```
+
+This replays every rule against the bundled evidence and confirms the result matches the manifest's claim. Works for both Genesis workspace packs and custom profile packs.
+
 ## Try the demo
 
 To see PX verify sample SOC 2 evidence instead:
@@ -209,7 +232,7 @@ PX proves that evidence existed, was not altered, and conforms to rules. What th
 
 ## Technical
 
-- 1355 lines of vanilla Node.js
+- ~1960 lines of vanilla Node.js
 - Zero external dependencies (`fs`, `path`, `crypto` only)
 - SHA-256 for hashing, Ed25519 for signing (when Authority is live)
 - No proprietary crypto, no blockchain
