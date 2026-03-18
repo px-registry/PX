@@ -36,6 +36,259 @@ const EVIDENCE_DIR = 'evidence';
 const OUTPUT_DIR = 'output';
 
 // ══════════════════════════════════════════
+// Verification Seal
+// ══════════════════════════════════════════
+
+function generateSeal(evidenceHash, created, allPass, ruleCount) {
+  // evidenceHash is "sha256:<hex>", extract hex part chars 8-11
+  const hex = evidenceHash.replace(/^sha256:/, '');
+  const hashPart = hex.substring(8, 12).toUpperCase();
+  const date = new Date(created);
+  const quarter = 'Q' + (Math.floor(date.getMonth() / 3) + 1);
+  const timePart = date.getFullYear() + quarter;
+  const resultPart = allPass ? 'PASS' : 'FAIL';
+  return 'PX-' + hashPart + '-' + timePart + '-' + resultPart + '-' + ruleCount;
+}
+
+// ══════════════════════════════════════════
+// Lens HTML template
+// ══════════════════════════════════════════
+
+const LENS_TEMPLATE = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PX Lens</title>
+<style>
+:root{--pass:#16a34a;--fail:#dc2626;--draft:#d97706;--bg:#fafafa;--fg:#111;--muted:#666;--border:#ddd;--card:#fff;--mono:"Consolas","Monaco","Courier New",monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--fg);line-height:1.5;max-width:960px;margin:0 auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--fg);padding-bottom:16px;margin-bottom:24px}
+.logo{font-size:28px;font-weight:700;letter-spacing:-1px}
+.seal{font-family:var(--mono);font-size:16px;background:var(--fg);color:var(--bg);padding:6px 14px;border-radius:4px;letter-spacing:1px}
+.draft-badge{display:inline-block;background:var(--draft);color:#fff;font-size:12px;font-weight:600;padding:2px 10px;border-radius:3px;text-transform:uppercase;margin-left:12px}
+.btn-export{background:var(--fg);color:var(--bg);border:none;padding:8px 20px;font-size:14px;cursor:pointer;border-radius:4px;margin-top:8px}
+.btn-export:hover{opacity:.85}
+nav{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px}
+nav button{background:none;border:none;border-bottom:2px solid transparent;padding:10px 24px;font-size:14px;cursor:pointer;color:var(--muted);font-weight:500}
+nav button.active{color:var(--fg);border-bottom-color:var(--fg);font-weight:600}
+nav button:hover{color:var(--fg)}
+section{display:none}
+section.active{display:block}
+.field{margin-bottom:10px}
+.field-label{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600}
+.field-value{font-size:15px;margin-top:2px}
+.field-value.mono{font-family:var(--mono);font-size:13px;word-break:break-all}
+.result-banner{padding:16px 20px;border-radius:6px;font-size:18px;font-weight:700;margin:20px 0}
+.result-banner.pass{background:#dcfce7;color:var(--pass)}
+.result-banner.fail{background:#fef2f2;color:var(--fail)}
+.null-fields{background:#fefce8;border:1px solid #fde68a;border-radius:6px;padding:14px 18px;margin:16px 0;font-size:13px;color:#92400e}
+.null-fields code{font-family:var(--mono);background:#fef9c3;padding:1px 4px;border-radius:2px}
+.replay-indicator{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:4px;font-size:13px;font-weight:500;margin-top:12px}
+.replay-indicator.ok{background:#dcfce7;color:var(--pass)}
+.replay-indicator.warn{background:#fef2f2;color:var(--fail)}
+.one-liner{font-size:13px;color:var(--muted);margin-top:16px;font-style:italic}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600}
+td.pass-cell{color:var(--pass);font-weight:600}
+td.fail-cell{color:var(--fail);font-weight:600}
+.fail-detail{font-size:12px;color:var(--fail);font-family:var(--mono)}
+.scope-note{font-size:12px;color:var(--muted);margin-top:16px;padding:10px 14px;background:#f5f5f5;border-radius:4px}
+.trace{font-family:var(--mono);font-size:12px;background:#1e1e1e;color:#d4d4d4;padding:20px;border-radius:6px;overflow-x:auto;line-height:1.7;white-space:pre-wrap}
+.trace .ts{color:#858585}
+.trace .pass{color:#4ec9b0}
+.trace .fail{color:#f44747}
+.trace .dim{color:#858585}
+.trace .label{color:#9cdcfe}
+.cli-cmd{font-family:var(--mono);font-size:13px;background:#f5f5f5;padding:12px 16px;border-radius:4px;margin:12px 0;border:1px solid var(--border)}
+.no-trust{font-size:13px;color:var(--muted);margin-top:16px;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);text-align:center}
+@media print{
+  body{max-width:100%;padding:0;font-size:11px}
+  .btn-export,nav{display:none!important}
+  section{display:block!important;page-break-before:always}
+  section:first-of-type{page-break-before:avoid}
+  header{page-break-after:avoid}
+  .print-header{display:block;font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;margin-bottom:4px}
+  .trace{background:#f5f5f5!important;color:#111!important;border:1px solid #ccc}
+  .trace .ts,.trace .dim{color:#666!important}
+  .trace .pass{color:var(--pass)!important}
+  .trace .fail{color:var(--fail)!important}
+  .result-banner.pass{border:2px solid var(--pass);background:#fff!important}
+  .result-banner.fail{border:2px solid var(--fail);background:#fff!important}
+  table{font-size:11px}
+  th,td{padding:4px 8px;border:1px solid #ccc}
+  footer{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;border-top:1px solid #ccc;padding:4px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <span class="logo">PX Lens</span>
+    <span class="draft-badge">Draft</span>
+  </div>
+  <div style="text-align:right">
+    <div class="seal" id="seal"></div>
+    <button class="btn-export" onclick="window.print()">Export PDF</button>
+  </div>
+</header>
+<nav>
+  <button class="active" data-tab="summary">Summary</button>
+  <button data-tab="controls">Controls</button>
+  <button data-tab="replay">Replay</button>
+</nav>
+<main>
+  <section id="summary" class="active"></section>
+  <section id="controls"></section>
+  <section id="replay"></section>
+</main>
+<footer>Verification re-executed in your browser. No network used. No data leaves this page.</footer>
+<script>
+const MANIFEST=/*__MANIFEST__*/null;
+const EVIDENCE=/*__EVIDENCE__*/null;
+const PROFILE=/*__PROFILE__*/null;
+const STORED_RESULTS=/*__RESULTS__*/null;
+
+function resolveDotPath(obj,dotPath){
+  var segs=dotPath.split('.');var cur=obj;
+  for(var i=0;i<segs.length;i++){
+    if(cur===null||cur===undefined||typeof cur!=='object')return undefined;
+    cur=cur[segs[i]];
+  }
+  return cur;
+}
+function verifyRule(value,rule){
+  if(value===undefined||value===null)return{pass:false,reason:'path "'+rule.path+'" not found in evidence'};
+  var op=rule.operator||'eq';
+  if(op==='eq')return value===rule.expected?{pass:true,reason:'ok'}:{pass:false,reason:'got: '+JSON.stringify(value)+', expected: '+JSON.stringify(rule.expected)};
+  if(op==='gte'){if(typeof value!=='number')return{pass:false,reason:'expected number for gte, got '+typeof value};return value>=rule.expected?{pass:true,reason:'ok'}:{pass:false,reason:'got: '+value+', expected: >= '+rule.expected};}
+  if(op==='lte'){if(typeof value!=='number')return{pass:false,reason:'expected number for lte, got '+typeof value};return value<=rule.expected?{pass:true,reason:'ok'}:{pass:false,reason:'got: '+value+', expected: <= '+rule.expected};}
+  return{pass:false,reason:'unknown operator: '+op};
+}
+function runVerify(profile,evidence){
+  var results=[];
+  for(var i=0;i<profile.rules.length;i++){
+    var rule=profile.rules[i];var value=resolveDotPath(evidence,rule.path);var check=verifyRule(value,rule);
+    results.push({id:rule.id,description:rule.description||'',pass:check.pass,reason:check.reason,path:rule.path,expected:rule.expected,got:value});
+  }
+  return results;
+}
+async function sha256(text){
+  var data=new TextEncoder().encode(text);
+  var hash=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+}
+
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+document.addEventListener('DOMContentLoaded',function(){
+  if(!MANIFEST||!EVIDENCE||!PROFILE||!STORED_RESULTS){
+    document.querySelector('main').innerHTML='<div style="padding:40px;text-align:center;color:var(--fail)"><h2>No data embedded</h2><p>This lens.html has no verification data. Generate it via <code>px pack</code>.</p></div>';
+    return;
+  }
+
+  var seal=MANIFEST.seal||'';
+  document.getElementById('seal').textContent=seal;
+
+  var allPass=STORED_RESULTS.every(function(r){return r.pass});
+  var passCount=STORED_RESULTS.filter(function(r){return r.pass}).length;
+  var totalCount=STORED_RESULTS.length;
+
+  // ── Summary ──
+  var summaryHtml='<div class="print-header" style="display:none">PX Lens — Verification Report | '+esc(seal)+'</div>';
+  summaryHtml+='<div class="result-banner '+(allPass?'pass':'fail')+'">'+(allPass?'ALL PASS':'FAILED')+' — '+passCount+'/'+totalCount+' rules verified</div>';
+  summaryHtml+='<div class="field"><div class="field-label">Recipient</div><div class="field-value">'+esc(MANIFEST.intended_recipient||'Not specified')+'</div></div>';
+  summaryHtml+='<div class="field"><div class="field-label">Purpose</div><div class="field-value">'+esc(MANIFEST.stated_purpose||'Not specified')+'</div></div>';
+  summaryHtml+='<div class="field"><div class="field-label">Created</div><div class="field-value">'+esc(MANIFEST.created_at||'')+'</div></div>';
+  summaryHtml+='<div class="field"><div class="field-label">Profile</div><div class="field-value">'+esc((PROFILE.name||PROFILE.profile_id||'')+' v'+(PROFILE.profile_version||''))+'</div></div>';
+  summaryHtml+='<div class="field"><div class="field-label">Evidence Hash</div><div class="field-value mono">'+esc(MANIFEST.packet_hash||'')+'</div></div>';
+  summaryHtml+='<div class="null-fields"><strong>Draft — internal only. Not a Submission.</strong><br>Reserved fields: <code>submission_id</code> <code>sct</code> <code>acceptance_receipt</code> <code>recipient_binding</code> — all <code>null</code>.</div>';
+  summaryHtml+='<div class="one-liner">PX verified exported evidence against declared rules. Same input produces the same result.</div>';
+  summaryHtml+='<div style="margin-top:8px;font-size:13px;color:var(--muted)">Independent replay available. See Replay tab.</div>';
+  summaryHtml+='<div class="replay-indicator" id="recompute-summary"></div>';
+  document.getElementById('summary').innerHTML=summaryHtml;
+
+  // ── Controls ──
+  var ctrlHtml='<div class="print-header" style="display:none">PX Lens — Controls | '+esc(seal)+'</div>';
+  ctrlHtml+='<div class="field"><div class="field-label">Profile</div><div class="field-value">'+esc((PROFILE.name||PROFILE.profile_id||'')+' v'+(PROFILE.profile_version||''))+'</div></div>';
+  if(PROFILE.source_type)ctrlHtml+='<div class="field"><div class="field-label">Source Type</div><div class="field-value">'+esc(PROFILE.source_type)+'</div></div>';
+  ctrlHtml+='<table><thead><tr><th>#</th><th>Rule ID</th><th>Description</th><th>Result</th></tr></thead><tbody>';
+  for(var i=0;i<STORED_RESULTS.length;i++){
+    var r=STORED_RESULTS[i];
+    ctrlHtml+='<tr><td>'+(i+1)+'</td><td style="font-family:var(--mono);font-size:13px">'+esc(r.id)+'</td><td>'+esc(r.description||'')+'</td>';
+    if(r.pass){ctrlHtml+='<td class="pass-cell">PASS</td>';}
+    else{ctrlHtml+='<td class="fail-cell">FAIL<br><span class="fail-detail">'+esc(r.reason||'')+'</span></td>';}
+    ctrlHtml+='</tr>';
+  }
+  ctrlHtml+='</tbody></table>';
+  ctrlHtml+='<div class="scope-note">This verification covers exported state only. It does not represent live system status.<br>Same input, same result. This verification can be independently reproduced.</div>';
+  document.getElementById('controls').innerHTML=ctrlHtml;
+
+  // ── Replay ──
+  var replayHtml='<div class="print-header" style="display:none">PX Lens — Replay | '+esc(seal)+'</div>';
+  var now=new Date();
+  var ts=function(){return'['+now.toTimeString().slice(0,8)+'.'+String(now.getMilliseconds()).padStart(3,'0')+']';};
+  var traceLines=[];
+  traceLines.push('<span class="ts">'+ts()+'</span> <span class="label">Loading profile:</span> '+esc((PROFILE.name||PROFILE.profile_id)+' v'+(PROFILE.profile_version||''))+' ('+PROFILE.rules.length+' rules)');
+  traceLines.push('<span class="ts">'+ts()+'</span> <span class="label">Loading evidence:</span> '+STORED_RESULTS.length+' fields');
+  for(var i=0;i<STORED_RESULTS.length;i++){
+    var r=STORED_RESULTS[i];
+    traceLines.push('<span class="ts">'+ts()+'</span> Rule '+(i+1)+'/'+STORED_RESULTS.length+': <span class="label">'+esc(r.id)+'</span>');
+    traceLines.push('               Path: '+esc(r.path)+' \\u2192 '+esc(JSON.stringify(r.got)));
+    traceLines.push('               Expected: '+esc(JSON.stringify(r.expected))+' — '+(r.pass?'<span class="pass">PASS</span>':'<span class="fail">FAIL</span> '+esc(r.reason||'')));
+  }
+  traceLines.push('<span class="ts">'+ts()+'</span> <span class="label">Verification complete:</span> '+passCount+'/'+totalCount+(allPass?' <span class="pass">ALL PASS</span>':' <span class="fail">FAILED</span>'));
+  traceLines.push('<span class="ts">'+ts()+'</span> <span class="label">Packet hash:</span> <span class="dim">'+esc(MANIFEST.packet_hash||'')+'</span>');
+  replayHtml+='<div class="trace">'+traceLines.join('\\n')+'</div>';
+  replayHtml+='<div style="margin-top:16px"><div class="field-label">Bundled Files</div><div class="field-value" style="font-size:13px">draft-manifest.json, bundled-profile.json, bundled-evidence.json</div></div>';
+  replayHtml+='<div style="margin-top:12px"><div class="field-label">CLI Replay Command</div><div class="cli-cmd">node cli.js verify --manifest=draft-manifest.json</div></div>';
+  replayHtml+='<div class="replay-indicator" id="recompute-replay"></div>';
+  replayHtml+='<div class="no-trust">No trust required. The verification was re-executed in your browser and matches the stored results. For full independent verification, run the CLI command above with the bundled files.</div>';
+  document.getElementById('replay').innerHTML=replayHtml;
+
+  // ── Browser recompute ──
+  setTimeout(function(){
+    var recomputed=runVerify(PROFILE,EVIDENCE);
+    var match=true;
+    if(recomputed.length!==STORED_RESULTS.length){match=false;}
+    else{for(var i=0;i<recomputed.length;i++){if(recomputed[i].pass!==STORED_RESULTS[i].pass){match=false;break;}}}
+    var els=document.querySelectorAll('.replay-indicator');
+    for(var j=0;j<els.length;j++){
+      if(match){els[j].className='replay-indicator ok';els[j].innerHTML='\\u2713 Replay verified — stored results match browser recompute';}
+      else{els[j].className='replay-indicator warn';els[j].innerHTML='\\u26A0 Recompute mismatch — stored results may have been altered';}
+    }
+    // Update no-trust note if mismatch
+    if(!match){var nt=document.querySelector('.no-trust');if(nt)nt.innerHTML='<strong>\\u26A0 Warning:</strong> Browser recompute produced different results from the stored values. The stored results in this file may have been altered after generation.';}
+  },50);
+
+  // ── Tab switching ──
+  var tabs=document.querySelectorAll('nav button');
+  for(var i=0;i<tabs.length;i++){
+    tabs[i].addEventListener('click',function(){
+      for(var j=0;j<tabs.length;j++){tabs[j].classList.remove('active');}
+      this.classList.add('active');
+      var sections=document.querySelectorAll('main section');
+      for(var j=0;j<sections.length;j++){sections[j].classList.remove('active');}
+      document.getElementById(this.getAttribute('data-tab')).classList.add('active');
+    });
+  }
+});
+</script>
+</body>
+</html>`;
+
+function generateLensHtml(manifest, evidenceData, profileData, verifyResults) {
+  return LENS_TEMPLATE
+    .replace('/*__MANIFEST__*/null', JSON.stringify(manifest))
+    .replace('/*__EVIDENCE__*/null', JSON.stringify(evidenceData))
+    .replace('/*__PROFILE__*/null', JSON.stringify(profileData))
+    .replace('/*__RESULTS__*/null', JSON.stringify(verifyResults));
+}
+
+// ══════════════════════════════════════════
 // Console output helpers
 // ══════════════════════════════════════════
 
@@ -1340,6 +1593,20 @@ function cmdPack(args) {
     const profileHash = 'sha256:' + crypto.createHash('sha256').update(profileContent).digest('hex');
     const evidenceHash = 'sha256:' + crypto.createHash('sha256').update(evidenceContent).digest('hex');
 
+    // Build per-rule results for lens embedding
+    const lensResults = result.results.map(r => {
+      const rule = profileData.rules.find(rl => rl.id === r.id);
+      return {
+        id: r.id,
+        description: r.description || '',
+        pass: r.pass,
+        reason: r.reason || 'ok',
+        path: r.path,
+        expected: rule ? rule.expected : null,
+        got: r.value,
+      };
+    });
+
     const evidenceRefs = [{
       evidence_id: `ev-${now.toISOString().slice(0, 10).replace(/-/g, '')}-custom`,
       evidence_class: profileData.profile_id,
@@ -1368,10 +1635,13 @@ function cmdPack(args) {
     const packetContent = JSON.stringify(packet);
     const packetHash = 'sha256:' + crypto.createHash('sha256').update(packetContent).digest('hex');
 
+    const seal = generateSeal(evidenceHash, now.toISOString(), true, result.total);
+
     const manifest = {
       manifest_type: 'DRAFT_MANIFEST',
       manifest_ref: manifestRef,
       packet_ref: packetId,
+      seal: seal,
       created_at: now.toISOString(),
       generator: `px-cli/${VERSION}`,
       project: profileData.profile_id,
@@ -1421,15 +1691,21 @@ function cmdPack(args) {
     writeJSON(path.join(outputDir, 'bundled-evidence.json'), evidenceData);
     success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
 
+    // Generate self-contained lens.html
+    const lensHtml = generateLensHtml(manifest, evidenceData, profileData, lensResults);
+    fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
+
     log();
     info(`Packet ID:  ${packetId}`);
+    info(`Seal:       ${seal}`);
     info(`Evidence:   ${result.total} rules, all verified`);
     info(`Hash:       ${packetHash.slice(0, 20)}...`);
     if (flags.recipient) info(`Recipient:  ${flags.recipient}`);
     if (flags.purpose) info(`Purpose:    ${flags.purpose}`);
     log();
     log(`  ${CLR.bold}${CLR.green}Your proof is ready for internal review.${CLR.reset}`);
-    log(`  ${CLR.dim}Open draft-manifest.json in Lens to see your verification badge.${CLR.reset}`);
+    log(`  ${CLR.dim}Open lens.html in a browser to see your verification report.${CLR.reset}`);
     log();
     log(`  ${CLR.dim}Recipient can replay:${CLR.reset}`);
     log(`  ${CLR.cyan}node cli.js verify --manifest=${relativePx(OUTPUT_DIR, 'draft-manifest.json')}${CLR.reset}`);

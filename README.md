@@ -213,6 +213,21 @@ npx px verify --manifest=./draft-manifest.json
 
 Send the recipient `draft-manifest.json`, `bundled-profile.json`, and `bundled-evidence.json`. As long as these three files are in the same directory, replay works.
 
+## Verification Report
+
+When you pack with a custom profile, PX generates a self-contained `lens.html`.
+
+Open it in any browser — the verification re-executes automatically.
+
+Three views:
+- **Summary** — what was verified, for whom, result
+- **Controls** — each rule checked, pass/fail
+- **Replay** — step-by-step execution trace + CLI command
+
+Click "Export PDF" for a print-ready report. No CLI needed. No network needed.
+
+Each pack also gets a Verification Seal (e.g., `PX-A3F2-2026Q2-PASS-10`) — a short reference code for emails, tickets, and audit trails.
+
 ## Try the demo
 
 To see PX verify sample SOC 2 evidence instead:
@@ -242,7 +257,7 @@ PX proves that evidence existed, was not altered, and conforms to rules. What th
 
 ## Technical
 
-- ~1960 lines of vanilla Node.js
+- ~2240 lines of vanilla Node.js
 - Zero external dependencies (`fs`, `path`, `crypto` only)
 - SHA-256 for hashing, Ed25519 for signing (when Authority is live)
 - No proprietary crypto, no blockchain
