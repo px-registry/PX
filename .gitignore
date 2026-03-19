@@ -3,3 +3,9 @@ px/
 node_modules/
 examples/draft-manifest.json
 examples/draft-packet.json
+
+# Secrets & keys
+.env
+.env.*
+*.pem
+*.key

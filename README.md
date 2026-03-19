@@ -1,6 +1,16 @@
-# PX
+# PX — Recipient-Verifiable Handoff Envelope
 
-PX makes proof you can hand off.
+PX wraps any evidence in a cryptographic envelope that receivers can verify by opening a single HTML file. No install. No login. Offline. Five seconds.
+
+## What PX is
+
+- **Envelope, not a platform.** PX doesn't define what's inside. It signs the contents and generates Lens for verification.
+- **Zero dependencies.** SHA-256 + Ed25519. Nothing else.
+- **Receiver cost is zero.** Open lens.html in any browser. Done.
+
+## Status
+
+CLI works today. npm publish coming soon.
 
 ## Quick Start: Verify AWS Controls
 
@@ -104,7 +114,7 @@ sha256sum v1/delegation-policy.json
 
 Compare with the `artifact_hash` values in each `genesis/draft-packet.json` evidence ref, or in the reproduced `./px/evidence/*.evidence.json` files. They match.
 
-## Status
+## Draft vs Submission
 
 **Draft.** Internally verified, not submitted externally.
 
@@ -260,14 +270,6 @@ node cli.js pack
 ```
 
 This creates a workspace with four SOC 2 profiles (access control, encryption, patch management, monitoring) and sample evidence. One deliberate failure is included so you can experience the fix-and-re-verify loop.
-
-## What PX is
-
-PX generates machine-verifiable evidence from your systems, verifies it against deterministic rules, and packages it so someone else can check it.
-
-- **Draft** is free, unlimited, and works entirely offline
-- **Submission** adds a sealed timestamp, acceptance receipt, and recipient binding
-- **Lens** reads the manifest and shows the state — amber or green
 
 ## What PX is not
 
