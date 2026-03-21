@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PX — まとめて、渡して、その場で確かめられる</title>
+  <meta name="description" content="複数のファイルを署名付きパックにして、受信者がLensを開くだけで検証できる。デジタルハンドオフの検証インフラ。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="software.html">ソフトウェア</a></li>
+      <li><a href="compliance.html">質問票</a></li>
+      <li><a href="ai-ml.html">AI/ML</a></li>
+      <li><a href="examples.html">事例</a></li>
+      <li><a href="pricing.html">料金</a></li>
+    </ul>
+    <a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<section class="hero">
+  <div class="wrap reveal">
+    <p class="label">The Digital Handoff Protocol</p>
+    <h1>まとめて、渡して、<br>受け取った人がその場で確かめられる。</h1>
+    <p class="hero__sub">複数のファイルを署名付きパックにして渡すだけ。受信者はブラウザで「Lens」を開き、「この一式は崩れていない」と即断できます。</p>
+    <div class="hero__actions">
+      <a href="#lens-demo" class="btn btn--p btn--lg">Lensデモを見る</a>
+      <a href="#how" class="btn btn--s btn--lg">仕組みを知る</a>
+    </div>
+    <div class="hero__integrations">
+      GRCツール、CI/CD、質問票Excel — 何でもそのまま入れてください。
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 3 Profile Cards ═══ -->
+<section class="sec sec--bg" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">3つの入口</p>
+      <h2>何を渡す場面でも</h2>
+      <p>技術は全部同じ。語り方だけ変わる。</p>
+    </div>
+
+    <div class="profiles reveal">
+      <div class="pcard">
+        <div class="pcard__icon">📦</div>
+        <div class="pcard__title">ソフトウェアリリース</div>
+        <p class="pcard__desc">binary + SBOM + provenanceを検証可能な一式にして渡せる。受け取った人がLensで「全部揃ってる、改竄なし」と5秒で確認。</p>
+        <a href="software.html" class="pcard__link">詳しく見る &rarr;</a>
+      </div>
+      <div class="pcard">
+        <div class="pcard__icon">📋</div>
+        <div class="pcard__title">質問票 / コンプライアンス</div>
+        <p class="pcard__desc">回答と証拠をまとめて、受信者が確認の往復なしで済む。質問票Excelをそのまま入れるだけ。回答時間を数日から数分に。</p>
+        <a href="compliance.html" class="pcard__link">詳しく見る &rarr;</a>
+      </div>
+      <div class="pcard">
+        <div class="pcard__icon">🧠</div>
+        <div class="pcard__title">AI / MLモデル</div>
+        <p class="pcard__desc">モデル + config + eval を一式で、受信者がLensで確認。規制当局にモデルの挙動が変わっていないことを証明できる。</p>
+        <a href="ai-ml.html" class="pcard__link">詳しく見る &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ZIP+メールとの違い ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>ZIP + メールからの脱却</h2>
+    </div>
+    <div class="reveal" style="overflow-x:auto;max-width:960px;margin:0 auto">
+      <table class="cmp">
+        <thead>
+          <tr><th>要件</th><th>従来の ZIP + メール</th><th class="hi" style="text-align:center">PX Pack</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">一式が全部揃っているか</td>
+            <td class="n">開いて探すまで分からない</td>
+            <td class="hi"><span class="y">✓</span> マニフェスト照合（1つ欠ければFail）</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">送った後に変わっていないか</td>
+            <td class="n">分からない</td>
+            <td class="hi"><span class="y">✓</span> ハッシュ検証（1bitでも変わればRed）</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">誰が作ったか</td>
+            <td class="n">メール送信者（偽装可能）</td>
+            <td class="hi"><span class="y">✓</span> SHA-256 ハッシュ検証</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">回答と証拠の対応</td>
+            <td class="n">受信者が手作業で突き合わせ</td>
+            <td class="hi"><span class="y">✓</span> 構造化リンク（slice_ref）</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">受信者の確認方法</td>
+            <td class="n">1つずつ全ファイルを目視確認</td>
+            <td class="hi"><span class="y">✓</span> Lensを1つ開くだけ（5秒）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Builder体験（Review Queue） ═══ -->
+<section class="sec" id="builder">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">作成者の体験</p>
+      <h2>整理はPXに。最後の決断だけ、あなたに。</h2>
+      <p>勝手に推測して嘘をつくAIは「署名付きのゴミ」を作るだけ。<br>PXは300ファイルから不要なものを自動で弾き、迷った18件だけをあなたに尋ねる。<br>キーボードを数回叩くだけ。</p>
+    </div>
+
+    <div class="builder reveal">
+      <div class="builder__bar">
+        <span>Review Queue [3/18]</span>
+        <span>Decisions needed: 18</span>
+      </div>
+      <div class="builder__body">
+        <div class="builder__stats">
+          <div class="builder__stat"><span>Ingested</span><strong>300</strong></div>
+          <div class="builder__stat"><span>Auto-sorted</span><strong>241</strong></div>
+          <div class="builder__stat accent"><span>Accept</span><strong>199</strong></div>
+          <div class="builder__stat"><span>You decide</span><strong>18</strong></div>
+        </div>
+        <div class="builder__q">Q12: MFA設定の証拠</div>
+        <div class="builder__item active">
+          <div>
+            <div class="builder__fname">[1] MFA設定_20260301.png</div>
+            <div class="builder__why">ファイル名一致 / 過去に採用済み</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="builder__check">&#10003; Selected</span>
+            <span class="builder__kbd">Enter</span>
+          </div>
+        </div>
+        <div class="builder__item dim">
+          <div>
+            <div class="builder__fname">[2] MFA設定_20241115.png</div>
+            <div class="builder__why">フォルダ内一致（古い可能性）</div>
+          </div>
+          <span class="builder__kbd">2</span>
+        </div>
+      </div>
+      <div class="builder__foot">
+        <span class="builder__kbd" style="background:var(--raised);color:var(--t2)">S</span> でスキップ（該当なし）
+      </div>
+    </div>
+
+    <p class="reveal" style="text-align:center;color:var(--t2);font-size:var(--ts-sm);margin-top:var(--sp-xl);max-width:520px;margin-left:auto;margin-right:auto">今回の提出を10分で終わらせる。来年は、3分。<br>あなたが下した判断をPXが記憶する。来年の監査では差分の3件を確認するだけ。<br>提出の苦痛は、年を追うごとにゼロに近づく。</p>
+    <p class="reveal" style="text-align:center;color:var(--t3);font-size:var(--ts-xs);margin-top:var(--sp-lg)">ハッシュ計算と署名はすべてローカルで完結。証拠ファイルが外部サーバーに送信されることはありません。</p>
+  </div>
+</section>
+
+<!-- ═══ Lens Demo (FAIL-first, white background) ═══ -->
+<section class="sec sec--bg" id="lens-demo">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">受信者の体験</p>
+      <h2>Lensを開く。それだけ。</h2>
+      <p>相手に要求するのは、ファイルを開くことだけ。<br>インストール不要。アカウント不要。ITリテラシーに関わらず、緑の画面がすべてを証明する。</p>
+    </div>
+
+    <div class="lens reveal">
+      <div class="lens__bar">
+        <div class="lens__dots">
+          <div class="lens__dot lens__dot--r"></div>
+          <div class="lens__dot lens__dot--y"></div>
+          <div class="lens__dot lens__dot--g"></div>
+        </div>
+        <span class="lens__title">lens.html (Offline Viewer)</span>
+      </div>
+      <div class="lens__body">
+        <div class="lens__tabs">
+          <button class="lens__tab on--fail" data-target="lens-fail">FAIL</button>
+          <button class="lens__tab" data-target="lens-pass">PASS</button>
+        </div>
+
+        <!-- FAIL (default visible) -->
+        <div class="lens-screen active" id="lens-fail">
+          <div class="verdict verdict--fail show">
+            <div class="verdict__title">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              この提出パックは有効ではありません
+            </div>
+            <p class="verdict__sub">1件の致命的な不一致が検出されました。提出者に差し戻してください。</p>
+          </div>
+          <div class="lens__kpis">
+            <div class="lens__kpi err"><span>Files</span><strong>27/28</strong></div>
+            <div class="lens__kpi err"><span>Refs</span><strong>40/41</strong></div>
+            <div class="lens__kpi"><span>Hash</span><strong style="color:#059669">Match</strong></div>
+          </div>
+          <div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> CAIQ_Answers.xlsx</div>
+              <div class="lens__hash">sha256:5cb6...</div>
+            </div>
+            <div class="lens__row lens__row--err">
+              <div class="lens__file" style="color:#dc2626"><span class="st-err">✕</span> security_policy.pdf（改ざん検知）</div>
+              <div class="lens__hash" style="color:#dc2626">Hash Mismatch</div>
+            </div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> aws_kms_config.json</div>
+              <div class="lens__hash">sha256:90fa...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASS -->
+        <div class="lens-screen" id="lens-pass">
+          <div class="verdict verdict--pass show">
+            <div class="verdict__title">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              この提出パックは有効です
+            </div>
+            <p class="verdict__sub">封印後の変更はなく、参照されている証拠はすべて揃っています。</p>
+            <p style="font-size:var(--ts-xs);color:#737373;margin-top:16px">Verified via PX — <a href="#how" style="color:#059669">Create your own pack</a></p>
+          </div>
+          <div class="lens__kpis">
+            <div class="lens__kpi"><span>Files</span><strong>28/28</strong></div>
+            <div class="lens__kpi"><span>Refs</span><strong>41/41</strong></div>
+            <div class="lens__kpi"><span>Hash</span><strong style="color:#059669">Match</strong></div>
+          </div>
+          <div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> CAIQ_Answers.xlsx</div>
+              <div class="lens__hash">sha256:5cb6...</div>
+            </div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> security_policy.pdf</div>
+              <div class="lens__hash">sha256:d41d...</div>
+            </div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> aws_kms_config.json</div>
+              <div class="lens__hash">sha256:90fa...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 2つのレイヤー ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">2つのレイヤー</p>
+      <h2>1回の提出で終わりません</h2>
+    </div>
+    <div class="layers reveal">
+      <div class="layer">
+        <div class="layer__num">Layer 1 — 今回の一式</div>
+        <h4>「全部揃ってる、改竄なし」を5秒で</h4>
+        <p>1回の受け渡しの検証。受信者がLensを開いて即断できる。</p>
+      </div>
+      <div class="layer">
+        <div class="layer__num">Layer 2 — 前回からの差分</div>
+        <h4>変わった部分だけ確認。前回と同じはそのまま</h4>
+        <p>前回のパックを参照して、何が変わったかを自動で表示。SOC2 Type 2の継続運用、リリースごとのバージョン履歴、モデルのfine-tune履歴。すべて同じ仕組み。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 構造的空白（10市場） ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>なぜPXが必要か</h2>
+    </div>
+    <div class="callout reveal" style="max-width:var(--w-n);margin:0 auto var(--sp-2x)">
+      署名はある。パッケージング＋受信者検証UIがない。
+    </div>
+    <div class="reveal" style="overflow-x:auto;max-width:960px;margin:0 auto">
+      <table class="gap-table">
+        <thead><tr><th>市場</th><th>署名/ハッシュ</th><th>パッケージング</th><th>受信者検証UI</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--t1)">ソフトウェア配布</td><td>Sigstore, GitHub Attestations</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">AI/ML</td><td>OpenSSF Model Signing</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">質問票/コンプラ</td><td>なし（GRCツールは収集のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">ベンダーリスク</td><td>SecurityScorecard（外部スコア）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">AIエージェント</td><td>MCP Gateway（認証のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">CoA/検査成績書</td><td>QMS内蔵（作成側のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">研究データ</td><td>RO-Crate（構造のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">機械可読コンプラ</td><td>OSCAL/CycloneDX</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">M&Aデューデリ</td><td>VDR（共有のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">インシデント証拠保全</td><td>フォレンジクスツール</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="reveal" style="text-align:center;color:var(--t3);font-size:var(--ts-sm);margin-top:var(--sp-xl)">署名する仕組みはある。でも「まとめて渡して、相手がその場で確認する」仕組みは、まだどこにもない。</p>
+  </div>
+</section>
+
+<!-- ═══ ジャンル tag cloud ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">Genres</p>
+      <h2>ソフトウェアから製造まで。<br>あらゆるジャンルに対応。</h2>
+      <p>PXは中身を解釈しない。構造とハッシュと署名だけ。</p>
+    </div>
+    <div class="tags reveal">
+      <span class="tag">SOC2 Questionnaire</span>
+      <span class="tag">CAIQ v4</span>
+      <span class="tag">SIG Lite</span>
+      <span class="tag">Vendor Risk Assessment</span>
+      <span class="tag">Software Release</span>
+      <span class="tag">SBOM Attestation</span>
+      <span class="tag">Container Image</span>
+      <span class="tag">GitHub Actions Artifact</span>
+      <span class="tag">ML Model Card</span>
+      <span class="tag">Model Weights + Config</span>
+      <span class="tag">Eval Results</span>
+      <span class="tag">Agent Action Log</span>
+      <span class="tag">MCP Tool Receipt</span>
+      <span class="tag">A2A Delegation Proof</span>
+      <span class="tag">Research Data Package</span>
+      <span class="tag">Clinical Trial Data</span>
+      <span class="tag">Certificate of Analysis</span>
+      <span class="tag">Batch Record</span>
+      <span class="tag">ISO 27001 Evidence</span>
+      <span class="tag">HIPAA Compliance Pack</span>
+      <span class="tag">GDPR DPIA</span>
+      <span class="tag">Penetration Test Report</span>
+      <span class="tag">Insurance Submission</span>
+      <span class="tag">OSCAL Assessment</span>
+      <span class="tag">CycloneDX VEX</span>
+      <span class="tag">RO-Crate Wrapper</span>
+      <span class="tag">Legal Discovery Pack</span>
+      <span class="tag">Firmware Update</span>
+      <span class="tag">API Specification</span>
+      <span class="tag">and more</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PXがやらないこと ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>PXがやらないこと</h2>
+      <p>何をしないかで、何をするかが明確になる。</p>
+    </div>
+    <div class="notdo reveal">
+      <div class="notdo__item">
+        <div class="notdo__title">収集しない</div>
+        <p class="notdo__desc">PXは証拠を集めない。あなたが集めたファイルを、渡せる形にする。</p>
+      </div>
+      <div class="notdo__item">
+        <div class="notdo__title">中身の真実性を保証しない</div>
+        <p class="notdo__desc">渡した後に誰かが手を加えていないことを証明する。中身はあなたが正しいと判断したもの。PXはそれを封印する。</p>
+      </div>
+      <div class="notdo__item">
+        <div class="notdo__title">既存ツールと競合しない</div>
+        <p class="notdo__desc">今使っているツールを変える必要はない。PXは、その先の「渡す瞬間」だけを受け持つ。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 毎日使って、必要な時に渡す ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">Draft は永久無料</p>
+      <h2>毎日使って、必要な時に渡す</h2>
+    </div>
+    <div class="daily reveal">
+      <div class="daily__flow">
+        <div class="daily__col">
+          <p class="label">日常（無料）</p>
+          <h4>社内で回す</h4>
+          <p>証拠を入れるたびにPXが整理して、いつでもパックにできる状態を保つ。次の監査？前回のルールが残っているから、差分だけ確認。3分で終わる。</p>
+        </div>
+        <div class="daily__arrow">&rarr;</div>
+        <div class="daily__col" style="border-color:rgba(16,185,129,.3)">
+          <p class="label">提出時（課金）</p>
+          <h4>ボタン1つで外部へ</h4>
+          <p>外部に渡す必要が出たら、Submissionに切り替え。社内の積み重ねが、そのまま署名付き提出物になる。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Pull構造カード (from GPT, customer language) ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">受信者が次の作成者になる</p>
+      <h2>Pack it. Send it. They verify it.</h2>
+    </div>
+    <div class="pull-card reveal">
+      <h4>受け取って終わりではない</h4>
+      <p>パックを受け取った人は、自分のLens検証結果をそのまま次の相手に共有できます。監査法人→経営層、ベンダー→元請→最終顧客。検証済みの証拠は組織をまたいで流通します。</p>
+      <div class="pull__flow">
+        <div class="pull__step">作成者がPack</div>
+        <div class="pull__arrow">&rarr;</div>
+        <div class="pull__step">受信者がLens検証</div>
+        <div class="pull__arrow">&rarr;</div>
+        <div class="pull__step">次の相手にそのまま転送</div>
+        <div class="pull__arrow">&rarr;</div>
+        <div class="pull__step">誰でもLensで再検証</div>
+      </div>
+      <div style="margin-top:var(--sp-xl);text-align:center">
+        <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px pack ./evidence-folder/</code>
+        <p style="font-size:var(--ts-xs);color:var(--t3);margin-top:8px">APIキー不要。依存関係ゼロ。このコマンドだけ。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Pricing Summary ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">料金</p>
+      <h2>Creating proof is free.<br>Responsibility is priced.</h2>
+    </div>
+    <div class="price-cards reveal">
+      <div class="price-card price-card--hl">
+        <div class="price-card__name">Draft</div>
+        <div class="price-card__price">&yen;0</div>
+        <div class="price-card__unit">永久無料</div>
+        <ul class="price-card__list">
+          <li>Pack生成 &mdash; 無制限</li>
+          <li>Lens検証 &mdash; 無制限</li>
+          <li>オフライン動作</li>
+          <li>CLI（ローカル動作）</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="price-card__name">Submission</div>
+        <div class="price-card__price">$500〜</div>
+        <div class="price-card__unit">プリペイドクレジット制</div>
+        <ul class="price-card__list">
+          <li>外部handoffの封印</li>
+          <li>Starter $500 / 10 credits</li>
+          <li>Growth $2,000 / 50 credits</li>
+          <li>Scale $10,000 / 300 credits</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="price-card__name">Partner / Ops</div>
+        <div class="price-card__price">$10K〜</div>
+        <div class="price-card__unit">年額固定</div>
+        <ul class="price-card__list">
+          <li>チーム管理</li>
+          <li>Learned Rules蓄積</li>
+          <li>質問票代行・TPRM支援</li>
+          <li>チャネルパートナー構造</li>
+        </ul>
+      </div>
+    </div>
+    <p class="reveal" style="text-align:center;margin-top:var(--sp-xl);color:var(--t3);font-size:var(--ts-sm)">テスト期間中は全機能無料。<a href="pricing.html">料金の詳細 &rarr;</a></p>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal"><h2>FAQ</h2></div>
+    <div class="faq reveal">
+      <div class="faq__item">
+        <button class="faq__q">PXとは何ですか？</button>
+        <div class="faq__a"><p>複数のファイルを署名付きパックにして、受信者がLensという1つのHTMLファイルを開くだけで「この一式は崩れていない」と即断できるツールです。CLIで動作します。ブラウザ上のCloud版は準備中です。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">他のGRCツールと競合しますか？</button>
+        <div class="faq__a"><p>いいえ。PXは証拠を集めません。今使っているツールで集めたファイルを、そのまま渡せる形にします。ワークフローは変わりません。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">受信者は何をインストールする必要がありますか？</button>
+        <div class="faq__a"><p>何も。lens.htmlをブラウザで開くだけです。インターネット接続も不要です。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">無料ですか？</button>
+        <div class="faq__a"><p>Draftモード（パック生成 + Lens検証）は永久無料です。外部handoffの封印（Submission）にクレジット課金が発生します。テスト期間中はすべての機能が無料です。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">どんな種類のファイルに対応していますか？</button>
+        <div class="faq__a"><p>何でも。Profile切替でソフトウェアリリース、質問票、AI/MLモデル等に対応します。Genericモードでは入れたファイルすべてをパックにできます。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">PXが停止したら、過去のパックはどうなりますか？</button>
+        <div class="faq__a"><p>そのまま使えます。Lensは外部APIに一切依存しない自己完結型HTMLです。PXが停止しても、過去に作ったパックは完全なオフライン環境で検証し続けられます。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">セキュリティの仕組みは？</button>
+        <div class="faq__a"><p>SHA-256ハッシュ検証。外部ライブラリへの依存ゼロ。Lensはオフラインで動作し、ネットワークへの通信を一切行いません。fail-close設計により、1つでも不整合があれば検証は失敗します。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta-band">
+  <div class="wrap reveal">
+    <h2>御社の質問票1本で試す</h2>
+    <p>既存のツールを捨てる必要はない。次回の提出で、1回だけ並行して使ってみてください。<br>組織内でパックを作り、Lensで確認するまでは永久に無料。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+    <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:var(--sp-xl)">テスト期間中は全機能無料。</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="software.html">ソフトウェア</a></li>
+          <li><a href="compliance.html">質問票</a></li>
+          <li><a href="ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="examples.html">事例</a></li>
+          <li><a href="pricing.html">料金</a></li>
+          <li><a href="trust.html">信頼性</a></li>
+          <li><a href="pilot.html">パイロット</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>会社</h4>
+        <ul>
+          <li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

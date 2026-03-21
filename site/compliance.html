@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>質問票 / コンプライアンス — PX</title>
+  <meta name="description" content="質問票Excelをそのまま入れるだけ。回答と証拠が構造化され、受信者がLensで5秒確認。確認の往復を減らす。提出の手間を減らす。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="software.html">ソフトウェア</a></li>
+      <li><a href="compliance.html" class="active">質問票</a></li>
+      <li><a href="ai-ml.html">AI/ML</a></li>
+      <li><a href="examples.html">事例</a></li>
+      <li><a href="pricing.html">料金</a></li>
+    </ul>
+    <a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<section class="phero">
+  <div class="wrap wrap--n">
+    <p class="phero__label">Questionnaire Profile</p>
+    <h1>回答と証拠をまとめて、確認の往復をなくす</h1>
+    <p>質問票Excelをそのまま入れるだけ。回答と証拠が構造化され、受信者がLensで5秒確認。確認の往復を減らす。提出の手間を減らす。</p>
+  </div>
+</section>
+
+<!-- ═══ The Problem ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap wrap--n">
+    <div class="sec-head reveal">
+      <h2>質問票の提出に何日かかっていますか？</h2>
+    </div>
+    <div class="frow reveal">
+      <div class="frow__text">
+        <ol>
+          <li>質問ごとに証拠ファイルを探して紐づける手作業</li>
+          <li>提出後に「このファイルが開けない」「Q12の根拠は？」の往復</li>
+          <li>次の質問票でも同じ作業をゼロからやり直し</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ How PX works for questionnaires ═══ -->
+<section class="sec">
+  <div class="wrap wrap--n">
+    <div class="frow reveal">
+      <div class="frow__text">
+        <h3>Drop &rarr; Detect &rarr; Structure &rarr; Review &rarr; Pack</h3>
+        <p>質問票Excelをドロップ。PXが質問を自動抽出し、証拠ファイルを候補として紐づける。あなたが確認するのは曖昧な候補だけ。残りは自動。</p>
+      </div>
+      <div class="frow__vis">
+        <div class="lens">
+          <div class="lens__bar">Author Preview</div>
+          <div class="lens__body">
+            <p><strong>Ingested:</strong> 300 &nbsp;/&nbsp; <strong>Structured:</strong> 241</p>
+            <p><strong>Safe to Accept:</strong> 199</p>
+            <p><strong>Decisions needed:</strong> 18</p>
+            <p><strong>Pack status:</strong> Draft ready</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Review Queue ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap wrap--n">
+    <div class="frow frow--flip reveal">
+      <div class="frow__vis">
+        <div class="lens">
+          <div class="lens__bar">Review Queue</div>
+          <div class="lens__body">
+            <p><strong>Q12: MFA設定の証拠</strong> [3/18]</p>
+            <hr class="hr">
+            <p>候補:</p>
+            <p>[1] MFA設定_20250301.png<br>&nbsp;&nbsp;&nbsp;&nbsp;&rarr; ファイル名に「MFA」「2025」含む</p>
+            <p>[2] MFA設定_20241115.png<br>&nbsp;&nbsp;&nbsp;&nbsp;&rarr; ファイル名に「MFA」含む（古い）</p>
+            <hr class="hr">
+            <p>Enter=1を採用 &nbsp; S=スキップ</p>
+          </div>
+        </div>
+      </div>
+      <div class="frow__text">
+        <h3>判断だけに集中</h3>
+        <p>キーボードで秒速処理。候補はPXが出す。あなたは選ぶだけ。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Learned Rules ═══ -->
+<section class="sec">
+  <div class="wrap wrap--n">
+    <div class="sec-head reveal">
+      <h2>2回目以降は差分だけ</h2>
+    </div>
+    <p>1回目: 300ファイル &rarr; 18件判断 &rarr; 10-15分。<br>
+       2回目: 310ファイル &rarr; 3件判断 &rarr; 3分。<br>
+       Learned Rulesが時間とともに強くなる。</p>
+    <div class="callout">
+      2年目に300ファイルDrop &rarr; 即Draft Ready。手作業には戻れない。
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Lens for questionnaires ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap wrap--n">
+    <div class="frow reveal">
+      <div class="frow__vis">
+        <div class="lens">
+          <div class="lens__bar">Lens</div>
+          <div class="lens__body">
+            <div class="verdict verdict--pass">
+              <div class="verdict__icon">&#10003;</div>
+              <div class="verdict__title">この提出パックは有効です</div>
+              <div class="verdict__sub">PASS</div>
+            </div>
+            <div class="verdict__stats">
+              回答42件確認済み / 証拠58ファイル / 改変なし / ハッシュ一致
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frow__text">
+        <h3>受信者の体験</h3>
+        <p>監査人はLensを開くだけ。回答と証拠の対応が構造化されている。1つずつファイルを開く必要はない。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Integration ═══ -->
+<section class="sec">
+  <div class="wrap wrap--n">
+    <div class="sec-head reveal">
+      <h2>今使っているツールはそのまま</h2>
+    </div>
+    <p>GRCツールで集めた証拠をそのままドロップ。PXが署名付きパックにまとめる。ワークフローは変わらない。</p>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta-band">
+  <div class="wrap">
+    <h2>御社の質問票1本で試す</h2>
+    <p>手元のExcelをそのまま入れるだけ。3分でLensまで到達。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="software.html">ソフトウェア</a></li>
+          <li><a href="compliance.html">質問票</a></li>
+          <li><a href="ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="examples.html">事例</a></li>
+          <li><a href="pricing.html">料金</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+          <li><a href="trust.html">信頼性</a></li>
+          <li><a href="pilot.html">パイロット</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>会社</h4>
+        <ul>
+          <li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

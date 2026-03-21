@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>パイロット — PX</title>
+  <meta name="description" content="1つの管理策スライス。2週間。リスクゼロ。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="software.html">ソフトウェア</a></li>
+      <li><a href="compliance.html">質問票</a></li>
+      <li><a href="ai-ml.html">AI/ML</a></li>
+      <li><a href="examples.html">事例</a></li>
+      <li><a href="pricing.html">料金</a></li>
+    </ul>
+    <a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<section class="phero reveal">
+  <div class="wrap">
+    <p class="phero__label">パイロット</p>
+    <h1>1つの管理策スライス。<br>2週間。リスクゼロ。</h1>
+    <p>コミットメントの前に、あなた自身の証拠でPXを確認する。</p>
+  </div>
+</section>
+
+<!-- ═══ 4 Steps ═══ -->
+<section class="sec reveal">
+  <div class="wrap wrap--n">
+    <div style="display:flex;flex-direction:column;gap:var(--sp-3x)">
+
+      <div style="display:flex;gap:var(--sp-xl);align-items:flex-start">
+        <div class="step-num">1</div>
+        <div>
+          <h3 style="margin-bottom:var(--sp-sm)">範囲を選ぶ</h3>
+          <p style="font-size:var(--ts-lg);line-height:1.7">1つの領域を選ぶ：AWS IAM管理策、GitHub組織セキュリティ、または独自の管理策セット。5〜10ルールで十分。必要ならプロファイル作成を支援します。</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:var(--sp-xl);align-items:flex-start">
+        <div class="step-num">2</div>
+        <div>
+          <h3 style="margin-bottom:var(--sp-sm)">エクスポートして検証する</h3>
+          <p style="font-size:var(--ts-lg);line-height:1.7">証拠をエクスポートする（AWS/GitHubのガイド付き）。PXで検証を実行。何が合格し何が不合格かを確認。ギャップを修正してもしなくても、どちらも有用なデータ。</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:var(--sp-xl);align-items:flex-start">
+        <div class="step-num">3</div>
+        <div>
+          <h3 style="margin-bottom:var(--sp-sm)">パックして渡す</h3>
+          <p style="font-size:var(--ts-lg);line-height:1.7">検証パックまたは回答パックを生成。社内レビュアー、監査人、またはベースラインとして保管。相手はLensを開き、ブラウザで検証が再現される。</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:var(--sp-xl);align-items:flex-start">
+        <div class="step-num">4</div>
+        <div>
+          <h3 style="margin-bottom:var(--sp-sm)">判断する</h3>
+          <p style="font-size:var(--ts-lg);line-height:1.7">時間は節約できたか？出力は使えたか？レビュアーはこの形式を受け入れたか？あなたが決める。プレッシャーも契約も営業フォローアップもなし。</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 必要なもの ═══ -->
+<section class="sec sec--bg reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>必要なもの</h2>
+    </div>
+    <div class="profiles">
+      <div class="pcard" style="text-align:center">
+        <div class="pcard__icon" style="margin:0 auto 24px">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <p class="pcard__title">Node.js</p>
+        <p class="pcard__desc">v16以上。唯一の前提条件。</p>
+      </div>
+      <div class="pcard" style="text-align:center">
+        <div class="pcard__icon" style="margin:0 auto 24px">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>
+        </div>
+        <p class="pcard__title">証拠JSON</p>
+        <p class="pcard__desc">ソースシステムからエクスポート。ガイド付き。</p>
+      </div>
+      <div class="pcard" style="text-align:center">
+        <div class="pcard__icon" style="margin:0 auto 24px">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <p class="pcard__title">30分</p>
+        <p class="pcard__desc">クローン、エクスポート、検証、パック。ほとんどのパイロットは1セッションで完了。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta-band reveal">
+  <div class="wrap">
+    <h2>今すぐ始める</h2>
+    <p>リポジトリをクローンしてサンプルデータで実行する。<br>または、ご連絡いただければ環境に合わせたパイロットを設計します。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="software.html">ソフトウェア</a></li>
+          <li><a href="compliance.html">質問票</a></li>
+          <li><a href="ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="examples.html">事例</a></li>
+          <li><a href="pricing.html">料金</a></li>
+          <li><a href="trust.html">信頼性</a></li>
+          <li><a href="pilot.html">パイロット</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>会社</h4>
+        <ul>
+          <li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

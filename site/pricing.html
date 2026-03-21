@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>料金 — PX</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<nav class="nav"><div class="nav__in"><a href="index.html" class="nav__logo">P<b>X</b></a><ul class="nav__links"><li><a href="software.html">ソフトウェア</a></li><li><a href="compliance.html">質問票</a></li><li><a href="ai-ml.html">AI/ML</a></li><li><a href="examples.html">事例</a></li><li><a href="pricing.html">料金</a></li></ul><a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a><button class="nav__ham" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button></div></nav>
+
+<!-- ===== Hero ===== -->
+<section class="phero">
+  <div class="wrap">
+    <span class="phero__label">料金</span>
+    <h1>Creating proof is free.<br>Responsibility is priced.</h1>
+    <p>Pack生成とLens検証は永久無料。外部handoffの封印に課金。</p>
+  </div>
+</section>
+
+<!-- ===== Notice ===== -->
+<section class="sec">
+  <div class="wrap wrap--n">
+    <div class="callout">テスト期間中は全機能無料</div>
+  </div>
+</section>
+
+<!-- ===== Price Cards ===== -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="price-cards reveal">
+
+      <div class="price-card price-card--hl">
+        <div class="price-card__name">DRAFT</div>
+        <div class="price-card__price">¥0</div>
+        <div class="price-card__unit">永久無料</div>
+        <ul class="price-card__list">
+          <li>Pack生成 — 無制限</li>
+          <li>Lens検証 — 無制限</li>
+          <li>オフライン動作</li>
+          <li>CLI（ローカル動作）</li>
+        </ul>
+      </div>
+
+      <div class="price-card">
+        <div class="price-card__name">SUBMISSION</div>
+        <div class="price-card__price">$500〜</div>
+        <div class="price-card__unit">プリペイドクレジット制</div>
+        <ul class="price-card__list">
+          <li>外部handoffの封印</li>
+          <li>Starter $500 / 10 credits</li>
+          <li>Growth $2,000 / 50 credits</li>
+          <li>Scale $10,000 / 300 credits</li>
+          <li>1 Submission = 1 credit</li>
+        </ul>
+      </div>
+
+      <div class="price-card">
+        <div class="price-card__name">PARTNER / OPS</div>
+        <div class="price-card__price">$10K〜</div>
+        <div class="price-card__unit">年額固定</div>
+        <ul class="price-card__list">
+          <li>質問票代行・GRCコンサル・TPRM支援</li>
+          <li>チーム管理</li>
+          <li>Learned Rules蓄積</li>
+          <li>チャネルパートナー構造</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== Embedded / API ===== -->
+<section class="sec">
+  <div class="wrap">
+    <h3>Embedded / API</h3>
+    <p>他社ツールのユーザー向け。月1,000回無料 → 超過従量。他社ツール上に載るdistribution layer。</p>
+  </div>
+</section>
+
+<!-- ===== Draft vs Submission ===== -->
+<section class="sec sec--bg">
+  <div class="wrap wrap--n">
+    <h3>DraftとSubmissionの違い</h3>
+    <table class="tier-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Draft</th>
+          <th>Submission</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>内容</td>
+          <td>署名付きパックを生成。ローカルで完結。</td>
+          <td>Draftに封印（タイムスタンプ + 受理証明 + 受信者バインディング）を加える。外部handoff用。</td>
+        </tr>
+        <tr>
+          <td>用途</td>
+          <td>内部利用・開発中</td>
+          <td>外部handoff</td>
+        </tr>
+        <tr>
+          <td>料金</td>
+          <td>無料</td>
+          <td>課金</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== Partner Badges ===== -->
+<section class="sec">
+  <div class="wrap">
+    <h3>Partner Badges</h3>
+    <table class="tier-table">
+      <thead>
+        <tr>
+          <th>バッジ</th>
+          <th>料金</th>
+          <th>説明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Compatible</td>
+          <td>無料</td>
+          <td>PX packを生成できることを表示</td>
+        </tr>
+        <tr>
+          <td>Embedded</td>
+          <td>$10-30K/年</td>
+          <td>PXが製品に統合されていることを表示</td>
+        </tr>
+        <tr>
+          <td>Verified</td>
+          <td>$50K/年</td>
+          <td>受信者のpull（Lensでの検証要求）が実証された後</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>よくある質問</h2>
+    </div>
+    <div class="faq">
+
+      <div class="faq__item">
+        <button class="faq__q">テスト期間終了後、Draftは本当に無料のままですか？</button>
+        <div class="faq__a">
+          <p>はい。Draftは永久無料です。</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button class="faq__q">クレジットの有効期限は？</button>
+        <div class="faq__a">
+          <p>なし。購入したクレジットは無期限です。</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button class="faq__q">Partner/Opsの最低契約期間は？</button>
+        <div class="faq__a">
+          <p>1年間。</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button class="faq__q">Embedded/APIの従量課金の単価は？</button>
+        <div class="faq__a">
+          <p>月1,000回無料。超過分は1回あたり$0.10。</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-band">
+  <div class="wrap">
+    <h2>まずは無料で試す</h2>
+    <p>テスト期間中は全機能無料。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="footer"><div class="wrap"><div class="footer__grid"><div><div class="footer__brand">P<b>X</b></div><p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p></div><div class="footer__col"><h4>Profile</h4><ul><li><a href="software.html">ソフトウェア</a></li><li><a href="compliance.html">質問票</a></li><li><a href="ai-ml.html">AI/ML</a></li></ul></div><div class="footer__col"><h4>リソース</h4><ul><li><a href="examples.html">事例</a></li><li><a href="pricing.html">料金</a></li><li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li></ul></div><div class="footer__col"><h4>会社</h4><ul><li><a href="trust.html">信頼性</a></li><li><a href="pilot.html">導入ステップ</a></li><li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li></ul></div></div><div class="footer__bottom"><span>&copy; 2026 PX Registry KK</span><span>MIT License</span></div></div></footer>
+
+<!-- ===== FAQ Accordion Script ===== -->
+
+<script src="script.js"></script>
+</body>
+</html>

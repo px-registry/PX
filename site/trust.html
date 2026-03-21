@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>信頼性 — PX</title>
+  <meta name="description" content="PXとは何か。何でないか。今日何が動いていて、何が計画中か。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="software.html">ソフトウェア</a></li>
+      <li><a href="compliance.html">質問票</a></li>
+      <li><a href="ai-ml.html">AI/ML</a></li>
+      <li><a href="examples.html">事例</a></li>
+      <li><a href="pricing.html">料金</a></li>
+    </ul>
+    <a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="phero reveal">
+  <div class="wrap">
+    <p class="label">信頼性</p>
+    <h1>今日何が本当か<br>お伝えします。</h1>
+    <p>検証ツールだからこそ、自分自身にも同じ基準を適用する。</p>
+  </div>
+</section>
+
+<!-- PXとは -->
+<section class="sec reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>PXとは</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-xl)">
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm);color:var(--green)">検証エンジン</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">構造化された証拠を読み、決定論的ルールで評価し、合格か不合格を報告する。ルールはJSONプロファイルで宣言。検証は再現可能。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm);color:var(--green)">証拠パッケージングツール</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">証拠、プロファイル、結果を1つのパックにまとめ、受信者が再検証できる形にする。SHA-256ハッシュが収集後の改竄を証明。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm);color:var(--green)">Node.jsが動くどこでも動くCLI</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">外部依存ゼロ。オフライン動作。約2,700行のバニラJavaScript。ツール全体が1ファイル。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm);color:var(--green)">オープンソース（MIT）</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">コードベース全体が公開。読める。フォークできる。監査できる。検証ロジックにプロプライエタリなものは何もない。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PXではないもの -->
+<section class="sec sec--bg reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>PXではないもの</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-xl)">
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm);color:var(--red)">コンプライアンスプラットフォームではない</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">リスクの追跡、ポリシーの管理、担当者の割当、リマインダーの送信はしない。証拠を検証してパッケージする。それだけ。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm);color:var(--red)">監査人ではない</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">意見を出さない。リスクの重大性を評価しない。コンプライアンスを判定しない。値をルールと照合する。結果の解釈は人間がする。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm);color:var(--red)">SaaSではない</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">アカウントなし。ダッシュボードなし。ベンダーロックインなし。PXはあなたのマシンで動く。出力はプレーンなファイル。すべてあなたのもの。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 今日動いているもの -->
+<section class="sec reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>今日動いているもの</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-lg)">
+      <div class="status">
+        <span class="status__dot status__dot--green"></span>
+        <div class="status__text">
+          <h4>ドラフトモード</h4>
+          <p>ローカルで検証、パッケージ、再検証。無料。無制限。オフライン。</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="status__dot status__dot--green"></span>
+        <div class="status__text">
+          <h4>カスタムプロファイル</h4>
+          <p>JSONで独自ルールを記述。任意の構造化証拠に対して検証可能。</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="status__dot status__dot--green"></span>
+        <div class="status__text">
+          <h4>Lens（レビュービュー）</h4>
+          <p>自己完結型HTMLファイル。ブラウザ内再検証、PDFエクスポート、スライスリファレンス。</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="status__dot status__dot--green"></span>
+        <div class="status__text">
+          <h4>質問票モード</h4>
+          <p>CAIQ/SIGマッピング、CSV/MD出力、例外報告書。</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="status__dot status__dot--green"></span>
+        <div class="status__text">
+          <h4>受信者リプレイ</h4>
+          <p>npx経由でクローン不要の再検証。バンドルされた入力に対して実行。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 計画中のもの -->
+<section class="sec sec--bg reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>計画中のもの</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-lg)">
+      <div class="status">
+        <span class="status__dot status__dot--amber"></span>
+        <div class="status__text">
+          <h4>PX Authority</h4>
+          <p>封印タイムスタンプ、受領証、受信者バインディング。ドラフトをサブミッションに変換。</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="status__dot status__dot--amber"></span>
+        <div class="status__text">
+          <h4>Ed25519署名</h4>
+          <p>マニフェストへの暗号署名。Authorityインフラが必要。</p>
+        </div>
+      </div>
+      <div class="status">
+        <span class="status__dot status__dot--amber"></span>
+        <div class="status__text">
+          <h4>追加アダプター</h4>
+          <p>SOC 2、ISO 27001、HIPAA、PCI-DSS等のドメインプロファイル。</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:var(--sp-2x);border-left-color:var(--amber)">
+      <p>
+        <strong>計画中の機能は約束ではありません。</strong><br>
+        <span style="color:var(--t2)">現在の方向を示すもの。リリースされ次第このページを更新します。判断に関わる機能は直接お問い合わせください。</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 原則 -->
+<section class="sec reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>原則</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-xl)">
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm)">送信者にも優しい</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">PXは導入する組織自身を助ける。証拠収集が速くなる。質問票回答が自動化される。送信者が受益者。レビュアーだけではない。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm)">敵を作らない</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">PXは監査人もGRCプラットフォームも既存ワークフローも置き換えない。検証レイヤーを追加する。価値による採用を目指す。ディスプレースメントではなく。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm)">存在するものについて正直に</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">ドラフトモードは今日動いている。Authorityは計画中。計画中の機能を現在の機能としてマーケティングしない。<a href="trust.html">信頼性ページ</a>はリリースに合わせて更新する。</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:var(--sp-sm)">デフォルトでオープン</h4>
+        <p style="font-size:var(--ts-lg);line-height:1.7">MITライセンス。公開コードベース。プロプライエタリな暗号なし。PXを使わない人でもプロトコルを検証できるべき。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- お問い合わせ -->
+<section class="sec sec--bg reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>お問い合わせ</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto">
+      <p style="font-size:var(--ts-lg)">
+        <a href="mailto:hello@px-registry.org">hello@px-registry.org</a>
+      </p>
+      <p style="font-size:var(--ts-lg);margin-top:var(--sp-sm)">
+        <a href="https://github.com/px-registry/PX" target="_blank">github.com/px-registry/PX</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band reveal">
+  <div class="wrap">
+    <h2>コードを読む</h2>
+    <p>検証ツールを信頼する最良の方法は、自分で検証すること。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">渡した証拠が、そのまま検証される。</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="software.html">ソフトウェア</a></li>
+          <li><a href="compliance.html">質問票</a></li>
+          <li><a href="ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="examples.html">事例</a></li>
+          <li><a href="pricing.html">料金</a></li>
+          <li><a href="trust.html">信頼性</a></li>
+          <li><a href="pilot.html">Lens を体験する</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>会社</h4>
+        <ul>
+          <li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

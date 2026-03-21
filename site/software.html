@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PX — ソフトウェアリリース Profile</title>
+  <meta name="description" content="binary + SBOM + provenance を検証可能な一式にして渡せる。受信者がLensで5秒で確認。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="software.html" class="active">ソフトウェア</a></li>
+      <li><a href="compliance.html">質問票</a></li>
+      <li><a href="ai-ml.html">AI/ML</a></li>
+      <li><a href="examples.html">事例</a></li>
+      <li><a href="pricing.html">料金</a></li>
+    </ul>
+    <a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="phero">
+  <div class="wrap">
+    <p class="phero__label">Release Profile</p>
+    <h1>binary + SBOM + provenance を検証可能な一式にして渡せる</h1>
+    <p>ソフトウェアリリースに必要なファイルを署名付きパックにまとめ、受け取った人がLensで「全部揃ってる、改竄なし」と5秒で確認できる。</p>
+  </div>
+</section>
+
+<!-- The Problem -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>バラバラに渡していませんか？</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-xl)">
+      <div style="padding:var(--sp-xl);border:1px solid var(--border);border-radius:var(--r-lg)">
+        <h4 style="margin-bottom:var(--sp-sm)">1. binaryとSBOMが別メールで届く</h4>
+        <p style="font-size:var(--ts-sm);line-height:1.7">受信者はどのSBOMがどのbinaryに対応するか分からず、確認作業が発生する。</p>
+      </div>
+      <div style="padding:var(--sp-xl);border:1px solid var(--border);border-radius:var(--r-lg)">
+        <h4 style="margin-bottom:var(--sp-sm)">2. provenanceがGitHub UIの奥に埋まっている</h4>
+        <p style="font-size:var(--ts-sm);line-height:1.7">ビルドの証明があっても、受信者がたどり着けなければ意味がない。</p>
+      </div>
+      <div style="padding:var(--sp-xl);border:1px solid var(--border);border-radius:var(--r-lg)">
+        <h4 style="margin-bottom:var(--sp-sm)">3. 受け取った人がどこから確認すればいいか分からない</h4>
+        <p style="font-size:var(--ts-sm);line-height:1.7">ファイルは揃っていても、検証の起点がないと信頼を確認できない。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How PX solves it -->
+<section class="sec">
+  <div class="wrap">
+    <div class="frow reveal">
+      <div class="frow__text">
+        <h3>1コマンドでパック</h3>
+        <p><code style="color:var(--green);font-size:var(--ts-sm)">px pack ./release/</code> &mdash; binary、SBOM、README、provenanceをまとめて署名。受信者にはlens.htmlが1つ付く。</p>
+      </div>
+      <div class="frow__vis">
+        <p style="font-size:var(--ts-sm);color:var(--t3);font-weight:700;margin-bottom:var(--sp-lg)">3ステップ</p>
+        <div style="display:flex;flex-direction:column;gap:var(--sp-lg)">
+          <div style="display:flex;align-items:flex-start;gap:var(--sp-md)">
+            <span style="color:var(--green);font-weight:700;font-size:var(--ts-lg);flex-shrink:0">1.</span>
+            <p style="font-size:var(--ts-sm);line-height:1.7">リリースファイルをフォルダにまとめる（binary, SBOM, provenance, README）</p>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:var(--sp-md)">
+            <span style="color:var(--green);font-weight:700;font-size:var(--ts-lg);flex-shrink:0">2.</span>
+            <p style="font-size:var(--ts-sm);line-height:1.7">px pack ./release/ を実行 &mdash; マニフェスト生成・ハッシュ・署名が一括で行われる</p>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:var(--sp-md)">
+            <span style="color:var(--green);font-weight:700;font-size:var(--ts-lg);flex-shrink:0">3.</span>
+            <p style="font-size:var(--ts-sm);line-height:1.7">生成されたパック（lens.html付き）を受信者に渡す。相手はlens.htmlを開くだけ</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lens experience -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="frow frow--flip reveal">
+      <div class="frow__text">
+        <h3>受信者はLensを開くだけ</h3>
+        <p>インストール不要。アカウント不要。オフラインで動く。lens.htmlをブラウザで開けば、5秒で「全部揃ってる、改竄なし、ハッシュ一致」と確認できる。技術的知識は必要ない。</p>
+      </div>
+      <div class="frow__vis">
+        <div class="lens" style="max-width:100%;box-shadow:none;border:none;background:transparent">
+          <div class="lens__bar">
+            <div class="lens__dots">
+              <div class="lens__dot lens__dot--r"></div>
+              <div class="lens__dot lens__dot--y"></div>
+              <div class="lens__dot lens__dot--g"></div>
+            </div>
+            <span class="lens__title">lens.html</span>
+            <span></span>
+          </div>
+          <div class="lens__body" style="padding:var(--sp-lg)">
+            <div class="verdict verdict--pass">
+              <div class="verdict__icon">&#10003;</div>
+              <div class="verdict__title">このリリースパックは有効です</div>
+              <p class="verdict__sub">封印後の変更はなく、すべてのファイルが揃っています。</p>
+              <div class="verdict__stats">
+                <span>4ファイル確認済み</span>
+                <span>SBOM検証済み</span>
+                <span>改変なし</span>
+                <span>ハッシュ一致</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Neighboring tools -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>署名の上に、受信者の確認手段を加える</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto">
+      <p style="font-size:var(--ts-base);line-height:1.7;margin-bottom:var(--sp-2x)">Sigstore、GitHub Attestations、SLSA &mdash; 署名はすでにある。PXはその上に「パッケージング + 受信者検証UI」を加える。</p>
+      <div class="callout">署名はある。パッケージング＋受信者検証UIがない。PXはここを埋める。</div>
+    </div>
+  </div>
+</section>
+
+<!-- Release Lineage -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Release Lineage（継続した履歴）</h2>
+    </div>
+    <div style="max-width:var(--w-n);margin:0 auto">
+      <p style="font-size:var(--ts-base);line-height:1.7">parent_manifest_refs[] で前のリリースを参照。受信者は「このv2.1がv2.0の次であること」を検証できる。1回のリリースで終わらない。リリースの連続性を検証可能にし、継続した信頼の履歴を構築する。</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band">
+  <div class="wrap">
+    <h2>リリースをPackにする</h2>
+    <p>手元のリリースファイルで試せます。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="software.html">ソフトウェア</a></li>
+          <li><a href="compliance.html">質問票</a></li>
+          <li><a href="ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="examples.html">事例</a></li>
+          <li><a href="pricing.html">料金</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+          <li><a href="trust.html">信頼性</a></li>
+          <li><a href="pilot.html">パイロット</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>会社</h4>
+        <ul>
+          <li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical Overview — PX</title>
+  <meta name="description" content="PX internals: verification engine, hash chain, profile format, seal format, and CLI.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="../index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="../software.html">ソフトウェア</a></li>
+      <li><a href="../compliance.html">質問票</a></li>
+      <li><a href="../ai-ml.html">AI/ML</a></li>
+      <li><a href="../examples.html">事例</a></li>
+      <li><a href="../pricing.html">料金</a></li>
+    </ul>
+    <a href="../demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="phero reveal">
+  <div class="wrap">
+    <p class="label">Technical</p>
+    <h1>How PX works inside</h1>
+    <p>~2,700 lines. Zero dependencies. SHA-256 + Ed25519.</p>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section class="sec reveal">
+  <div class="wrap" style="max-width:var(--w-n)">
+    <h2 style="margin-bottom:var(--sp-2x)">Architecture</h2>
+
+    <div style="display:flex;flex-direction:column;gap:var(--sp-2x)">
+      <div>
+        <p class="label">Core</p>
+        <p style="font-size:var(--ts-lg);line-height:1.7">SHA-256 hashing, Ed25519 signing (planned), JSON schema validation, deterministic rule evaluation. Node.js crypto module only — no external packages.</p>
+      </div>
+      <div>
+        <p class="label">CLI Commands</p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem">
+          <span class="tag">init</span>
+          <span class="tag">generate</span>
+          <span class="tag">verify</span>
+          <span class="tag">pack</span>
+          <span class="tag">answer-pack</span>
+          <span class="tag">check</span>
+        </div>
+        <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:0.5rem">Single entry point (cli.js). Each command is a pure function.</p>
+      </div>
+      <div>
+        <p class="label">Profiles &amp; Collectors</p>
+        <p style="font-size:var(--ts-lg);line-height:1.7">Profiles are JSON rule sets. Collectors are optional shell scripts for automated evidence collection. Two built-in profiles: AWS Core Controls (10 rules), GitHub Org Security (10 rules).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Verification Model -->
+<section class="sec sec--bg reveal">
+  <div class="wrap" style="max-width:var(--w-n)">
+    <h2 style="margin-bottom:var(--sp-2x)">Verification model</h2>
+    <div style="display:flex;flex-direction:column;gap:var(--sp-xl)">
+      <div>
+        <h4 style="margin-bottom:0.5rem">1. Evidence hashing</h4>
+        <p>SHA-256 hash of the raw evidence JSON, computed at load time and recorded in the manifest.</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:0.5rem">2. Rule evaluation</h4>
+        <p>Each rule: dot-notation path into evidence, expected value, operator (eq/gte/lte). Deterministic.</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:0.5rem">3. Manifest generation</h4>
+        <p>Evidence hash + profile hash + results + timestamp + seal + recipient + purpose.</p>
+      </div>
+      <div>
+        <h4 style="margin-bottom:0.5rem">4. Replay verification</h4>
+        <p>Receiver hashes bundled evidence, runs bundled rules, compares against manifest claims.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Profile Format -->
+<section class="sec reveal">
+  <div class="wrap" style="max-width:var(--w-n)">
+    <h2 style="margin-bottom:var(--sp-2x)">Profile format</h2>
+
+    <div class="code-block" style="margin-bottom:var(--sp-xl)">
+<pre style="margin:0;white-space:pre-wrap"><span class="comment">// Example rule</span>
+{
+  <span class="string">"id"</span>: <span class="string">"iam.mfa_enforced"</span>,
+  <span class="string">"description"</span>: <span class="string">"MFA is enforced for all IAM users"</span>,
+  <span class="string">"path"</span>: <span class="string">"iam.mfa_enabled"</span>,
+  <span class="string">"expected"</span>: true,
+  <span class="string">"caiq_ref"</span>: <span class="string">"IAM-02.1"</span>,
+  <span class="string">"sig_ref"</span>: <span class="string">"H.2.1"</span>
+}</pre>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table class="comparison">
+        <thead><tr><th>Field</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">id</td><td>Yes</td><td>Unique rule identifier</td></tr>
+          <tr><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">description</td><td>Yes</td><td>Human-readable explanation</td></tr>
+          <tr><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">path</td><td>Yes</td><td>Dot-notation path into evidence JSON</td></tr>
+          <tr><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">expected</td><td>Yes</td><td>Value to check against</td></tr>
+          <tr><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">operator</td><td>No</td><td>eq (default), gte, or lte</td></tr>
+          <tr><td style="color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">caiq_ref</td><td>No</td><td>CAIQ framework reference</td></tr>
+          <tr><td style="color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">sig_ref</td><td>No</td><td>SIG framework reference</td></tr>
+          <tr><td style="color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">answer_template</td><td>No</td><td>Suggested answer text for PASS</td></tr>
+          <tr><td style="color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:var(--ts-sm)">exception_template</td><td>No</td><td>Exception text for FAIL</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Seal Format -->
+<section class="sec sec--bg reveal">
+  <div class="wrap" style="max-width:var(--w-n)">
+    <h2 style="margin-bottom:var(--sp-xl)">Seal format</h2>
+    <div class="seal" style="font-size:var(--ts-lg);margin-bottom:var(--sp-xl)">PX-A3F2-2026Q2-PASS-10</div>
+    <div style="display:flex;flex-direction:column;gap:0.6rem;font-size:var(--ts-sm)">
+      <div style="display:flex;gap:var(--sp-lg)"><span style="color:var(--green);font-weight:700;min-width:80px">PX</span><span style="color:var(--t3)">Fixed prefix</span></div>
+      <div style="display:flex;gap:var(--sp-lg)"><span style="color:var(--green);font-weight:700;min-width:80px">A3F2</span><span style="color:var(--t3)">Evidence hash chars 8-11 (uppercased)</span></div>
+      <div style="display:flex;gap:var(--sp-lg)"><span style="color:var(--green);font-weight:700;min-width:80px">2026Q2</span><span style="color:var(--t3)">Year + quarter</span></div>
+      <div style="display:flex;gap:var(--sp-lg)"><span style="color:var(--green);font-weight:700;min-width:80px">PASS</span><span style="color:var(--t3)">PASS or MIXED</span></div>
+      <div style="display:flex;gap:var(--sp-lg)"><span style="color:var(--green);font-weight:700;min-width:80px">10</span><span style="color:var(--t3)">Total rules</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CLI Quick Reference -->
+<section class="sec reveal">
+  <div class="wrap" style="max-width:var(--w-n)">
+    <h2 style="margin-bottom:var(--sp-2x)">CLI quick reference</h2>
+    <div style="display:flex;flex-direction:column;gap:var(--sp-xl)">
+      <div>
+        <div class="code-block"><span class="cmd">px verify</span> <span class="flag">--profile</span>=&lt;file&gt; <span class="flag">--evidence</span>=&lt;file&gt;</div>
+        <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:0.5rem">Run rules against evidence.</p>
+      </div>
+      <div>
+        <div class="code-block"><span class="cmd">px verify</span> <span class="flag">--manifest</span>=&lt;file&gt;</div>
+        <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:0.5rem">Replay verification against bundled inputs.</p>
+      </div>
+      <div>
+        <div class="code-block"><span class="cmd">px pack</span> <span class="flag">--profile</span>=&lt;file&gt; <span class="flag">--evidence</span>=&lt;file&gt; [<span class="flag">--recipient</span>=&lt;who&gt;] [<span class="flag">--purpose</span>=&lt;why&gt;]</div>
+        <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:0.5rem">Fail-close packaging. All rules must pass.</p>
+      </div>
+      <div>
+        <div class="code-block"><span class="cmd">px answer-pack</span> <span class="flag">--profile</span>=&lt;file&gt; <span class="flag">--evidence</span>=&lt;file&gt; [<span class="flag">--recipient</span>=&lt;who&gt;] [<span class="flag">--purpose</span>=&lt;why&gt;]</div>
+        <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:0.5rem">Questionnaire mode. Mixed results OK.</p>
+      </div>
+      <div>
+        <div class="code-block"><span class="cmd">px check</span> <span class="flag">--profile</span>=&lt;file&gt; [-- &lt;args&gt;]</div>
+        <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:0.5rem">Collect + verify in one step.</p>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:var(--sp-2x)">
+      <a href="cli.html" class="btn btn--s">Full CLI reference</a>
+    </p>
+  </div>
+</section>
+
+<!-- Output Comparison Table -->
+<section class="sec sec--bg reveal">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>モード別出力一覧</h2>
+    </div>
+
+    <div style="overflow-x:auto;max-width:800px;margin:0 auto">
+      <table class="comparison">
+        <thead>
+          <tr>
+            <th>ファイル</th>
+            <th>検証モード</th>
+            <th>質問票モード</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">manifest.json</td>
+            <td style="color:var(--green)">&#10003;</td>
+            <td style="color:var(--green)">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">lens.html</td>
+            <td style="color:var(--green)">&#10003;</td>
+            <td style="color:var(--green)">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">bundled-evidence.json</td>
+            <td style="color:var(--green)">&#10003;</td>
+            <td style="color:var(--green)">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">bundled-profile.json</td>
+            <td style="color:var(--green)">&#10003;</td>
+            <td style="color:var(--green)">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">summary.txt</td>
+            <td style="color:var(--green)">&#10003;</td>
+            <td style="color:var(--green)">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">answers.csv</td>
+            <td style="color:var(--t3)">&mdash;</td>
+            <td style="color:var(--amber)">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">answers.md</td>
+            <td style="color:var(--t3)">&mdash;</td>
+            <td style="color:var(--amber)">&#10003;</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">exceptions.md</td>
+            <td style="color:var(--t3)">&mdash;</td>
+            <td style="color:var(--amber)">&#10003; <span style="color:var(--t3);font-size:var(--ts-xs)">(不合格時)</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">question-map.csv</td>
+            <td style="color:var(--t3)">&mdash;</td>
+            <td style="color:var(--amber)">&#10003;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-band reveal">
+  <div class="wrap">
+    <h2>Read the source</h2>
+    <p>The entire tool is one file. Read it in 30 minutes.</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="../demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">Proof you can hand off.</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="../software.html">ソフトウェア</a></li>
+          <li><a href="../compliance.html">質問票</a></li>
+          <li><a href="../ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="../examples.html">100の事例</a></li>
+          <li><a href="../pricing.html">料金</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+          <li><a href="../trust.html">信頼性</a></li>
+          <li><a href="../pilot.html">パイロット</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Technical</h4>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="cli.html">CLI Reference</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+</body>
+</html>

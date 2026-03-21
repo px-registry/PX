@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>事例 — PX</title>
+<meta name="description" content="PXが活きるジャンル。ソフトウェア配布からAIモデル、サプライチェーンまで、デジタルハンドオフのあらゆる場面を網羅。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="nav" id="navbar"><div class="nav__in"><a href="index.html" class="nav__logo">P<b>X</b></a><ul class="nav__links"><li><a href="software.html">ソフトウェア</a></li><li><a href="compliance.html">質問票</a></li><li><a href="ai-ml.html">AI/ML</a></li><li><a href="examples.html">事例</a></li><li><a href="pricing.html">料金</a></li></ul><a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a><button class="nav__ham" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button></div></nav>
+
+<!-- Hero -->
+<section class="phero">
+  <span class="phero__label">事例</span>
+  <h1>「Aが作った証拠を、Bが検証したい」すべての場面</h1>
+  <p>「まとめて渡して、相手がその場で確かめる」。その仕組みが、どの業界にもなかった。</p>
+</section>
+
+<!-- Callout -->
+<section class="sec">
+  <div class="wrap--n">
+    <div class="callout reveal">技術は全部同じ。語り方だけ変わる。</div>
+  </div>
+</section>
+
+<!-- Example Cards -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="label">Genres</span>
+      <h2>あらゆる市場で、同じプロトコル</h2>
+      <p>10カテゴリ × 各3事例。すべて「Pack → 渡す → 検証」の同一フローで動く。</p>
+    </div>
+
+    <div class="ex-grid reveal">
+
+      <!-- 1. ソフトウェア配布 -->
+      <div class="ex-card">
+        <span class="ex-card__cat">ソフトウェア配布</span>
+        <h3 class="ex-card__title">SBOMとバイナリの一括検証</h3>
+        <p class="ex-card__desc">ビルド済みバイナリとSBOM（CycloneDX/SPDX）をPackにまとめ、受け取った顧客がワンコマンドで完全性と来歴を検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">ソフトウェア配布</span>
+        <h3 class="ex-card__title">GitHub Actions リリースパック</h3>
+        <p class="ex-card__desc">CI/CDパイプラインの成果物をGitHub Actionsから自動でPackにし、リリースごとに署名付きアーティファクトとして配布する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">ソフトウェア配布</span>
+        <h3 class="ex-card__title">npm/PyPIパッケージ署名検証</h3>
+        <p class="ex-card__desc">公開パッケージにPXメタデータを添付し、インストール時にレジストリ側で署名・ハッシュを自動検証する。</p>
+      </div>
+
+      <!-- 2. 質問票/コンプライアンス -->
+      <div class="ex-card">
+        <span class="ex-card__cat">質問票/コンプライアンス</span>
+        <h3 class="ex-card__title">SOC 2 Type 1 質問票回答</h3>
+        <p class="ex-card__desc">SOC 2の質問票回答と証拠スクリーンショットをPackにまとめ、監査法人がマニフェスト照合で改ざんなしを確認する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">質問票/コンプライアンス</span>
+        <h3 class="ex-card__title">ISO 27001 エビデンス提出</h3>
+        <p class="ex-card__desc">ISMS認証に必要なポリシー文書・ログ・設定画面のキャプチャを一括パッケージし、審査機関へ送付する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">質問票/コンプライアンス</span>
+        <h3 class="ex-card__title">ベンダーリスク質問票（SIG/CAIQ）</h3>
+        <p class="ex-card__desc">SIGやCAIQの回答済みスプレッドシートとエビデンスファイルをPackにし、依頼元がハッシュで完全性を即時検証する。</p>
+      </div>
+
+      <!-- 3. AI/MLモデル -->
+      <div class="ex-card">
+        <span class="ex-card__cat">AI/MLモデル</span>
+        <h3 class="ex-card__title">モデルカード + weights一式</h3>
+        <p class="ex-card__desc">学習済みモデルウェイト、モデルカード、ライセンス情報をPackにまとめ、利用者がダウンロード後に完全性を検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">AI/MLモデル</span>
+        <h3 class="ex-card__title">EU AI Act 適合性文書</h3>
+        <p class="ex-card__desc">高リスクAIシステムに必要な技術文書・テスト結果・リスク評価をPackにし、規制当局が署名検証で真正性を確認する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">AI/MLモデル</span>
+        <h3 class="ex-card__title">LLM評価結果パック</h3>
+        <p class="ex-card__desc">ベンチマークスコア、評価データセット、実行ログを一式パッケージし、第三者が再現・検証できる形で共有する。</p>
+      </div>
+
+      <!-- 4. ベンダーリスク管理 -->
+      <div class="ex-card">
+        <span class="ex-card__cat">ベンダーリスク管理</span>
+        <h3 class="ex-card__title">サードパーティアセスメント回答</h3>
+        <p class="ex-card__desc">委託先が回答したセキュリティアセスメントと証跡を1つのPackにし、委託元がオフラインでも検証できるようにする。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">ベンダーリスク管理</span>
+        <h3 class="ex-card__title">サブプロセッサーリスト検証</h3>
+        <p class="ex-card__desc">SaaSベンダーのサブプロセッサー一覧とDPA（データ処理契約）をPackにまとめ、顧客が変更差分を検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">ベンダーリスク管理</span>
+        <h3 class="ex-card__title">セキュリティスコアの証拠付き提出</h3>
+        <p class="ex-card__desc">外部スキャン結果やペネトレーションテスト報告書をPackにし、スコアの根拠をハッシュ付きで提示する。</p>
+      </div>
+
+      <!-- 5. 研究データ -->
+      <div class="ex-card">
+        <span class="ex-card__cat">研究データ</span>
+        <h3 class="ex-card__title">臨床試験データパック</h3>
+        <p class="ex-card__desc">治験のCRF（症例報告書）、統計解析結果、プロトコルをPackにまとめ、規制当局がデータ完全性を検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">研究データ</span>
+        <h3 class="ex-card__title">研究再現性パッケージ</h3>
+        <p class="ex-card__desc">論文の生データ、コード、実行環境定義をPackにし、査読者や他の研究者が再現実験を行える形で公開する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">研究データ</span>
+        <h3 class="ex-card__title">オープンデータセット検証</h3>
+        <p class="ex-card__desc">公開データセットにPXマニフェストを付与し、ダウンロード者がファイル欠損や改ざんを即座に検出する。</p>
+      </div>
+
+      <!-- 6. 機械可読コンプライアンス -->
+      <div class="ex-card">
+        <span class="ex-card__cat">機械可読コンプライアンス</span>
+        <h3 class="ex-card__title">OSCAL評価結果パック</h3>
+        <p class="ex-card__desc">NISTのOSCAL形式で記述された評価結果とエビデンスをPackにまとめ、自動化ツールが検証・取り込みできるようにする。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">機械可読コンプライアンス</span>
+        <h3 class="ex-card__title">CycloneDX VEX配布</h3>
+        <p class="ex-card__desc">脆弱性の影響有無を記述したVEXドキュメントをSBOMと一緒にPackにし、利用者が署名付きで受け取る。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">機械可読コンプライアンス</span>
+        <h3 class="ex-card__title">NIST CSFマッピング証拠</h3>
+        <p class="ex-card__desc">NIST Cybersecurity Frameworkの各コントロールに対する実装証拠をPackにし、監査時にワンクリックで照合する。</p>
+      </div>
+
+      <!-- 7. CoA/検査成績書 -->
+      <div class="ex-card">
+        <span class="ex-card__cat">CoA/検査成績書</span>
+        <h3 class="ex-card__title">製造バッチCoA（成績書）</h3>
+        <p class="ex-card__desc">製造ロットごとの検査成績書（CoA）と試験データをPackにまとめ、納品先が受入時に真正性を確認する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">CoA/検査成績書</span>
+        <h3 class="ex-card__title">材料証明書パック</h3>
+        <p class="ex-card__desc">原材料のミルシートや成分分析結果をPackにし、サプライチェーン上の各社がトレーサビリティを検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">CoA/検査成績書</span>
+        <h3 class="ex-card__title">受入検査結果の検証</h3>
+        <p class="ex-card__desc">入荷品の受入検査記録と合否判定をPackにまとめ、品質管理部門が記録の改ざんなしを確認する。</p>
+      </div>
+
+      <!-- 8. サプライチェーン -->
+      <div class="ex-card">
+        <span class="ex-card__cat">サプライチェーン</span>
+        <h3 class="ex-card__title">カーボンオフセット証拠</h3>
+        <p class="ex-card__desc">排出量算定書、オフセットクレジット証書、第三者認証レポートをPackにし、取引先が環境対応を検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">サプライチェーン</span>
+        <h3 class="ex-card__title">EU DPP（デジタルプロダクトパスポート）</h3>
+        <p class="ex-card__desc">製品のライフサイクル情報、素材構成、リサイクル情報をPackにし、EU規制が求めるDPPとして配布する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">サプライチェーン</span>
+        <h3 class="ex-card__title">森林破壊規制対応証拠</h3>
+        <p class="ex-card__desc">EUDR（森林破壊規制）に必要な地理座標データ、デューデリジェンス報告をPackにまとめ、輸入者が検証する。</p>
+      </div>
+
+      <!-- 9. 金融/保険 -->
+      <div class="ex-card">
+        <span class="ex-card__cat">金融/保険</span>
+        <h3 class="ex-card__title">KYC/AMLエビデンスパック</h3>
+        <p class="ex-card__desc">本人確認書類、スクリーニング結果、リスク評価をPackにし、コンプライアンス部門が証跡の完全性を検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">金融/保険</span>
+        <h3 class="ex-card__title">保険損害証拠一式</h3>
+        <p class="ex-card__desc">事故写真、修理見積書、医療診断書をPackにまとめ、保険会社が受付時にファイル改ざんの有無を即時判定する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">金融/保険</span>
+        <h3 class="ex-card__title">財務監査エビデンス</h3>
+        <p class="ex-card__desc">勘定科目明細、銀行残高確認書、契約書コピーをPackにし、監査法人がエビデンスの網羅性と真正性を確認する。</p>
+      </div>
+
+      <!-- 10. AIエージェント -->
+      <div class="ex-card">
+        <span class="ex-card__cat">AIエージェント</span>
+        <h3 class="ex-card__title">MCP Gateway認証証跡</h3>
+        <p class="ex-card__desc">MCPサーバーのアクセスログ、認証トークン検証結果をPackにし、ゲートウェイ通過時の正当性を第三者が監査する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">AIエージェント</span>
+        <h3 class="ex-card__title">エージェント行動ログパック</h3>
+        <p class="ex-card__desc">自律エージェントの意思決定ログ、API呼び出し履歴、実行結果をPackにし、運用者が事後に行動を検証する。</p>
+      </div>
+      <div class="ex-card">
+        <span class="ex-card__cat">AIエージェント</span>
+        <h3 class="ex-card__title">A2A通信の検証記録</h3>
+        <p class="ex-card__desc">エージェント間通信のペイロード、タイムスタンプ、署名をPackにまとめ、通信経路全体の完全性を検証可能にする。</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA Band -->
+<section class="cta-band">
+  <h2>どんなファイルでもPackにできます</h2>
+  <p>まずは手元のファイルで試してください。</p>
+  <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+    <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+    <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+    <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+  </div>
+</section>
+
+<footer class="footer"><div class="wrap"><div class="footer__grid"><div><div class="footer__brand">P<b>X</b></div><p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p></div><div class="footer__col"><h4>Profile</h4><ul><li><a href="software.html">ソフトウェア</a></li><li><a href="compliance.html">質問票</a></li><li><a href="ai-ml.html">AI/ML</a></li></ul></div><div class="footer__col"><h4>リソース</h4><ul><li><a href="examples.html">事例</a></li><li><a href="pricing.html">料金</a></li><li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li><li><a href="trust.html">信頼性</a></li><li><a href="pilot.html">パイロット</a></li></ul></div><div class="footer__col"><h4>会社</h4><ul><li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li></ul></div></div><div class="footer__bottom"><span>&copy; 2026 PX Registry KK</span><span>MIT License</span></div></div></footer>
+
+<script src="script.js"></script>
+</body>
+</html>

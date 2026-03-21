@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PX — まとめて、渡して、その場で確かめられる</title>
+  <meta name="description" content="複数のファイルを署名付きパックにして、受信者がLensを開くだけで検証できる。デジタルハンドオフの検証インフラ。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+/* PX Design System v4 — Integration build
+   CC structure + Gemini design language + Claude tag cloud + GPT Pull card
+   ──────────────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap');
+
+:root {
+  /* Surfaces */
+  --ink: #050505;
+  --surface: #0e0e0e;
+  --raised: #171717;
+  --border: #262626;
+  --border-h: #404040;
+
+  /* Text */
+  --t1: #fafafa;
+  --t2: #a3a3a3;
+  --t3: #737373;
+
+  /* Accent */
+  --green: #10b981;
+  --green-b: #34d399;
+  --green-d: #059669;
+  --green-g: rgba(16,185,129,0.10);
+  --red: #ef4444;
+  --red-g: rgba(239,68,68,0.08);
+  --amber: #f59e0b;
+
+  /* Spacing */
+  --sp-xs: 0.25rem; --sp-sm: 0.5rem; --sp-md: 1rem; --sp-lg: 1.5rem;
+  --sp-xl: 2.5rem; --sp-2x: 4rem; --sp-3x: 6rem; --sp-4x: 10rem;
+
+  /* Widths */
+  --w: 1200px;
+  --w-n: 720px;
+
+  /* Type scale */
+  --ts-xs: 0.75rem; --ts-sm: 0.875rem; --ts-base: 1.0625rem;
+  --ts-lg: 1.25rem; --ts-xl: 1.5rem; --ts-2x: 1.875rem;
+  --ts-3x: 2.5rem; --ts-4x: clamp(2rem,4vw,3rem); --ts-5x: clamp(2.5rem,5vw,4.5rem);
+
+  /* Radii */
+  --r-sm: 6px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px;
+  --ease: cubic-bezier(0.16,1,0.3,1);
+
+  /* Fonts */
+  --font-head: 'Sora', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--ink);
+  color: var(--t1);
+  line-height: 1.6;
+  font-size: var(--ts-base);
+  overflow-x: hidden;
+}
+
+::selection { background: var(--green); color: #000; }
+
+a { color: var(--green); text-decoration: none; transition: color .2s; }
+a:hover { color: var(--green-b); }
+img { max-width: 100%; display: block; }
+ul { list-style: none; }
+
+h1,h2,h3,h4 {
+  font-family: var(--font-head);
+  font-weight: 700; line-height: 1.15; letter-spacing: -0.03em; color: var(--t1);
+}
+h1 { font-size: var(--ts-5x); }
+h2 { font-size: var(--ts-4x); }
+h3 { font-size: var(--ts-2x); }
+h4 { font-size: var(--ts-xl); }
+p { color: var(--t2); }
+
+/* ── Layout ── */
+.wrap { max-width: var(--w); margin: 0 auto; padding: 0 24px; }
+.wrap--n { max-width: var(--w-n); }
+.sec { padding: var(--sp-4x) 0; }
+.sec--sm { padding: var(--sp-3x) 0; }
+.sec--bg { background: var(--surface); }
+.sec-head { text-align: center; max-width: 680px; margin: 0 auto var(--sp-3x); }
+.sec-head p { font-size: var(--ts-lg); margin-top: var(--sp-lg); }
+
+/* Eyebrow label */
+.label { font-size: var(--ts-xs); font-weight: 600; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--green); margin-bottom: var(--sp-sm); }
+
+/* ── Nav ── */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 72px; border-bottom: 1px solid transparent; transition: all .3s ease; }
+.nav.scrolled { background: rgba(5,5,5,0.8); backdrop-filter: blur(16px);
+  border-bottom-color: var(--border); }
+.nav__in { display: flex; align-items: center; justify-content: space-between;
+  max-width: var(--w); margin: 0 auto; padding: 0 24px; height: 100%; }
+.nav__logo { font-family: var(--font-head); font-size: 1.25rem; font-weight: 800;
+  color: var(--t1); letter-spacing: -0.04em; display: flex; align-items: center; gap: 8px; }
+.nav__logo b { color: var(--green); }
+.nav__links { display: flex; gap: 32px; list-style: none; }
+.nav__links a { color: var(--t3); font-size: var(--ts-sm); font-weight: 500; }
+.nav__links a:hover, .nav__links a.active { color: var(--t1); }
+.nav__cta { padding: .55rem 1.3rem; background: var(--t1); color: var(--ink) !important;
+  font-size: var(--ts-sm); font-weight: 700; border-radius: var(--r-sm); transition: all .2s; }
+.nav__cta:hover { background: #fff; transform: translateY(-1px);
+  box-shadow: 0 4px 24px rgba(255,255,255,.15); }
+.nav__ham { display: none; background: none; border: none; color: var(--t1); cursor: pointer; padding: var(--sp-sm); }
+
+/* ── Buttons ── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  padding: .85rem 1.8rem; font-size: var(--ts-base); font-weight: 600; font-family: inherit;
+  border: none; border-radius: var(--r-sm); cursor: pointer; transition: all .2s; text-decoration: none; }
+.btn--p { background: var(--t1); color: var(--ink); }
+.btn--p:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,255,255,.15); }
+.btn--s { background: var(--raised); color: var(--t1); border: 1px solid var(--border); }
+.btn--s:hover { border-color: var(--border-h); background: #262626; }
+.btn--lg { padding: 1rem 2.2rem; font-size: var(--ts-lg); height: 52px; }
+.btn--sm { padding: .5rem 1.2rem; font-size: var(--ts-sm); }
+
+/* ── Hero ── */
+.hero { padding: 180px 0 100px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 800px; background: radial-gradient(circle, rgba(16,185,129,.12) 0%, transparent 60%);
+  pointer-events: none; filter: blur(40px); z-index: -1; }
+.hero h1 { max-width: 780px; margin: 0 auto 24px; }
+.hero__sub { font-size: 1.125rem; color: var(--t2); max-width: 680px; margin: 0 auto 40px; line-height: 1.7; }
+.hero__actions { display: flex; gap: var(--sp-lg); justify-content: center; }
+.hero__integrations { display: flex; gap: 16px; align-items: center; justify-content: center;
+  margin-top: 64px; color: var(--t3); font-size: var(--ts-sm); flex-wrap: wrap; }
+.hero__integrations span { padding: 6px 12px; border: 1px solid var(--border); border-radius: 20px;
+  background: var(--surface); color: var(--t2); font-size: var(--ts-xs); }
+
+/* ── Profile cards (3 columns) ── */
+.profiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.pcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md);
+  padding: 32px; transition: all .3s ease; display: flex; flex-direction: column; }
+.pcard:hover { border-color: var(--border-h); transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,.5); }
+.pcard__icon { font-size: 1.5rem; margin-bottom: 24px; display: inline-flex;
+  align-items: center; justify-content: center; width: 48px; height: 48px;
+  background: var(--ink); border: 1px solid var(--border); border-radius: 8px; }
+.pcard__title { font-family: var(--font-head); font-size: var(--ts-xl); font-weight: 700;
+  color: var(--t1); margin-bottom: var(--sp-md); }
+.pcard__desc { font-size: var(--ts-sm); color: var(--t2); line-height: 1.7; flex: 1; }
+.pcard__link { display: inline-flex; align-items: center; gap: .3rem; font-size: var(--ts-sm);
+  font-weight: 600; color: var(--green); margin-top: var(--sp-lg); }
+.pcard__link:hover { gap: .5rem; }
+
+/* ── Comparison table ── */
+.cmp { width: 100%; border-collapse: collapse; text-align: left; }
+.cmp th, .cmp td { padding: 20px 24px; border-bottom: 1px solid var(--border); font-size: var(--ts-sm); }
+.cmp thead th { font-weight: 500; color: var(--t2); font-family: var(--font-head); width: 33%; }
+.cmp .hi { background: var(--raised); border-left: 1px solid var(--border); border-right: 1px solid var(--border); color: var(--t1); }
+.cmp thead .hi { color: var(--green); font-size: var(--ts-base); border-top: 1px solid var(--border);
+  border-radius: 8px 8px 0 0; }
+.cmp tbody tr:last-child .hi { border-bottom: 1px solid var(--border); border-radius: 0 0 8px 8px; }
+.cmp .y { color: var(--green); font-weight: 700; margin-right: 8px; }
+.cmp .n { color: var(--t3); }
+
+/* ── Builder mock (Review Queue) ── */
+.builder { background: var(--ink); border: 1px solid var(--border); border-radius: var(--r-md);
+  overflow: hidden; max-width: 620px; margin: 0 auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.6); }
+.builder__bar { display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: var(--raised); border-bottom: 1px solid var(--border);
+  font-size: var(--ts-xs); color: var(--t2); }
+.builder__bar span:last-child { color: var(--amber); }
+.builder__body { padding: 24px; }
+.builder__stats { display: flex; gap: 16px; margin-bottom: 20px; }
+.builder__stat { flex: 1; border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 10px; text-align: center; }
+.builder__stat span { display: block; font-size: var(--ts-xs); color: var(--t3);
+  text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+.builder__stat strong { font-size: var(--ts-lg); font-weight: 700; color: var(--t1); }
+.builder__stat.accent strong { color: var(--green); }
+.builder__q { font-size: var(--ts-base); font-weight: 600; color: var(--t1);
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.builder__item { border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 14px 16px; margin-bottom: 10px; background: var(--surface);
+  display: flex; justify-content: space-between; align-items: center;
+  transition: all .2s; position: relative; }
+.builder__item.active { border-color: var(--green); background: var(--green-g); }
+.builder__fname { font-size: var(--ts-sm); font-weight: 500; color: var(--t1); }
+.builder__why { font-size: var(--ts-xs); color: var(--t3); margin-top: 4px; }
+.builder__item.active .builder__why { color: var(--green); }
+.builder__check { font-size: var(--ts-sm); color: var(--green); font-weight: 600; }
+.builder__kbd { display: inline-block; background: var(--border); color: var(--t1);
+  font-size: var(--ts-xs); padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+.builder__item.active .builder__kbd { background: var(--green); color: var(--ink); }
+.builder__item.dim { opacity: .5; }
+.builder__foot { text-align: center; padding: 12px; border-top: 1px solid var(--border);
+  font-size: var(--ts-xs); color: var(--t3); }
+
+/* ── Lens demo (WHITE background — Gemini style) ── */
+.lens { background: #ffffff; color: #171717; border-radius: var(--r-md);
+  overflow: hidden; max-width: 620px; margin: 0 auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.6); }
+.lens__bar { display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px; background: #f5f5f5; border-bottom: 1px solid #e5e5e5; }
+.lens__dots { display: flex; gap: 6px; }
+.lens__dot { width: 10px; height: 10px; border-radius: 50%; }
+.lens__dot--r { background: #ff5f56; } .lens__dot--y { background: #ffbd2e; } .lens__dot--g { background: #27c93f; }
+.lens__title { font-size: var(--ts-xs); color: #737373; font-weight: 500; margin-left: auto; }
+.lens__body { padding: 32px; }
+
+.lens__tabs { display: flex; gap: 12px; margin-bottom: 24px; }
+.lens__tab { padding: .5rem 1rem; font-size: var(--ts-sm); font-weight: 600; color: #737373;
+  border-radius: var(--r-sm); cursor: pointer; border: 1px solid #e5e5e5; transition: all .2s;
+  background: #fff; font-family: inherit; }
+.lens__tab.on--fail { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+.lens__tab.on--pass { background: #ecfdf5; color: #059669; border-color: #6ee7b7; }
+
+/* Lens KPI row */
+.lens__kpis { display: flex; gap: 16px; margin-bottom: 24px; }
+.lens__kpi { flex: 1; border: 1px solid #e5e5e5; border-radius: var(--r-sm); padding: 12px; text-align: center; }
+.lens__kpi span { display: block; font-size: var(--ts-xs); color: #737373; text-transform: uppercase;
+  letter-spacing: .05em; margin-bottom: 4px; }
+.lens__kpi strong { font-size: var(--ts-xl); font-weight: 700; color: #171717; }
+.lens__kpi.err strong { color: #dc2626; }
+
+/* Lens verdict */
+.verdict { padding: 20px; border-radius: var(--r-sm); border: 1px solid; margin-bottom: 24px;
+  display: none; animation: slideDown .3s ease; }
+.verdict.show { display: block; }
+.verdict__title { display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-head); font-size: 1.125rem; font-weight: 700; margin-bottom: 8px; }
+.verdict__sub { font-size: var(--ts-sm); color: #525252; margin: 0; }
+.verdict--pass { background: #ecfdf5; border-color: #6ee7b7; }
+.verdict--pass .verdict__title { color: #059669; }
+.verdict--fail { background: #fef2f2; border-color: #fca5a5; }
+.verdict--fail .verdict__title { color: #dc2626; }
+
+/* Lens file rows */
+.lens__row { display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 0; border-bottom: 1px solid #e5e5e5; }
+.lens__row:last-child { border-bottom: none; }
+.lens__row--err { background: #fef2f2; margin: 0 -32px; padding: 14px 32px; }
+.lens__file { font-size: var(--ts-sm); font-weight: 500; display: flex; align-items: center; gap: 8px; color: #171717; }
+.lens__hash { font-size: var(--ts-xs); color: #737373; font-family: 'Courier New', monospace; }
+.st-ok { color: #059669; font-weight: 700; }
+.st-err { color: #dc2626; font-weight: 700; }
+
+/* Lens screen toggle */
+.lens-screen { display: none; }
+.lens-screen.active { display: block; }
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 2 Layers ── */
+.layers { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; max-width: 960px; margin: 0 auto; }
+.layer { padding: 32px; border: 1px solid var(--border); border-radius: var(--r-md); }
+.layer__num { font-size: var(--ts-xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--green); margin-bottom: 12px; }
+.layer h4 { margin-bottom: 12px; }
+.layer p { font-size: var(--ts-sm); line-height: 1.7; }
+
+/* ── Structural gap table ── */
+.gap-table { width: 100%; border-collapse: collapse; }
+.gap-table th, .gap-table td { padding: .7rem 1rem; text-align: left; font-size: var(--ts-sm); border-bottom: 1px solid var(--border); }
+.gap-table thead th { font-weight: 600; color: var(--t3); font-size: var(--ts-xs);
+  text-transform: uppercase; letter-spacing: .06em; }
+.gap-table td { color: var(--t2); }
+.gap-table .empty { color: var(--red); }
+
+/* ── Not-do list ── */
+.notdo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.notdo__item { padding: var(--sp-xl); border: 1px solid var(--border); border-radius: var(--r-md); }
+.notdo__title { font-family: var(--font-head); font-weight: 700; font-size: var(--ts-lg);
+  color: var(--t1); margin-bottom: var(--sp-sm); }
+.notdo__desc { font-size: var(--ts-sm); color: var(--t2); line-height: 1.7; }
+
+/* ── Tag cloud (100 genres — from Claude) ── */
+.tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 32px; }
+.tag { font-size: var(--ts-xs); padding: 6px 14px; border: 1px solid var(--border);
+  border-radius: 20px; color: var(--t3); background: var(--surface); transition: all .2s; }
+.tag:hover { border-color: var(--border-h); color: var(--t2); }
+
+/* ── Daily use (Draft merit) ── */
+.daily { max-width: 720px; margin: 0 auto; }
+.daily__flow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: start;
+  margin-top: 40px; }
+.daily__col { padding: 28px; border: 1px solid var(--border); border-radius: var(--r-md); }
+.daily__col h4 { margin-bottom: 12px; font-size: var(--ts-lg); }
+.daily__col p { font-size: var(--ts-sm); line-height: 1.7; }
+.daily__col .label { margin-bottom: 8px; }
+.daily__arrow { color: var(--green); font-size: var(--ts-3x); align-self: center; }
+
+@media (max-width: 768px) {
+  .daily__flow { grid-template-columns: 1fr; text-align: center; }
+  .daily__arrow { transform: rotate(90deg); justify-self: center; }
+}
+
+/* ── Pull structure card (from GPT, customer language) ── */
+.pull-card { max-width: 640px; margin: 0 auto; padding: 40px; border: 1px solid var(--border);
+  border-radius: var(--r-md); background: var(--surface); text-align: center; }
+.pull-card h4 { margin-bottom: 16px; }
+.pull-card p { margin: 0 auto; }
+.pull__flow { display: flex; align-items: center; justify-content: center; gap: 16px;
+  margin-top: 32px; flex-wrap: wrap; }
+.pull__step { padding: 12px 20px; border-radius: var(--r-sm); background: var(--raised);
+  border: 1px solid var(--border); font-size: var(--ts-sm); color: var(--t1); font-weight: 500; }
+.pull__arrow { color: var(--green); font-size: var(--ts-xl); }
+
+/* ── Pricing summary ── */
+.price-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.price-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-xl);
+  padding: var(--sp-2x) var(--sp-xl); }
+.price-card--hl { border-color: rgba(16,185,129,.3); }
+.price-card__name { font-size: var(--ts-xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--green); margin-bottom: var(--sp-md); }
+.price-card__price { font-family: var(--font-head); font-size: var(--ts-3x); font-weight: 800;
+  color: var(--t1); margin-bottom: var(--sp-sm); line-height: 1; }
+.price-card__unit { font-size: var(--ts-sm); color: var(--t3); margin-bottom: var(--sp-xl); }
+.price-card__list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+.price-card__list li { font-size: var(--ts-sm); color: var(--t2); padding-left: 1.4rem; position: relative; }
+.price-card__list li::before { content: '✓'; position: absolute; left: 0;
+  color: var(--green); font-weight: 700; }
+
+/* ── FAQ ── */
+.faq { max-width: var(--w-n); margin: 0 auto; display: flex; flex-direction: column; }
+.faq__item { border-bottom: 1px solid var(--border); }
+.faq__q { width: 100%; padding: var(--sp-lg) 0; background: none; border: none; color: var(--t1);
+  font-family: var(--font-head); font-size: var(--ts-lg); font-weight: 700; text-align: left;
+  cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.faq__q::after { content: '+'; font-size: var(--ts-xl); color: var(--t3); transition: transform .3s; }
+.faq__item.open .faq__q::after { content: '\2212'; }
+.faq__a { max-height: 0; overflow: hidden; transition: max-height .4s var(--ease); }
+.faq__item.open .faq__a { max-height: 300px; }
+.faq__a p { padding-bottom: var(--sp-lg); font-size: var(--ts-sm); line-height: 1.8; }
+
+/* ── CTA band ── */
+.cta-band { text-align: center; padding: var(--sp-4x) 0; }
+.cta-band h2 { margin-bottom: var(--sp-lg); }
+.cta-band p { font-size: var(--ts-lg); max-width: 480px; margin: 0 auto 40px; }
+
+/* ── Callout ── */
+.callout { border-left: 3px solid var(--green); padding: var(--sp-lg) var(--sp-xl);
+  background: var(--green-g); border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  font-size: var(--ts-lg); color: var(--t1); font-weight: 600; }
+
+/* ── Footer ── */
+.footer { border-top: 1px solid var(--border); padding: var(--sp-3x) 0 var(--sp-2x); }
+.footer__grid { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr; gap: var(--sp-2x); }
+.footer__brand { font-family: var(--font-head); font-size: 1.25rem; font-weight: 800;
+  color: var(--t1); margin-bottom: var(--sp-md); }
+.footer__brand b { color: var(--green); }
+.footer__desc { color: var(--t3); font-size: var(--ts-sm); max-width: 280px; }
+.footer__col h4 { font-size: var(--ts-xs); font-weight: 700; color: var(--t2);
+  text-transform: uppercase; letter-spacing: .08em; margin-bottom: var(--sp-lg); }
+.footer__col ul { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+.footer__col a { color: var(--t3); font-size: var(--ts-sm); }
+.footer__col a:hover { color: var(--t1); }
+.footer__bottom { margin-top: var(--sp-2x); padding-top: var(--sp-lg); border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; color: var(--t3); font-size: var(--ts-xs); }
+
+/* ── Profile sub-page hero ── */
+.phero { padding: calc(var(--sp-3x) + 72px) 0 var(--sp-3x); }
+.phero__label { font-size: var(--ts-xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--green); margin-bottom: var(--sp-md); }
+.phero h1 { font-size: var(--ts-4x); max-width: 640px; margin-bottom: var(--sp-lg); }
+.phero p { font-size: var(--ts-lg); color: var(--t2); max-width: 560px; line-height: 1.7; }
+
+/* Feature rows */
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3x); align-items: center; }
+.frow--flip { direction: rtl; } .frow--flip > * { direction: ltr; }
+.frow__text h3 { margin-bottom: var(--sp-md); }
+.frow__text p { font-size: var(--ts-base); line-height: 1.7; }
+.frow__vis { background: var(--raised); border: 1px solid var(--border); border-radius: var(--r-xl); padding: var(--sp-2x); }
+
+/* Examples grid */
+.ex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-lg); }
+.ex-card { background: var(--raised); border: 1px solid var(--border); border-radius: var(--r-md);
+  padding: var(--sp-xl); transition: border-color .2s; }
+.ex-card:hover { border-color: var(--border-h); }
+.ex-card__cat { font-size: var(--ts-xs); font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--green); margin-bottom: var(--sp-sm); }
+.ex-card__title { font-family: var(--font-head); font-weight: 700; font-size: var(--ts-lg);
+  color: var(--t1); margin-bottom: var(--sp-sm); }
+.ex-card__desc { font-size: var(--ts-sm); color: var(--t2); line-height: 1.6; }
+
+/* Pricing page tiers */
+.tier-table { width: 100%; border-collapse: collapse; margin-top: var(--sp-xl); }
+.tier-table th, .tier-table td { padding: .8rem 1.2rem; text-align: left; font-size: var(--ts-sm);
+  border-bottom: 1px solid var(--border); }
+.tier-table thead th { font-weight: 700; color: var(--t3); font-size: var(--ts-xs);
+  text-transform: uppercase; letter-spacing: .06em; }
+.tier-table td { color: var(--t2); }
+
+/* ── Code blocks (technical pages) ── */
+.code-block { background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 16px 20px; font-family: 'JetBrains Mono', monospace;
+  font-size: var(--ts-sm); color: var(--t2); line-height: 1.8; overflow-x: auto; }
+.code-block .cmd { color: var(--green); font-weight: 600; }
+.code-block .flag { color: var(--amber); }
+.code-block .comment { color: var(--t3); }
+.code-block .string { color: var(--green); }
+
+.comparison { width: 100%; border-collapse: collapse; }
+.comparison th, .comparison td { padding: 10px 16px; text-align: left;
+  font-size: var(--ts-sm); border-bottom: 1px solid var(--border); }
+.comparison thead th { font-weight: 600; color: var(--t3); font-size: var(--ts-xs);
+  text-transform: uppercase; letter-spacing: .06em; }
+.comparison .mono { font-family: 'JetBrains Mono', monospace; }
+
+.seal { display: inline-block; padding: 12px 24px; background: var(--green-g);
+  border: 1px solid rgba(16,185,129,0.2); border-radius: var(--r-sm);
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--green);
+  letter-spacing: .05em; }
+
+/* ── Pilot step numbers ── */
+.step-num { display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; border-radius: 50%; background: var(--green-g);
+  border: 2px solid rgba(16,185,129,0.2); color: var(--green); font-weight: 700;
+  font-size: var(--ts-lg); margin-bottom: var(--sp-md); flex-shrink: 0; }
+
+/* ── Status dots (trust page) ── */
+.status { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0;
+  border-bottom: 1px solid var(--border); }
+.status__dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+.status__dot--green { background: var(--green); }
+.status__dot--amber { background: var(--amber); }
+.status__text { font-size: var(--ts-sm); color: var(--t2); }
+.status__text strong { color: var(--t1); display: block; margin-bottom: 2px; }
+
+/* ── Scroll reveal (Gemini) ── */
+.reveal { opacity: 0; transform: translateY(30px); transition: 0.8s var(--ease); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Responsive ── */
+@media (max-width: 960px) {
+  .profiles { grid-template-columns: 1fr; gap: var(--sp-lg); }
+  .notdo { grid-template-columns: 1fr; }
+  .price-cards { grid-template-columns: 1fr; }
+  .frow, .frow--flip { grid-template-columns: 1fr; direction: ltr; }
+  .footer__grid { grid-template-columns: 1fr 1fr; gap: var(--sp-xl); }
+  .layers { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: var(--ts-4x); }
+  h2 { font-size: var(--ts-3x); }
+  .nav__links { display: none; }
+  .nav__links.open { display: flex; flex-direction: column; position: absolute; top: 72px; left: 0; right: 0;
+    background: var(--ink); border-bottom: 1px solid var(--border); padding: 16px 24px; gap: 16px; z-index: 99; }
+  .nav__ham { display: block; }
+  .hero { padding: 140px 0 80px; }
+  .hero__actions { flex-direction: column; align-items: center; }
+  .gap-table { font-size: var(--ts-xs); }
+  .gap-table th, .gap-table td { padding: .4rem .5rem; }
+  .lens__kpis { flex-wrap: wrap; }
+  .lens__kpi { min-width: 45%; }
+}
+
+@media (max-width: 480px) {
+  .wrap { padding: 0 var(--sp-lg); }
+  .footer__grid { grid-template-columns: 1fr; }
+}
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="software.html">ソフトウェア</a></li>
+      <li><a href="compliance.html">質問票</a></li>
+      <li><a href="ai-ml.html">AI/ML</a></li>
+      <li><a href="examples.html">事例</a></li>
+      <li><a href="pricing.html">料金</a></li>
+    </ul>
+    <a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ Hero ═══ -->
+<section class="hero">
+  <div class="wrap reveal">
+    <p class="label">The Digital Handoff Protocol</p>
+    <h1>まとめて、渡して、<br>受け取った人がその場で確かめられる。</h1>
+    <p class="hero__sub">複数のファイルを署名付きパックにして渡すだけ。受信者はブラウザで「Lens」を開き、「この一式は崩れていない」と即断できます。</p>
+    <div class="hero__actions">
+      <a href="#lens-demo" class="btn btn--p btn--lg">Lensデモを見る</a>
+      <a href="#how" class="btn btn--s btn--lg">仕組みを知る</a>
+    </div>
+    <div class="hero__integrations">
+      GRCツール、CI/CD、質問票Excel — 何でもそのまま入れてください。
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 3 Profile Cards ═══ -->
+<section class="sec sec--bg" id="how">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">3つの入口</p>
+      <h2>何を渡す場面でも</h2>
+      <p>技術は全部同じ。語り方だけ変わる。</p>
+    </div>
+
+    <div class="profiles reveal">
+      <div class="pcard">
+        <div class="pcard__icon">📦</div>
+        <div class="pcard__title">ソフトウェアリリース</div>
+        <p class="pcard__desc">binary + SBOM + provenanceを検証可能な一式にして渡せる。受け取った人がLensで「全部揃ってる、改竄なし」と5秒で確認。</p>
+        <a href="software.html" class="pcard__link">詳しく見る &rarr;</a>
+      </div>
+      <div class="pcard">
+        <div class="pcard__icon">📋</div>
+        <div class="pcard__title">質問票 / コンプライアンス</div>
+        <p class="pcard__desc">回答と証拠をまとめて、受信者が確認の往復なしで済む。質問票Excelをそのまま入れるだけ。回答時間を数日から数分に。</p>
+        <a href="compliance.html" class="pcard__link">詳しく見る &rarr;</a>
+      </div>
+      <div class="pcard">
+        <div class="pcard__icon">🧠</div>
+        <div class="pcard__title">AI / MLモデル</div>
+        <p class="pcard__desc">モデル + config + eval を一式で、受信者がLensで確認。規制当局にモデルの挙動が変わっていないことを証明できる。</p>
+        <a href="ai-ml.html" class="pcard__link">詳しく見る &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ZIP+メールとの違い ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>ZIP + メールからの脱却</h2>
+    </div>
+    <div class="reveal" style="overflow-x:auto;max-width:960px;margin:0 auto">
+      <table class="cmp">
+        <thead>
+          <tr><th>要件</th><th>従来の ZIP + メール</th><th class="hi" style="text-align:center">PX Pack</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">一式が全部揃っているか</td>
+            <td class="n">開いて探すまで分からない</td>
+            <td class="hi"><span class="y">✓</span> マニフェスト照合（1つ欠ければFail）</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">送った後に変わっていないか</td>
+            <td class="n">分からない</td>
+            <td class="hi"><span class="y">✓</span> ハッシュ検証（1bitでも変わればRed）</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">誰が作ったか</td>
+            <td class="n">メール送信者（偽装可能）</td>
+            <td class="hi"><span class="y">✓</span> SHA-256 ハッシュ検証</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">回答と証拠の対応</td>
+            <td class="n">受信者が手作業で突き合わせ</td>
+            <td class="hi"><span class="y">✓</span> 構造化リンク（slice_ref）</td>
+          </tr>
+          <tr>
+            <td style="color:var(--t1);font-weight:600">受信者の確認方法</td>
+            <td class="n">1つずつ全ファイルを目視確認</td>
+            <td class="hi"><span class="y">✓</span> Lensを1つ開くだけ（5秒）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Builder体験（Review Queue） ═══ -->
+<section class="sec" id="builder">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">作成者の体験</p>
+      <h2>整理はPXに。最後の決断だけ、あなたに。</h2>
+      <p>勝手に推測して嘘をつくAIは「署名付きのゴミ」を作るだけ。<br>PXは300ファイルから不要なものを自動で弾き、迷った18件だけをあなたに尋ねる。<br>キーボードを数回叩くだけ。</p>
+    </div>
+
+    <div class="builder reveal">
+      <div class="builder__bar">
+        <span>Review Queue [3/18]</span>
+        <span>Decisions needed: 18</span>
+      </div>
+      <div class="builder__body">
+        <div class="builder__stats">
+          <div class="builder__stat"><span>Ingested</span><strong>300</strong></div>
+          <div class="builder__stat"><span>Auto-sorted</span><strong>241</strong></div>
+          <div class="builder__stat accent"><span>Accept</span><strong>199</strong></div>
+          <div class="builder__stat"><span>You decide</span><strong>18</strong></div>
+        </div>
+        <div class="builder__q">Q12: MFA設定の証拠</div>
+        <div class="builder__item active">
+          <div>
+            <div class="builder__fname">[1] MFA設定_20260301.png</div>
+            <div class="builder__why">ファイル名一致 / 過去に採用済み</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="builder__check">&#10003; Selected</span>
+            <span class="builder__kbd">Enter</span>
+          </div>
+        </div>
+        <div class="builder__item dim">
+          <div>
+            <div class="builder__fname">[2] MFA設定_20241115.png</div>
+            <div class="builder__why">フォルダ内一致（古い可能性）</div>
+          </div>
+          <span class="builder__kbd">2</span>
+        </div>
+      </div>
+      <div class="builder__foot">
+        <span class="builder__kbd" style="background:var(--raised);color:var(--t2)">S</span> でスキップ（該当なし）
+      </div>
+    </div>
+
+    <p class="reveal" style="text-align:center;color:var(--t2);font-size:var(--ts-sm);margin-top:var(--sp-xl);max-width:520px;margin-left:auto;margin-right:auto">今回の提出を10分で終わらせる。来年は、3分。<br>あなたが下した判断をPXが記憶する。来年の監査では差分の3件を確認するだけ。<br>提出の苦痛は、年を追うごとにゼロに近づく。</p>
+    <p class="reveal" style="text-align:center;color:var(--t3);font-size:var(--ts-xs);margin-top:var(--sp-lg)">ハッシュ計算と署名はすべてローカルで完結。証拠ファイルが外部サーバーに送信されることはありません。</p>
+  </div>
+</section>
+
+<!-- ═══ Lens Demo (FAIL-first, white background) ═══ -->
+<section class="sec sec--bg" id="lens-demo">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">受信者の体験</p>
+      <h2>Lensを開く。それだけ。</h2>
+      <p>相手に要求するのは、ファイルを開くことだけ。<br>インストール不要。アカウント不要。ITリテラシーに関わらず、緑の画面がすべてを証明する。</p>
+    </div>
+
+    <div class="lens reveal">
+      <div class="lens__bar">
+        <div class="lens__dots">
+          <div class="lens__dot lens__dot--r"></div>
+          <div class="lens__dot lens__dot--y"></div>
+          <div class="lens__dot lens__dot--g"></div>
+        </div>
+        <span class="lens__title">lens.html (Offline Viewer)</span>
+      </div>
+      <div class="lens__body">
+        <div class="lens__tabs">
+          <button class="lens__tab on--fail" data-target="lens-fail">FAIL</button>
+          <button class="lens__tab" data-target="lens-pass">PASS</button>
+        </div>
+
+        <!-- FAIL (default visible) -->
+        <div class="lens-screen active" id="lens-fail">
+          <div class="verdict verdict--fail show">
+            <div class="verdict__title">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              この提出パックは有効ではありません
+            </div>
+            <p class="verdict__sub">1件の致命的な不一致が検出されました。提出者に差し戻してください。</p>
+          </div>
+          <div class="lens__kpis">
+            <div class="lens__kpi err"><span>Files</span><strong>27/28</strong></div>
+            <div class="lens__kpi err"><span>Refs</span><strong>40/41</strong></div>
+            <div class="lens__kpi"><span>Hash</span><strong style="color:#059669">Match</strong></div>
+          </div>
+          <div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> CAIQ_Answers.xlsx</div>
+              <div class="lens__hash">sha256:5cb6...</div>
+            </div>
+            <div class="lens__row lens__row--err">
+              <div class="lens__file" style="color:#dc2626"><span class="st-err">✕</span> security_policy.pdf（改ざん検知）</div>
+              <div class="lens__hash" style="color:#dc2626">Hash Mismatch</div>
+            </div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> aws_kms_config.json</div>
+              <div class="lens__hash">sha256:90fa...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASS -->
+        <div class="lens-screen" id="lens-pass">
+          <div class="verdict verdict--pass show">
+            <div class="verdict__title">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              この提出パックは有効です
+            </div>
+            <p class="verdict__sub">封印後の変更はなく、参照されている証拠はすべて揃っています。</p>
+            <p style="font-size:var(--ts-xs);color:#737373;margin-top:16px">Verified via PX — <a href="#how" style="color:#059669">Create your own pack</a></p>
+          </div>
+          <div class="lens__kpis">
+            <div class="lens__kpi"><span>Files</span><strong>28/28</strong></div>
+            <div class="lens__kpi"><span>Refs</span><strong>41/41</strong></div>
+            <div class="lens__kpi"><span>Hash</span><strong style="color:#059669">Match</strong></div>
+          </div>
+          <div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> CAIQ_Answers.xlsx</div>
+              <div class="lens__hash">sha256:5cb6...</div>
+            </div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> security_policy.pdf</div>
+              <div class="lens__hash">sha256:d41d...</div>
+            </div>
+            <div class="lens__row">
+              <div class="lens__file"><span class="st-ok">✓</span> aws_kms_config.json</div>
+              <div class="lens__hash">sha256:90fa...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 2つのレイヤー ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">2つのレイヤー</p>
+      <h2>1回の提出で終わりません</h2>
+    </div>
+    <div class="layers reveal">
+      <div class="layer">
+        <div class="layer__num">Layer 1 — 今回の一式</div>
+        <h4>「全部揃ってる、改竄なし」を5秒で</h4>
+        <p>1回の受け渡しの検証。受信者がLensを開いて即断できる。</p>
+      </div>
+      <div class="layer">
+        <div class="layer__num">Layer 2 — 前回からの差分</div>
+        <h4>変わった部分だけ確認。前回と同じはそのまま</h4>
+        <p>前回のパックを参照して、何が変わったかを自動で表示。SOC2 Type 2の継続運用、リリースごとのバージョン履歴、モデルのfine-tune履歴。すべて同じ仕組み。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 構造的空白（10市場） ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>なぜPXが必要か</h2>
+    </div>
+    <div class="callout reveal" style="max-width:var(--w-n);margin:0 auto var(--sp-2x)">
+      署名はある。パッケージング＋受信者検証UIがない。
+    </div>
+    <div class="reveal" style="overflow-x:auto;max-width:960px;margin:0 auto">
+      <table class="gap-table">
+        <thead><tr><th>市場</th><th>署名/ハッシュ</th><th>パッケージング</th><th>受信者検証UI</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--t1)">ソフトウェア配布</td><td>Sigstore, GitHub Attestations</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">AI/ML</td><td>OpenSSF Model Signing</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">質問票/コンプラ</td><td>なし（GRCツールは収集のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">ベンダーリスク</td><td>SecurityScorecard（外部スコア）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">AIエージェント</td><td>MCP Gateway（認証のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">CoA/検査成績書</td><td>QMS内蔵（作成側のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">研究データ</td><td>RO-Crate（構造のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">機械可読コンプラ</td><td>OSCAL/CycloneDX</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">M&Aデューデリ</td><td>VDR（共有のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">インシデント証拠保全</td><td>フォレンジクスツール</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="reveal" style="text-align:center;color:var(--t3);font-size:var(--ts-sm);margin-top:var(--sp-xl)">署名する仕組みはある。でも「まとめて渡して、相手がその場で確認する」仕組みは、まだどこにもない。</p>
+  </div>
+</section>
+
+<!-- ═══ ジャンル tag cloud ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">Genres</p>
+      <h2>ソフトウェアから製造まで。<br>あらゆるジャンルに対応。</h2>
+      <p>PXは中身を解釈しない。構造とハッシュと署名だけ。</p>
+    </div>
+    <div class="tags reveal">
+      <span class="tag">SOC2 Questionnaire</span>
+      <span class="tag">CAIQ v4</span>
+      <span class="tag">SIG Lite</span>
+      <span class="tag">Vendor Risk Assessment</span>
+      <span class="tag">Software Release</span>
+      <span class="tag">SBOM Attestation</span>
+      <span class="tag">Container Image</span>
+      <span class="tag">GitHub Actions Artifact</span>
+      <span class="tag">ML Model Card</span>
+      <span class="tag">Model Weights + Config</span>
+      <span class="tag">Eval Results</span>
+      <span class="tag">Agent Action Log</span>
+      <span class="tag">MCP Tool Receipt</span>
+      <span class="tag">A2A Delegation Proof</span>
+      <span class="tag">Research Data Package</span>
+      <span class="tag">Clinical Trial Data</span>
+      <span class="tag">Certificate of Analysis</span>
+      <span class="tag">Batch Record</span>
+      <span class="tag">ISO 27001 Evidence</span>
+      <span class="tag">HIPAA Compliance Pack</span>
+      <span class="tag">GDPR DPIA</span>
+      <span class="tag">Penetration Test Report</span>
+      <span class="tag">Insurance Submission</span>
+      <span class="tag">OSCAL Assessment</span>
+      <span class="tag">CycloneDX VEX</span>
+      <span class="tag">RO-Crate Wrapper</span>
+      <span class="tag">Legal Discovery Pack</span>
+      <span class="tag">Firmware Update</span>
+      <span class="tag">API Specification</span>
+      <span class="tag">and more</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PXがやらないこと ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>PXがやらないこと</h2>
+      <p>何をしないかで、何をするかが明確になる。</p>
+    </div>
+    <div class="notdo reveal">
+      <div class="notdo__item">
+        <div class="notdo__title">収集しない</div>
+        <p class="notdo__desc">PXは証拠を集めない。あなたが集めたファイルを、渡せる形にする。</p>
+      </div>
+      <div class="notdo__item">
+        <div class="notdo__title">中身の真実性を保証しない</div>
+        <p class="notdo__desc">渡した後に誰かが手を加えていないことを証明する。中身はあなたが正しいと判断したもの。PXはそれを封印する。</p>
+      </div>
+      <div class="notdo__item">
+        <div class="notdo__title">既存ツールと競合しない</div>
+        <p class="notdo__desc">今使っているツールを変える必要はない。PXは、その先の「渡す瞬間」だけを受け持つ。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 毎日使って、必要な時に渡す ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">Draft は永久無料</p>
+      <h2>毎日使って、必要な時に渡す</h2>
+    </div>
+    <div class="daily reveal">
+      <div class="daily__flow">
+        <div class="daily__col">
+          <p class="label">日常（無料）</p>
+          <h4>社内で回す</h4>
+          <p>証拠を入れるたびにPXが整理して、いつでもパックにできる状態を保つ。次の監査？前回のルールが残っているから、差分だけ確認。3分で終わる。</p>
+        </div>
+        <div class="daily__arrow">&rarr;</div>
+        <div class="daily__col" style="border-color:rgba(16,185,129,.3)">
+          <p class="label">提出時（課金）</p>
+          <h4>ボタン1つで外部へ</h4>
+          <p>外部に渡す必要が出たら、Submissionに切り替え。社内の積み重ねが、そのまま署名付き提出物になる。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Pull構造カード (from GPT, customer language) ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">受信者が次の作成者になる</p>
+      <h2>Pack it. Send it. They verify it.</h2>
+    </div>
+    <div class="pull-card reveal">
+      <h4>受け取って終わりではない</h4>
+      <p>パックを受け取った人は、自分のLens検証結果をそのまま次の相手に共有できます。監査法人→経営層、ベンダー→元請→最終顧客。検証済みの証拠は組織をまたいで流通します。</p>
+      <div class="pull__flow">
+        <div class="pull__step">作成者がPack</div>
+        <div class="pull__arrow">&rarr;</div>
+        <div class="pull__step">受信者がLens検証</div>
+        <div class="pull__arrow">&rarr;</div>
+        <div class="pull__step">次の相手にそのまま転送</div>
+        <div class="pull__arrow">&rarr;</div>
+        <div class="pull__step">誰でもLensで再検証</div>
+      </div>
+      <div style="margin-top:var(--sp-xl);text-align:center">
+        <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px pack ./evidence-folder/</code>
+        <p style="font-size:var(--ts-xs);color:var(--t3);margin-top:8px">APIキー不要。依存関係ゼロ。このコマンドだけ。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Pricing Summary ═══ -->
+<section class="sec sec--bg">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="label">料金</p>
+      <h2>Creating proof is free.<br>Responsibility is priced.</h2>
+    </div>
+    <div class="price-cards reveal">
+      <div class="price-card price-card--hl">
+        <div class="price-card__name">Draft</div>
+        <div class="price-card__price">&yen;0</div>
+        <div class="price-card__unit">永久無料</div>
+        <ul class="price-card__list">
+          <li>Pack生成 &mdash; 無制限</li>
+          <li>Lens検証 &mdash; 無制限</li>
+          <li>オフライン動作</li>
+          <li>CLI（ローカル動作）</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="price-card__name">Submission</div>
+        <div class="price-card__price">$500〜</div>
+        <div class="price-card__unit">プリペイドクレジット制</div>
+        <ul class="price-card__list">
+          <li>外部handoffの封印</li>
+          <li>Starter $500 / 10 credits</li>
+          <li>Growth $2,000 / 50 credits</li>
+          <li>Scale $10,000 / 300 credits</li>
+        </ul>
+      </div>
+      <div class="price-card">
+        <div class="price-card__name">Partner / Ops</div>
+        <div class="price-card__price">$10K〜</div>
+        <div class="price-card__unit">年額固定</div>
+        <ul class="price-card__list">
+          <li>チーム管理</li>
+          <li>Learned Rules蓄積</li>
+          <li>質問票代行・TPRM支援</li>
+          <li>チャネルパートナー構造</li>
+        </ul>
+      </div>
+    </div>
+    <p class="reveal" style="text-align:center;margin-top:var(--sp-xl);color:var(--t3);font-size:var(--ts-sm)">テスト期間中は全機能無料。<a href="pricing.html">料金の詳細 &rarr;</a></p>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head reveal"><h2>FAQ</h2></div>
+    <div class="faq reveal">
+      <div class="faq__item">
+        <button class="faq__q">PXとは何ですか？</button>
+        <div class="faq__a"><p>複数のファイルを署名付きパックにして、受信者がLensという1つのHTMLファイルを開くだけで「この一式は崩れていない」と即断できるツールです。CLIで動作します。ブラウザ上のCloud版は準備中です。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">他のGRCツールと競合しますか？</button>
+        <div class="faq__a"><p>いいえ。PXは証拠を集めません。今使っているツールで集めたファイルを、そのまま渡せる形にします。ワークフローは変わりません。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">受信者は何をインストールする必要がありますか？</button>
+        <div class="faq__a"><p>何も。lens.htmlをブラウザで開くだけです。インターネット接続も不要です。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">無料ですか？</button>
+        <div class="faq__a"><p>Draftモード（パック生成 + Lens検証）は永久無料です。外部handoffの封印（Submission）にクレジット課金が発生します。テスト期間中はすべての機能が無料です。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">どんな種類のファイルに対応していますか？</button>
+        <div class="faq__a"><p>何でも。Profile切替でソフトウェアリリース、質問票、AI/MLモデル等に対応します。Genericモードでは入れたファイルすべてをパックにできます。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">PXが停止したら、過去のパックはどうなりますか？</button>
+        <div class="faq__a"><p>そのまま使えます。Lensは外部APIに一切依存しない自己完結型HTMLです。PXが停止しても、過去に作ったパックは完全なオフライン環境で検証し続けられます。</p></div>
+      </div>
+      <div class="faq__item">
+        <button class="faq__q">セキュリティの仕組みは？</button>
+        <div class="faq__a"><p>SHA-256ハッシュ検証。外部ライブラリへの依存ゼロ。Lensはオフラインで動作し、ネットワークへの通信を一切行いません。fail-close設計により、1つでも不整合があれば検証は失敗します。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta-band">
+  <div class="wrap reveal">
+    <h2>御社の質問票1本で試す</h2>
+    <p>既存のツールを捨てる必要はない。次回の提出で、1回だけ並行して使ってみてください。<br>組織内でパックを作り、Lensで確認するまでは永久に無料。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+    <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:var(--sp-xl)">テスト期間中は全機能無料。</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="software.html">ソフトウェア</a></li>
+          <li><a href="compliance.html">質問票</a></li>
+          <li><a href="ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="examples.html">事例</a></li>
+          <li><a href="pricing.html">料金</a></li>
+          <li><a href="trust.html">信頼性</a></li>
+          <li><a href="pilot.html">パイロット</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>会社</h4>
+        <ul>
+          <li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* PX Site — Script v4
+   Nav scroll, Lens PASS/FAIL, FAQ accordion, scroll reveal
+   ─────────────────────────────────────────────────────────── */
+
+(function () {
+  'use strict';
+
+  /* ── Nav scroll effect (Gemini) ── */
+  var nav = document.getElementById('navbar');
+  if (nav) {
+    window.addEventListener('scroll', function () {
+      if (window.scrollY > 20) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    });
+  }
+
+  /* ── Mobile nav toggle ── */
+  var ham = document.querySelector('.nav__ham');
+  var links = document.querySelector('.nav__links');
+  if (ham && links) {
+    ham.addEventListener('click', function () {
+      links.classList.toggle('open');
+      ham.setAttribute('aria-expanded', links.classList.contains('open'));
+    });
+    // Close menu when a link is clicked
+    links.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        links.classList.remove('open');
+      });
+    });
+  }
+
+  /* ── Lens PASS/FAIL toggle ── */
+  var lensTabs = document.querySelectorAll('.lens__tab');
+  lensTabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      // Remove all tab active states
+      lensTabs.forEach(function (t) {
+        t.classList.remove('on--pass', 'on--fail');
+      });
+      // Hide all screens
+      document.querySelectorAll('.lens-screen').forEach(function (s) {
+        s.classList.remove('active');
+      });
+      // Activate clicked
+      var target = tab.getAttribute('data-target');
+      if (target === 'lens-pass') {
+        tab.classList.add('on--pass');
+      } else {
+        tab.classList.add('on--fail');
+      }
+      var screen = document.getElementById(target);
+      if (screen) screen.classList.add('active');
+    });
+  });
+
+  /* ── FAQ accordion ── */
+  document.querySelectorAll('.faq__q').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = btn.parentElement;
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq__item').forEach(function (i) {
+        i.classList.remove('open');
+      });
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+
+  /* ── Scroll reveal (Gemini IntersectionObserver) ── */
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      observer.observe(el);
+    });
+  } else {
+    // Fallback: show everything immediately
+    document.querySelectorAll('.reveal').forEach(function (el) {
+      el.classList.add('visible');
+    });
+  }
+
+})();
+</script>
+
+</body>
+</html>

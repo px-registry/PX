@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI/ML Model Profile — PX</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ───── Nav ───── -->
+<nav class="nav" id="navbar"><div class="nav__in"><a href="index.html" class="nav__logo">P<b>X</b></a><ul class="nav__links"><li><a href="software.html">ソフトウェア</a></li><li><a href="compliance.html">質問票</a></li><li><a href="ai-ml.html">AI/ML</a></li><li><a href="examples.html">事例</a></li><li><a href="pricing.html">料金</a></li></ul><a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a><button class="nav__ham" aria-label="Menu"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button></div></nav>
+
+<!-- ───── Hero ───── -->
+<section class="phero">
+  <div class="wrap">
+    <span class="phero__label">Model Profile</span>
+    <h1>モデル + config + eval を一式で渡せる</h1>
+    <p>AI/MLモデルに必要なファイルを署名付きパックにまとめ、受信者がLensで「この一式は崩れていない」と即断できる。渡したモデルが、渡した後に変わっていないことを証明する。</p>
+  </div>
+</section>
+
+<!-- ───── Problem ───── -->
+<section class="sec sec--bg">
+  <div class="wrap wrap--n">
+    <div class="sec-head reveal">
+      <h2>モデルのweightsとevalを別々に共有していませんか？</h2>
+    </div>
+    <div class="frow reveal">
+      <div class="frow__text">
+        <ul>
+          <li>weights, config, evaluation resultsがバラバラのリンクで共有される</li>
+          <li>「このevalはどのweightsに対するもの？」が追跡不能</li>
+          <li>EU AI Actでモデルカードの提出が義務化 — 検証可能な形式がない</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── How PX works ───── -->
+<section class="sec">
+  <div class="wrap wrap--n">
+    <div class="frow reveal">
+      <div class="frow__text">
+        <h3>1つのPackにまとめる</h3>
+        <p>weights（必須）+ config（必須）+ eval（推奨）。PXが署名してLensを生成。受信者はLensを開くだけ。</p>
+      </div>
+      <div class="frow__vis">
+        <div class="lens">
+          <div class="lens__bar">
+            <span class="lens__dots">
+              <span class="lens__dot--r"></span>
+              <span class="lens__dot--y"></span>
+              <span class="lens__dot--g"></span>
+            </span>
+            <span class="lens__title">Pack contents</span>
+          </div>
+          <div class="lens__body">
+            <p><strong>weights.bin</strong> — 必須</p>
+            <p><strong>config.json</strong> — 必須</p>
+            <p><strong>eval_results.json</strong> — 推奨</p>
+            <p><strong>model_card.md</strong> — 推奨</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── Lens experience ───── -->
+<section class="sec sec--bg">
+  <div class="wrap wrap--n">
+    <div class="frow frow--flip reveal">
+      <div class="frow__text">
+        <h3>受信者はLensを開くだけ</h3>
+        <p>インストール不要。オフライン動作。モデルの完全性を5秒で確認。</p>
+      </div>
+      <div class="frow__vis">
+        <div class="lens">
+          <div class="lens__bar">
+            <span class="lens__dots">
+              <span class="lens__dot--r"></span>
+              <span class="lens__dot--y"></span>
+              <span class="lens__dot--g"></span>
+            </span>
+            <span class="lens__title">PX Lens</span>
+          </div>
+          <div class="lens__body">
+            <div class="verdict verdict--pass">
+              <span class="verdict__icon">&#10003;</span>
+              <span class="verdict__title">このモデルパックは有効です</span>
+              <span class="verdict__sub"></span>
+              <div class="verdict__stats">
+                <span>4ファイル確認済み</span>
+                <span>weights検証済み</span>
+                <span>改変なし</span>
+                <span>ハッシュ一致</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── Neighboring tools ───── -->
+<section class="sec">
+  <div class="wrap wrap--n">
+    <div class="sec-head reveal">
+      <h2>OpenSSF Model Signingの「次」</h2>
+      <p>OpenSSF Model Signingはモデルに署名する。PXはその上に「パッケージング + 受信者検証UI」を加える。署名だけでは受信者は確認できない。Lensがあれば確認できる。</p>
+    </div>
+    <div class="callout">
+      署名はある。パッケージング＋受信者検証UIがない。
+    </div>
+  </div>
+</section>
+
+<!-- ───── Model Lineage ───── -->
+<section class="sec sec--bg">
+  <div class="wrap wrap--n">
+    <div class="sec-head reveal">
+      <h2>Model Lineage（継続した履歴）</h2>
+      <p>parent_manifest_refs[]で前のモデルバージョンを参照。v1.0 → v1.1 → v2.0の連鎖を検証可能に。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───── CTA ───── -->
+<section class="cta-band">
+  <div class="wrap">
+    <h2>モデルをPackにする</h2>
+    <p>手元のモデルファイルで試せます。</p>
+    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
+      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
+    </div>
+  </div>
+</section>
+
+<!-- ───── Footer ───── -->
+<footer class="footer"><div class="wrap"><div class="footer__grid"><div><div class="footer__brand">P<b>X</b></div><p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p></div><div class="footer__col"><h4>Profile</h4><ul><li><a href="software.html">ソフトウェア</a></li><li><a href="compliance.html">質問票</a></li><li><a href="ai-ml.html">AI/ML</a></li></ul></div><div class="footer__col"><h4>リソース</h4><ul><li><a href="examples.html">事例</a></li><li><a href="pricing.html">料金</a></li><li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li><li><a href="trust.html">信頼性</a></li><li><a href="pilot.html">パイロット</a></li></ul></div><div class="footer__col"><h4>会社</h4><ul><li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li></ul></div></div><div class="footer__bottom"><span>&copy; 2026 PX Registry KK</span><span>MIT License</span></div></div></footer>
+
+<script src="script.js"></script>
+</body>
+</html>

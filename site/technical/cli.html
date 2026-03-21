@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLI Reference — PX</title>
+  <meta name="description" content="Complete CLI reference for PX: all commands, flags, and examples.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="nav" id="navbar">
+  <div class="nav__in">
+    <a href="../index.html" class="nav__logo">P<b>X</b></a>
+    <ul class="nav__links">
+      <li><a href="../software.html">ソフトウェア</a></li>
+      <li><a href="../compliance.html">質問票</a></li>
+      <li><a href="../ai-ml.html">AI/ML</a></li>
+      <li><a href="../examples.html">事例</a></li>
+      <li><a href="../pricing.html">料金</a></li>
+    </ul>
+    <a href="../demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
+    <button class="nav__ham" aria-label="Menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="phero reveal">
+  <div class="wrap">
+    <p class="label">Technical / CLI</p>
+    <h1>CLI Reference</h1>
+    <p>Every command, every flag.</p>
+  </div>
+</section>
+
+<!-- All Commands -->
+<section class="sec reveal">
+  <div class="wrap" style="max-width:var(--w-n)">
+
+    <!-- Installation -->
+    <div style="margin-bottom:var(--sp-2x)">
+      <h2 style="margin-bottom:var(--sp-lg)">Installation</h2>
+      <div class="code-block">
+        <div><span class="comment"># Clone and use directly</span></div>
+        <div><span class="cmd">git clone</span> https://github.com/px-registry/PX.git</div>
+        <div><span class="cmd">cd</span> PX</div>
+        <div><span class="cmd">node</span> cli.js help</div>
+        <div style="margin-top:1rem"><span class="comment"># Or via npx (no clone needed)</span></div>
+        <div><span class="cmd">npx</span> px help</div>
+      </div>
+      <p style="color:var(--t3);font-size:var(--ts-sm);margin-top:var(--sp-sm)">Requires Node.js v16+. No npm install needed — zero external dependencies.</p>
+    </div>
+
+    <hr class="divider" style="margin:0 0 var(--sp-2x)">
+
+    <!-- verify -->
+    <div style="margin-bottom:var(--sp-2x)" id="verify">
+      <h2 style="margin-bottom:var(--sp-md)">verify</h2>
+      <p style="color:var(--t2);margin-bottom:var(--sp-lg)">Run rules against evidence and report results. Two modes: direct verification and replay.</p>
+
+      <h4 style="font-size:var(--ts-base);margin-bottom:var(--sp-sm)">Direct verification</h4>
+      <div class="code-block" style="margin-bottom:var(--sp-md)">
+        <span class="cmd">px verify</span> <span class="flag">--profile</span>=&lt;profile.json&gt; <span class="flag">--evidence</span>=&lt;evidence.json&gt;
+      </div>
+      <div style="overflow-x:auto;margin-bottom:var(--sp-lg)">
+        <table class="comparison">
+          <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="mono" style="color:var(--green)">--profile</td><td>Yes</td><td>Path to profile JSON file</td></tr>
+            <tr><td class="mono" style="color:var(--green)">--evidence</td><td>Yes</td><td>Path to evidence JSON file</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 style="font-size:var(--ts-base);margin-bottom:var(--sp-sm)">Replay verification</h4>
+      <div class="code-block" style="margin-bottom:var(--sp-md)">
+        <span class="cmd">px verify</span> <span class="flag">--manifest</span>=&lt;manifest.json&gt;
+      </div>
+      <div style="overflow-x:auto">
+        <table class="comparison">
+          <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="mono" style="color:var(--green)">--manifest</td><td>Yes</td><td>Path to manifest. Loads bundled-evidence.json and bundled-profile.json from same directory.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin:0 0 var(--sp-2x)">
+
+    <!-- pack -->
+    <div style="margin-bottom:var(--sp-2x)" id="pack">
+      <h2 style="margin-bottom:var(--sp-md)">pack</h2>
+      <p style="color:var(--t2);margin-bottom:var(--sp-lg)">Fail-close packaging. All rules must pass. Generates proof pack.</p>
+
+      <div class="code-block" style="margin-bottom:var(--sp-md)">
+        <span class="cmd">px pack</span> <span class="flag">--profile</span>=&lt;file&gt; <span class="flag">--evidence</span>=&lt;file&gt; [<span class="flag">--recipient</span>=&lt;who&gt;] [<span class="flag">--purpose</span>=&lt;why&gt;]
+      </div>
+      <div style="overflow-x:auto;margin-bottom:var(--sp-lg)">
+        <table class="comparison">
+          <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="mono" style="color:var(--green)">--profile</td><td>Yes</td><td>Path to profile JSON</td></tr>
+            <tr><td class="mono" style="color:var(--green)">--evidence</td><td>Yes</td><td>Path to evidence JSON</td></tr>
+            <tr><td class="mono" style="color:var(--amber)">--recipient</td><td>No</td><td>Who the pack is for</td></tr>
+            <tr><td class="mono" style="color:var(--amber)">--purpose</td><td>No</td><td>Why the pack was created</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="label" style="margin-bottom:var(--sp-sm)">Output files</p>
+      <div style="font-size:var(--ts-sm);color:var(--t2);display:flex;flex-direction:column;gap:4px">
+        <div><span class="mono" style="color:var(--t1)">draft-manifest.json</span> — verification record</div>
+        <div><span class="mono" style="color:var(--t1)">lens.html</span> — self-contained review view</div>
+        <div><span class="mono" style="color:var(--t1)">bundled-evidence.json</span> — evidence snapshot</div>
+        <div><span class="mono" style="color:var(--t1)">bundled-profile.json</span> — rule definitions</div>
+        <div><span class="mono" style="color:var(--t1)">summary.txt</span> — plain text summary</div>
+        <div><span class="mono" style="color:var(--t1)">send-these-files.txt</span> — file checklist for recipients</div>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin:0 0 var(--sp-2x)">
+
+    <!-- answer-pack -->
+    <div style="margin-bottom:var(--sp-2x)" id="answer-pack">
+      <h2 style="margin-bottom:var(--sp-md)">answer-pack</h2>
+      <p style="color:var(--t2);margin-bottom:var(--sp-lg)">Questionnaire mode. Mixed results OK. Generates answer rows mapped to CAIQ/SIG frameworks.</p>
+
+      <div class="code-block" style="margin-bottom:var(--sp-md)">
+        <span class="cmd">px answer-pack</span> <span class="flag">--profile</span>=&lt;file&gt; <span class="flag">--evidence</span>=&lt;file&gt; [<span class="flag">--recipient</span>=&lt;who&gt;] [<span class="flag">--purpose</span>=&lt;why&gt;]
+      </div>
+      <div style="overflow-x:auto;margin-bottom:var(--sp-lg)">
+        <table class="comparison">
+          <thead><tr><th>Flag</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="mono" style="color:var(--green)">--profile</td><td>Yes</td><td>Path to profile JSON (should include caiq_ref/sig_ref)</td></tr>
+            <tr><td class="mono" style="color:var(--green)">--evidence</td><td>Yes</td><td>Path to evidence JSON</td></tr>
+            <tr><td class="mono" style="color:var(--amber)">--recipient</td><td>No</td><td>Who the pack is for</td></tr>
+            <tr><td class="mono" style="color:var(--amber)">--purpose</td><td>No</td><td>Why the pack was created</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="label" style="margin-bottom:var(--sp-sm)">Output files</p>
+      <div style="font-size:var(--ts-sm);color:var(--t2);display:flex;flex-direction:column;gap:4px">
+        <div><span class="mono" style="color:var(--t1)">answers.csv</span> — Excel-ready answer rows (UTF-8 BOM)</div>
+        <div><span class="mono" style="color:var(--t1)">answers.md</span> — human-readable answers</div>
+        <div><span class="mono" style="color:var(--t1)">question-map.csv</span> — rule-to-framework mapping with keywords</div>
+        <div><span class="mono" style="color:var(--t1)">exceptions.md</span> — failed rules with compensating control placeholders (only if failures)</div>
+        <div><span class="mono" style="color:var(--t1)">lens.html</span> — review view (mixed results supported)</div>
+        <div><span class="mono" style="color:var(--t1)">summary.txt</span> — plain text summary</div>
+        <div><span class="mono" style="color:var(--t1)">draft-manifest.json</span> — verification record (artifact_kind: answer-pack)</div>
+        <div><span class="mono" style="color:var(--t1)">bundled-evidence.json</span> — evidence snapshot</div>
+        <div><span class="mono" style="color:var(--t1)">bundled-profile.json</span> — rule definitions</div>
+        <div><span class="mono" style="color:var(--t1)">send-these-files.txt</span> — file checklist</div>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin:0 0 var(--sp-2x)">
+
+    <!-- check -->
+    <div style="margin-bottom:var(--sp-2x)" id="check">
+      <h2 style="margin-bottom:var(--sp-md)">check</h2>
+      <p style="color:var(--t2);margin-bottom:var(--sp-lg)">Collect evidence and verify in one step. Requires the source CLI to be installed.</p>
+
+      <div class="code-block" style="margin-bottom:var(--sp-md)">
+        <div><span class="cmd">px check</span> <span class="flag">--profile</span>=&lt;file&gt; [-- &lt;collector-args&gt;]</div>
+        <div style="margin-top:0.5rem"><span class="comment"># Examples:</span></div>
+        <div><span class="cmd">px check</span> <span class="flag">--profile</span>=profiles/aws-core-controls-v1.json</div>
+        <div><span class="cmd">px check</span> <span class="flag">--profile</span>=profiles/github-org-security-v1.json -- myorg myrepo</div>
+      </div>
+      <p style="color:var(--t3);font-size:var(--ts-sm)">Evidence is saved to .px/evidence/ for reuse with pack or answer-pack.</p>
+    </div>
+
+    <hr class="divider" style="margin:0 0 var(--sp-2x)">
+
+    <!-- init -->
+    <div style="margin-bottom:var(--sp-2x)" id="init">
+      <h2 style="margin-bottom:var(--sp-md)">init</h2>
+      <p style="color:var(--t2);margin-bottom:var(--sp-lg)">Initialize a workspace with sample profiles and evidence.</p>
+
+      <div class="code-block" style="margin-bottom:var(--sp-md)">
+        <div><span class="cmd">px init</span> <span class="flag">--genesis</span> <span class="comment"># Verify PX's own governance files</span></div>
+        <div><span class="cmd">px init</span> <span class="flag">--demo</span>    <span class="comment"># SOC 2 sample data with one deliberate failure</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <div class="footer__brand">P<b>X</b></div>
+        <p class="footer__desc">Proof you can hand off.</p>
+      </div>
+      <div class="footer__col">
+        <h4>Profile</h4>
+        <ul>
+          <li><a href="../software.html">ソフトウェア</a></li>
+          <li><a href="../compliance.html">質問票</a></li>
+          <li><a href="../ai-ml.html">AI/ML</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>リソース</h4>
+        <ul>
+          <li><a href="../examples.html">100の事例</a></li>
+          <li><a href="../pricing.html">料金</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+          <li><a href="../trust.html">信頼性</a></li>
+          <li><a href="../pilot.html">パイロット</a></li>
+        </ul>
+      </div>
+      <div class="footer__col">
+        <h4>Technical</h4>
+        <ul>
+          <li><a href="index.html">Overview</a></li>
+          <li><a href="cli.html">CLI Reference</a></li>
+          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>&copy; 2026 PX Registry KK</span>
+      <span>MIT License</span>
+    </div>
+  </div>
+</footer>
+
+<script src="../script.js"></script>
+</body>
+</html>
