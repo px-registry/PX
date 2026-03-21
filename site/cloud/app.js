@@ -699,32 +699,45 @@
     // Store for download
     state.packBundle = packBundle;
 
-    // Render results
+    // Render results — Lens is the primary artifact
     $('pack-title').textContent = allPass ? 'Pack ready' : 'Pack ready (with issues)';
     $('pack-sub').textContent = seal + ' \u00b7 ' + state.files.length + ' files \u00b7 ' + passCount + '/' + totalCount + ' rules';
 
+    var lensSize = packBundle['lens-v2.html'] ? new Blob([packBundle['lens-v2.html']]).size : 0;
     var filesHtml = '';
-    var bundleFiles = Object.keys(packBundle);
-    for (var i = 0; i < bundleFiles.length; i++) {
-      var fname = bundleFiles[i];
-      var fsize = new Blob([packBundle[fname]]).size;
-      filesHtml += '<div class="pack-file"><span class="pack-file__name">' + esc(fname) + '</span><span class="pack-file__size">' + PXCore.formatBytes(fsize) + '</span></div>';
+    if (lensSize > 0) {
+      filesHtml += '<div class="pack-file" style="background:var(--pass-card)"><span class="pack-file__name" style="font-weight:700">lens-v2.html</span><span class="pack-file__size">' + PXCore.formatBytes(lensSize) + '</span></div>';
     }
+    filesHtml += '<div style="padding:8px 16px;font-size:11px;color:var(--ink45)">This single file contains the manifest, evidence, and verification results. The recipient opens it in any browser.</div>';
     $('pack-files').innerHTML = filesHtml;
   }
 
+  // Primary: download Lens only (self-contained, everything embedded)
   function downloadPack() {
     if (!state.packBundle) return;
-
-    // If lens-v2.html exists, download it directly as the primary artifact
     if (state.packBundle['lens-v2.html']) {
       downloadFile('lens-v2.html', state.packBundle['lens-v2.html'], 'text/html');
+      showToast('\u2713 Lens downloaded — send this file to the recipient');
+    } else {
+      // Fallback: download manifest if no Lens
+      downloadFile('draft-manifest.json', state.packBundle['draft-manifest.json'], 'application/json');
+      showToast('\u2713 Manifest downloaded');
     }
+  }
 
-    // Also download the manifest
-    downloadFile('draft-manifest.json', state.packBundle['draft-manifest.json'], 'application/json');
-
-    showToast('\u2713 Pack downloaded');
+  // Secondary: export all detail files for sender's records
+  function downloadAllDetails() {
+    if (!state.packBundle) return;
+    var keys = Object.keys(state.packBundle).filter(function(k) { return k !== 'lens-v2.html'; });
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i];
+      var type = k.endsWith('.json') ? 'application/json' : 'text/html';
+      // Stagger downloads to avoid browser blocking
+      (function(name, content, mimeType, delay) {
+        setTimeout(function() { downloadFile(name, content, mimeType); }, delay);
+      })(k, state.packBundle[k], type, i * 300);
+    }
+    showToast('\u2713 ' + keys.length + ' files exported');
   }
 
   function downloadFile(name, content, type) {
@@ -766,6 +779,10 @@
 
   $('btn-download').addEventListener('click', function() {
     downloadPack();
+  });
+
+  $('btn-export-details').addEventListener('click', function() {
+    downloadAllDetails();
   });
 
   $('btn-restart').addEventListener('click', function() {
