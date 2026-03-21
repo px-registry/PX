@@ -86,96 +86,111 @@
   });
 
   dropZone.addEventListener('click', function(e) {
-    if (e.target.id === 'btn-browse' || e.target.closest('#btn-browse') || e.target === dropZone || e.target.closest('.drop')) {
-      fileInput.click();
-    }
+    if (e.target.closest('#btn-browse') || e.target.closest('#btn-browse-folder')) return;
+    fileInput.click();
   });
   $('btn-browse').addEventListener('click', function(e) {
     e.stopPropagation();
+    fileInput.removeAttribute('webkitdirectory');
+    fileInput.click();
+  });
+  // Folder browse button
+  var folderBtn = document.createElement('button');
+  folderBtn.className = 'drop__btn';
+  folderBtn.id = 'btn-browse-folder';
+  folderBtn.textContent = 'Choose folder';
+  folderBtn.style.marginLeft = '8px';
+  folderBtn.style.background = 'transparent';
+  folderBtn.style.color = 'var(--ink)';
+  folderBtn.style.border = '1px solid var(--border)';
+  $('btn-browse').parentNode.insertBefore(folderBtn, $('btn-browse').nextSibling);
+  folderBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    fileInput.setAttribute('webkitdirectory', '');
     fileInput.click();
   });
   fileInput.addEventListener('change', function() {
     if (fileInput.files.length > 0) {
-      processFiles(Array.from(fileInput.files));
+      var files = Array.from(fileInput.files);
+      // Attach webkitRelativePath as _path for folder uploads
+      files.forEach(function(f) {
+        if (f.webkitRelativePath) f._path = f.webkitRelativePath;
+      });
+      processFiles(files);
     }
   });
 
-  // Recursively read directory entries
+  // Recursively read directory entries (Promise-based for reliability)
   async function handleDrop(dataTransfer) {
     var items = dataTransfer.items;
     var files = [];
 
     if (items && items.length > 0 && items[0].webkitGetAsEntry) {
-      // Use webkitGetAsEntry for folder support
       var entries = [];
       for (var i = 0; i < items.length; i++) {
         var entry = items[i].webkitGetAsEntry();
         if (entry) entries.push(entry);
       }
-      files = await readEntries(entries);
+      files = await readAllEntries(entries, '');
     } else {
       files = Array.from(dataTransfer.files);
+    }
+    if (files.length === 0) {
+      showToast('No files found. Try selecting individual files.');
     }
     processFiles(files);
   }
 
-  function readEntries(entries) {
-    return new Promise(function(resolve) {
-      var results = [];
-      var pending = entries.length;
-      if (pending === 0) { resolve([]); return; }
-
-      entries.forEach(function(entry) {
-        readEntry(entry, '', function(fileList) {
-          results = results.concat(fileList);
-          pending--;
-          if (pending === 0) resolve(results);
+  async function readAllEntries(entries, pathPrefix) {
+    var allFiles = [];
+    for (var i = 0; i < entries.length; i++) {
+      var entry = entries[i];
+      if (entry.isFile) {
+        var file = await new Promise(function(resolve, reject) {
+          entry.file(resolve, reject);
         });
-      });
-    });
+        file._path = pathPrefix + file.name;
+        allFiles.push(file);
+      } else if (entry.isDirectory) {
+        // readEntries may return results in batches — must loop until empty
+        var dirEntries = await readDirectoryEntries(entry);
+        var subFiles = await readAllEntries(dirEntries, pathPrefix + entry.name + '/');
+        allFiles = allFiles.concat(subFiles);
+      }
+    }
+    return allFiles;
   }
 
-  function readEntry(entry, pathPrefix, callback) {
-    if (entry.isFile) {
-      entry.file(function(file) {
-        // Preserve relative path
-        file._path = pathPrefix + file.name;
-        callback([file]);
-      });
-    } else if (entry.isDirectory) {
-      var reader = entry.createReader();
-      var allEntries = [];
+  function readDirectoryEntries(dirEntry) {
+    return new Promise(function(resolve) {
+      var reader = dirEntry.createReader();
+      var accumulated = [];
       (function readBatch() {
         reader.readEntries(function(batch) {
           if (batch.length === 0) {
-            // Process all entries in this dir
-            var results = [];
-            var pending = allEntries.length;
-            if (pending === 0) { callback([]); return; }
-            allEntries.forEach(function(e) {
-              readEntry(e, pathPrefix + entry.name + '/', function(files) {
-                results = results.concat(files);
-                pending--;
-                if (pending === 0) callback(results);
-              });
-            });
+            resolve(accumulated);
           } else {
-            allEntries = allEntries.concat(Array.from(batch));
-            readBatch();
+            accumulated = accumulated.concat(Array.from(batch));
+            readBatch(); // Chrome returns max 100 per call, must keep reading
           }
+        }, function() {
+          resolve(accumulated); // On error, return what we have
         });
       })();
-    } else {
-      callback([]);
-    }
+    });
   }
 
   function processFiles(rawFiles) {
     // Filter out hidden files and system files
     state.files = rawFiles
       .filter(function(f) {
-        var name = f._path || f.name;
-        return !name.startsWith('.') && name.indexOf('/.') === -1 && name !== 'Thumbs.db' && name !== 'desktop.ini';
+        var p = f._path || f.webkitRelativePath || f.name;
+        // Skip hidden files/dirs, OS junk, and zero-byte files
+        if (p.startsWith('.') || p.indexOf('/.') !== -1) return false;
+        if (p.indexOf('__MACOSX') !== -1) return false;
+        if (f.name === 'Thumbs.db' || f.name === 'desktop.ini' || f.name === '.DS_Store') return false;
+        if (f.size === 0) return false;
+        return true;
       })
       .map(function(f) {
         return {
@@ -533,11 +548,10 @@
     $('pack-title').textContent = 'Building pack...';
     $('pack-sub').textContent = 'Generating manifest and Lens...';
 
-    // Build evidence data object
+    // Build evidence data object — include ALL file contents
     var evidenceData = {};
     var fileList = [];
 
-    // Include all evidence files
     for (var i = 0; i < state.files.length; i++) {
       var f = state.files[i];
       fileList.push({
@@ -546,14 +560,41 @@
         type: f.type,
         hash: f.hash,
       });
-      // For JSON evidence, parse and include in evidence data
-      if (f.type === 'evidence-structured' && f.name.endsWith('.json')) {
-        try {
+
+      var key = f.name.replace(/\.[^.]+$/, '').replace(/[-. ]/g, '_');
+      try {
+        if (f.name.toLowerCase().endsWith('.json')) {
           var text = await f.file.text();
-          var data = JSON.parse(text);
-          var key = f.name.replace('.json', '').replace(/[-. ]/g, '_');
-          evidenceData[key] = data;
-        } catch(e) { /* skip unparseable JSON */ }
+          evidenceData[key] = JSON.parse(text);
+        } else if (f.name.toLowerCase().endsWith('.csv')) {
+          var csvText = await f.file.text();
+          evidenceData[key] = { _type: 'csv', rows: PXCore.parseCSV(csvText) };
+        } else if (/\.(txt|md|yaml|yml|toml|ini|log|xml|html?)$/i.test(f.name)) {
+          evidenceData[key] = { _type: 'text', content: await f.file.text() };
+        } else if (/\.(png|jpe?g|gif)$/i.test(f.name)) {
+          // Base64-encode images (capped at 2MB to avoid huge bundles)
+          if (f.size <= 2 * 1024 * 1024) {
+            var buf = await f.file.arrayBuffer();
+            var bytes = new Uint8Array(buf);
+            var binary = '';
+            for (var b = 0; b < bytes.length; b++) binary += String.fromCharCode(bytes[b]);
+            evidenceData[key] = { _type: 'image', mime: f.file.type, base64: btoa(binary), size: f.size };
+          } else {
+            evidenceData[key] = { _type: 'image', mime: f.file.type, size: f.size, hash: f.hash, _note: 'too large to embed' };
+          }
+        } else if (/\.(pdf|docx?|xlsx?|zip|tar|gz|exe|dmg)$/i.test(f.name)) {
+          // Binary files — store metadata only
+          evidenceData[key] = { _type: 'binary', mime: f.file.type || 'application/octet-stream', size: f.size, hash: f.hash };
+        } else {
+          // Unknown — try text, fall back to metadata
+          try {
+            evidenceData[key] = { _type: 'text', content: await f.file.text() };
+          } catch(e2) {
+            evidenceData[key] = { _type: 'unknown', size: f.size, hash: f.hash };
+          }
+        }
+      } catch(e) {
+        evidenceData[key] = { _type: 'error', size: f.size, hash: f.hash };
       }
     }
 

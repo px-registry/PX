@@ -347,10 +347,20 @@ var PXCore = (function() {
 
   async function loadLensTemplate() {
     if (LENS_TEMPLATE) return;
-    try {
-      var resp = await fetch('../lens-v2.html');
-      if (resp.ok) LENS_TEMPLATE = await resp.text();
-    } catch(e) { /* Lens template not available, pack download will skip Lens */ }
+    // Try multiple paths (works both locally and on deployed site)
+    var paths = ['lens-v2-template.html', '../lens-v2.html', '/lens-v2.html', '/cloud/lens-v2-template.html'];
+    for (var i = 0; i < paths.length; i++) {
+      try {
+        var resp = await fetch(paths[i]);
+        if (resp.ok) {
+          var text = await resp.text();
+          if (text.indexOf('__MANIFEST__') !== -1) {
+            LENS_TEMPLATE = text;
+            return;
+          }
+        }
+      } catch(e) { /* try next path */ }
+    }
   }
 
   // ── Format helpers ──
