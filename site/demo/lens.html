@@ -1,517 +1,316 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PX Lens</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PX Lens v2 — FAIL Demo</title>
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#FFFFFF;--warm:#F7F6F3;--cool:#F2F3F5;
-  --ink:#1A1A1A;--ink70:rgba(26,26,26,.7);--ink45:rgba(26,26,26,.45);--ink20:rgba(26,26,26,.2);--ink08:rgba(26,26,26,.08);--ink04:rgba(26,26,26,.04);
-  --green:#16A34A;--green-bg:#F0FDF4;--green-bdr:#BBF7D0;
-  --amber:#D97706;--amber-bg:#FFFBEB;--amber-bdr:#FDE68A;
-  --red:#DC2626;--red-bg:#FEF2F2;--red-bdr:#FECACA;
-  --grey:#9CA3AF;
-  --fd:'Segoe UI',system-ui,sans-serif;--fm:'SF Mono','Cascadia Code','Consolas',monospace;
-  --r:12px;--rs:8px;
+:root {
+  --pass: #059669; --pass-light: #10b981; --pass-bg: rgba(16,185,129,0.05);
+  --pass-ring: #10b981; --pass-border: #6ee7b7; --pass-card: #ecfdf5;
+  --fail: #dc2626; --fail-light: #ef4444; --fail-bg: rgba(239,68,68,0.04);
+  --fail-ring: #ef4444; --fail-border: #fca5a5; --fail-card: #fef2f2;
+  --ink: #111827; --ink70: rgba(17,24,39,0.7); --ink45: rgba(17,24,39,0.45);
+  --ink20: rgba(17,24,39,0.2); --ink08: rgba(17,24,39,0.08); --ink04: rgba(17,24,39,0.03);
+  --bg: #ffffff; --surface: #f9fafb; --border: #e5e7eb;
+  --amber: #d97706; --amber-bg: #fffbeb;
+  --fd: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --fm: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --r: 16px; --rs: 10px; --rr: 8px;
 }
-html{height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--fd);line-height:1.6;min-height:100%;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
-.wrap{max-width:680px;margin:0 auto;padding:0 24px;width:100%}
-
-/* header */
-.hd{padding:16px 0;border-bottom:1px solid var(--ink08)}
-.hd__inner{display:flex;align-items:center;gap:12px}
-.hd__logo{font-weight:800;font-size:16px;letter-spacing:-.02em}
-.hd__sep{color:var(--ink20);font-weight:300}
-.hd__label{font-size:14px;color:var(--ink45);font-weight:500}
-.hd__privacy{margin-left:auto;font-size:11px;color:var(--ink45);display:flex;align-items:center;gap:4px}
-.hd__privacy svg{flex-shrink:0}
-
-/* drop zone */
-.drop{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;text-align:center;transition:background .15s}
-.drop--over{background:var(--ink04)}
-.drop__icon{font-size:48px;color:var(--ink20);margin-bottom:20px}
-.drop__title{font-size:18px;font-weight:700;margin-bottom:6px}
-.drop__sub{font-size:14px;color:var(--ink45);margin-bottom:24px;max-width:360px}
-.drop__btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;background:var(--ink);color:#fff;border:none;border-radius:var(--rs);font-family:var(--fd);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
-.drop__btn:hover{background:#333}
-.drop__or{font-size:12px;color:var(--ink20);margin-top:10px}
-.drop__hint{font-size:12px;color:var(--ink20);margin-top:24px}
-#file-input{display:none}
-
-/* result container */
-.result{padding:40px 0 80px;display:none}
-.result--visible{display:block}
-
-/* badge */
-.badge-wrap{display:flex;flex-direction:column;align-items:center;padding:32px 0 24px}
-.badge{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.badge--green{background:var(--green);box-shadow:0 0 0 6px var(--green-bg),0 6px 24px rgba(22,163,74,.12)}
-.badge--amber{background:var(--amber);box-shadow:0 0 0 6px var(--amber-bg),0 6px 24px rgba(217,119,6,.12)}
-.badge--red{background:var(--red);box-shadow:0 0 0 6px var(--red-bg),0 6px 24px rgba(220,38,38,.12)}
-.badge__icon{font-size:36px;color:#fff}
-.badge-label{margin-top:14px;font-weight:700;font-size:17px;text-align:center}
-.badge-meaning{margin-top:4px;font-size:14px;color:var(--ink45);text-align:center;max-width:400px;line-height:1.55}
-.badge-action{margin-top:14px;padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:500;text-align:center}
-.badge-action--green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bdr)}
-.badge-action--amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bdr)}
-
-/* meta table */
-.meta{margin-top:32px;border:1px solid var(--ink08);border-radius:var(--r);overflow:hidden}
-.meta__header{padding:12px 20px;background:var(--warm);font-size:13px;font-weight:700;border-bottom:1px solid var(--ink08)}
-.meta__row{display:flex;align-items:baseline;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--ink04);gap:16px}
-.meta__row:last-child{border-bottom:none}
-.meta__key{font-size:13px;color:var(--ink45);flex-shrink:0}
-.meta__val{font-size:13px;font-family:var(--fm);text-align:right;word-break:break-all}
-.meta__val--null{color:var(--ink20)}
-.meta__val--green{color:var(--green);font-weight:600}
-
-/* evidence table */
-.evidence{margin-top:20px;border:1px solid var(--ink08);border-radius:var(--r);overflow:hidden}
-.ev__header{padding:12px 20px;background:var(--warm);font-size:13px;font-weight:700;border-bottom:1px solid var(--ink08);display:flex;justify-content:space-between}
-.ev__row{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--ink04);gap:12px}
-.ev__row:last-child{border-bottom:none}
-.ev__name{font-size:13px;font-weight:500;flex:1}
-.ev__class{font-size:11px;font-family:var(--fm);color:var(--ink45);flex-shrink:0;margin-right:12px}
-.ev__fields{font-size:12px;color:var(--ink45);flex-shrink:0;margin-right:12px;font-family:var(--fm)}
-.ev__result{font-size:12px;font-family:var(--fm);font-weight:600;flex-shrink:0}
-.ev__result--pass{color:var(--green)}
-.ev__result--fail{color:var(--red)}
-
-/* boundary section */
-.boundary{margin-top:20px;border:1px solid var(--ink08);border-radius:var(--r);overflow:hidden}
-.boundary__header{padding:12px 20px;background:var(--warm);font-size:13px;font-weight:700;border-bottom:1px solid var(--ink08)}
-.boundary__row{display:flex;align-items:baseline;justify-content:space-between;padding:10px 20px;border-bottom:1px solid var(--ink04);gap:16px}
-.boundary__row:last-child{border-bottom:none}
-.boundary__key{font-size:13px;color:var(--ink45);flex-shrink:0}
-.boundary__val{font-size:13px;font-family:var(--fm);text-align:right;word-break:break-all}
-.boundary__val--null{color:var(--ink20)}
-.boundary__val--present{color:var(--green);font-weight:600}
-
-/* reload */
-.reload{margin-top:32px;text-align:center}
-.reload__btn{background:none;border:1px solid var(--ink08);border-radius:var(--rs);padding:8px 18px;font-family:var(--fd);font-size:13px;color:var(--ink45);cursor:pointer;transition:all .15s}
-.reload__btn:hover{border-color:var(--ink20);color:var(--ink70)}
-
-/* error state */
-.error-detail{margin-top:12px;padding:16px 20px;background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:var(--r);font-size:13px;color:var(--red);font-family:var(--fm);word-break:break-all}
-
-/* responsive */
-@media(max-width:480px){
-  .meta__row,.boundary__row{flex-direction:column;gap:2px}
-  .meta__val,.boundary__val{text-align:left}
-  .ev__class{display:none}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--fd); background: var(--bg); color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; transition: background-color 0.5s ease; }
+body.verdict-pass { background-color: var(--pass-bg); }
+body.verdict-fail { background-color: var(--fail-bg); }
+.wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+.hd { padding: 14px 0; border-bottom: 1px solid var(--ink08); }
+.hd__inner { display: flex; align-items: center; gap: 10px; }
+.hd__logo { font-weight: 800; font-size: 15px; letter-spacing: -0.02em; }
+.hd__sep { color: var(--ink20); font-weight: 300; }
+.hd__badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.hd__badge--pass { background: var(--pass-card); color: var(--pass); }
+.hd__badge--fail { background: var(--fail-card); color: var(--fail); }
+.hd__right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.hd__privacy { font-size: 11px; color: var(--ink45); display: flex; align-items: center; gap: 4px; }
+.tabs { display: flex; gap: 2px; padding: 12px 0 0; background: var(--bg); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--ink08); }
+.tab { background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--ink45); cursor: pointer; font-family: var(--fd); transition: all 0.15s; }
+.tab:hover { color: var(--ink70); }
+.tab.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.tab .tab-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; background: var(--fail-card); color: var(--fail); font-size: 10px; font-weight: 700; border-radius: 9px; margin-left: 5px; }
+.screen { display: none; padding: 32px 0 60px; }
+.screen.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.ring-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 0 28px; }
+.ring { position: relative; width: 160px; height: 160px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring__bg { fill: none; stroke: var(--ink08); stroke-width: 8; }
+.ring__fg { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s; }
+.ring__fg--pass { stroke: var(--pass-ring); }
+.ring__fg--fail { stroke: var(--fail-ring); }
+.ring__label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.ring__num { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.ring__num--pass { color: var(--pass); }
+.ring__num--fail { color: var(--fail); }
+.ring__denom { font-size: 16px; color: var(--ink45); font-weight: 500; }
+.ring__pct { font-size: 13px; color: var(--ink45); margin-top: 8px; font-weight: 500; }
+.verdict-msg { text-align: center; margin-bottom: 32px; }
+.verdict-msg__title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.verdict-msg__title--pass { color: var(--pass); }
+.verdict-msg__title--fail { color: var(--fail); }
+.verdict-msg__sub { font-size: 14px; color: var(--ink45); }
+.fail-list { margin-bottom: 28px; }
+.fail-item { background: var(--fail-card); border: 1px solid var(--fail-border); border-radius: var(--rs); padding: 14px 18px; margin-bottom: 10px; }
+.fail-item__id { font-size: 11px; font-weight: 600; color: var(--fail); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.fail-item__id::before { content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--fail); }
+.fail-item__text { font-size: 14px; color: var(--ink); line-height: 1.55; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; font-size: 14px; font-weight: 600; font-family: var(--fd); border: none; border-radius: var(--rs); cursor: pointer; transition: all 0.15s; }
+.btn--copy { background: var(--ink); color: #fff; }
+.btn--copy:hover { background: #374151; }
+.btn--ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+.btn--ghost:hover { background: var(--border); }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 10px 24px; border-radius: var(--rs); font-size: 13px; font-weight: 500; z-index: 999; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.meta-line { font-size: 12px; color: var(--ink20); text-align: center; margin-top: 16px; }
+.mapping { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.mapping__col { padding: 0; }
+.mapping__col--q { border-right: 1px solid var(--border); }
+.mapping__header { padding: 10px 18px; background: var(--surface); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink45); border-bottom: 1px solid var(--border); }
+.map-item { padding: 14px 18px; border-bottom: 1px solid var(--ink04); cursor: pointer; transition: all 0.15s; }
+.map-item:last-child { border-bottom: none; }
+.map-item.spotlight { background: #fff; opacity: 1 !important; }
+.map-item.dimmed { opacity: 0.18; }
+.map-item__id { font-size: 11px; font-weight: 600; color: var(--ink45); }
+.map-item__desc { font-size: 13px; color: var(--ink); margin-top: 2px; font-weight: 500; }
+.map-item__status { margin-top: 4px; font-size: 11px; font-weight: 600; }
+.map-item__status--pass { color: var(--pass); }
+.map-item__status--fail { color: var(--fail); }
+.evi-item { padding: 14px 18px; border-bottom: 1px solid var(--ink04); transition: all 0.15s; }
+.evi-item:last-child { border-bottom: none; }
+.evi-item.spotlight { background: var(--pass-card); border-left: 3px solid var(--pass); }
+.evi-item.spotlight-fail { background: var(--fail-card); border-left: 3px solid var(--fail); }
+.evi-item.dimmed { opacity: 0.18; }
+.evi-item__name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.evi-item__path { font-size: 11px; color: var(--ink45); font-family: var(--fm); margin-top: 2px; }
+.evi-item__badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-top: 4px; }
+.evi-item__badge--pass { background: var(--pass-card); color: var(--pass); }
+.evi-item__badge--fail { background: var(--fail-card); color: var(--fail); }
+.chain__timeline { display: flex; align-items: center; justify-content: center; gap: 0; padding: 20px 0 32px; }
+.chain__node { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; padding: 0 8px; transition: transform 0.15s; position: relative; }
+.chain__node:hover { transform: scale(1.08); }
+.chain__dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--ink20); background: var(--bg); }
+.chain__dot--pass { border-color: var(--pass); background: var(--pass-card); }
+.chain__dot--fail { border-color: var(--fail); background: var(--fail-card); }
+.chain__dot--current { width: 20px; height: 20px; border-width: 3px; }
+.chain__dot--current.chain__dot--pass { background: var(--pass); }
+.chain__dot--current.chain__dot--fail { background: var(--fail); }
+.chain__date { font-size: 11px; color: var(--ink45); font-weight: 500; }
+.chain__line { width: 32px; height: 2px; background: var(--ink08); flex-shrink: 0; margin-bottom: 22px; }
+.chain__label { font-size: 10px; font-weight: 600; color: var(--fail); position: absolute; top: -18px; }
+.chain__detail { border: 1px solid var(--border); border-radius: var(--rs); margin-bottom: 12px; overflow: hidden; }
+.chain__detail-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--surface); }
+.chain__detail-date { font-size: 14px; font-weight: 700; }
+.chain__detail-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.chain__detail-badge--pass { background: var(--pass-card); color: var(--pass); }
+.chain__detail-badge--fail { background: var(--fail-card); color: var(--fail); }
+.chain__detail-body { padding: 14px 18px; border-top: 1px solid var(--border); }
+.chain__diff { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+.chain__diff-item { font-size: 12px; color: var(--ink45); }
+.chain__diff-item strong { color: var(--ink); }
+.chain__link { font-size: 12px; color: var(--pass); font-weight: 600; text-decoration: none; }
+.adv-section { margin-bottom: 20px; }
+.adv-section summary { font-size: 13px; font-weight: 600; color: var(--ink45); cursor: pointer; padding: 12px 0; list-style: none; display: flex; align-items: center; gap: 8px; }
+.adv-section summary::before { content: '+'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: var(--ink04); font-size: 14px; font-weight: 700; color: var(--ink45); }
+.adv-section[open] summary::before { content: '\2212'; background: var(--ink08); }
+.adv-field { padding: 8px 0; border-bottom: 1px solid var(--ink04); display: flex; }
+.adv-field__label { width: 180px; flex-shrink: 0; font-size: 12px; font-weight: 500; color: var(--ink45); }
+.adv-field__value { font-size: 13px; font-family: var(--fm); color: var(--ink70); word-break: break-all; }
+.adv-json { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rr); padding: 16px; font-family: var(--fm); font-size: 11px; line-height: 1.7; overflow-x: auto; max-height: 400px; overflow-y: auto; color: var(--ink70); white-space: pre-wrap; margin-top: 12px; }
+.ft { padding: 20px 0; border-top: 1px solid var(--ink08); margin-top: 40px; }
+.ft__inner { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink20); }
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; } .mapping { grid-template-columns: 1fr; }
+  .mapping__col--q { border-right: none; border-bottom: 1px solid var(--border); }
+  .ring { width: 130px; height: 130px; } .ring__num { font-size: 32px; }
+  .actions { flex-direction: column; } .btn { width: 100%; }
 }
 </style>
 </head>
 <body>
-
-<!-- Header -->
-<header class="hd"><div class="wrap">
-  <div class="hd__inner">
-    <span class="hd__logo">PX</span>
-    <span class="hd__sep">/</span>
-    <span class="hd__label">Lens</span>
-    <span class="hd__privacy">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-      Runs entirely in your browser. No data leaves your machine.
-    </span>
+<div class="hd"><div class="wrap"><div class="hd__inner">
+  <span class="hd__logo">PX</span><span class="hd__sep">|</span>
+  <span style="font-size:14px;color:var(--ink45);font-weight:500">Lens</span>
+  <span class="hd__badge hd__badge--fail" id="hd-badge">2 FAIL</span>
+  <div class="hd__right"><span class="hd__privacy">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4v4c0 3.3 2.6 6.4 6 7 3.4-.6 6-3.7 6-7V4L8 1z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+    Offline</span></div>
+</div></div></div>
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-screen="verdict">Verdict</button>
+    <button class="tab" data-screen="mapping">Mapping <span class="tab-count">2</span></button>
+    <button class="tab" data-screen="chain">Chain</button>
+    <button class="tab" data-screen="advanced">Advanced</button>
   </div>
-</div></header>
-
-<!-- Drop zone (initial state) -->
-<div class="drop" id="drop-zone">
-  <div class="drop__icon">&#9673;</div>
-  <div class="drop__title">Open a PX manifest</div>
-  <div class="drop__sub">Drop a <strong>draft-manifest.json</strong> here, or click to select a file.</div>
-  <button class="drop__btn" onclick="document.getElementById('file-input').click()">Select manifest file</button>
-  <div class="drop__or">or drag and drop</div>
-  <input type="file" id="file-input" accept=".json">
-  <div class="drop__hint">Accepts draft-manifest.json or submission-manifest.json</div>
 </div>
+<div class="wrap">
 
-<!-- Result view (after loading) -->
-<div class="result" id="result">
-  <div class="wrap">
-
-    <!-- Badge -->
-    <div class="badge-wrap">
-      <div class="badge" id="badge"><span class="badge__icon" id="badge-icon"></span></div>
-      <div class="badge-label" id="badge-label"></div>
-      <div class="badge-meaning" id="badge-meaning"></div>
-      <div class="badge-action" id="badge-action"></div>
-    </div>
-
-    <!-- Manifest metadata -->
-    <div class="meta">
-      <div class="meta__header">Manifest</div>
-      <div class="meta__row"><span class="meta__key">Reference</span><span class="meta__val" id="m-ref"></span></div>
-      <div class="meta__row"><span class="meta__key">Packet</span><span class="meta__val" id="m-packet"></span></div>
-      <div class="meta__row"><span class="meta__key">Project</span><span class="meta__val" id="m-project"></span></div>
-      <div class="meta__row"><span class="meta__key">Framework</span><span class="meta__val" id="m-framework"></span></div>
-      <div class="meta__row"><span class="meta__key">Created</span><span class="meta__val" id="m-created"></span></div>
-      <div class="meta__row"><span class="meta__key">Packet hash</span><span class="meta__val" id="m-hash"></span></div>
-    </div>
-
-    <!-- Evidence summary -->
-    <div class="evidence" id="evidence-section">
-      <div class="ev__header">
-        <span>Evidence</span>
-        <span id="ev-summary"></span>
+  <!-- ═══ VERDICT ═══ -->
+  <div class="screen active" id="screen-verdict">
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg viewBox="0 0 160 160">
+          <circle class="ring__bg" cx="80" cy="80" r="68"/>
+          <circle class="ring__fg ring__fg--fail" id="ring-fg" cx="80" cy="80" r="68" stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
+        </svg>
+        <div class="ring__label">
+          <div class="ring__num ring__num--fail" id="ring-num">8</div>
+          <div class="ring__denom">/ 10</div>
+        </div>
       </div>
-      <div id="ev-rows"></div>
+      <div class="ring__pct">80% compatible</div>
     </div>
-
-    <!-- Submission boundary -->
-    <div class="boundary">
-      <div class="boundary__header">Submission state</div>
-      <div class="boundary__row"><span class="boundary__key">Submission ID</span><span class="boundary__val" id="b-subid"></span></div>
-      <div class="boundary__row"><span class="boundary__key">Sealed timestamp (SCT)</span><span class="boundary__val" id="b-sct"></span></div>
-      <div class="boundary__row"><span class="boundary__key">Acceptance receipt</span><span class="boundary__val" id="b-receipt"></span></div>
-      <div class="boundary__row"><span class="boundary__key">Recipient binding</span><span class="boundary__val" id="b-recipient"></span></div>
+    <div class="verdict-msg">
+      <div class="verdict-msg__title verdict-msg__title--fail">This submission pack has issues</div>
+      <div class="verdict-msg__sub">2 inconsistencies found</div>
     </div>
+    <div class="fail-list">
+      <div class="fail-item">
+        <div class="fail-item__id">patch_status.critical_zero</div>
+        <div class="fail-item__text">There are 2 unapplied critical patches. The rule requires 0 or fewer.</div>
+      </div>
+      <div class="fail-item">
+        <div class="fail-item__id">firewall_log.present</div>
+        <div class="fail-item__text">firewall-log.json was not found. It is not included in the pack.</div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn btn--copy" id="btn-copy-fix">Copy fix request</button>
+      <button class="btn btn--ghost" onclick="switchTab('mapping')">View details</button>
+    </div>
+    <div class="meta-line">Generated by px-cli/0.1.0 on 2026-03-21 11:03</div>
+  </div>
 
-    <!-- Reload -->
-    <div class="reload">
-      <button class="reload__btn" onclick="reset()">Load another manifest</button>
+  <!-- ═══ MAPPING ═══ -->
+  <div class="screen" id="screen-mapping">
+    <div class="mapping" id="mapping-grid"></div>
+  </div>
+
+  <!-- ═══ CHAIN ═══ -->
+  <div class="screen" id="screen-chain">
+    <div class="chain__timeline">
+      <div class="chain__node"><div class="chain__dot chain__dot--pass"></div><div class="chain__date">3/01</div></div>
+      <div class="chain__line"></div>
+      <div class="chain__node"><div class="chain__dot chain__dot--pass"></div><div class="chain__date">3/05</div></div>
+      <div class="chain__line"></div>
+      <div class="chain__node"><div class="chain__dot chain__dot--pass"></div><div class="chain__date">3/12</div></div>
+      <div class="chain__line"></div>
+      <div class="chain__node"><div class="chain__dot chain__dot--pass"></div><div class="chain__date">3/18</div></div>
+      <div class="chain__line"></div>
+      <div class="chain__node"><span class="chain__label">Current</span><div class="chain__dot chain__dot--fail chain__dot--current"></div><div class="chain__date">3/21</div></div>
+    </div>
+    <div class="chain__detail">
+      <div class="chain__detail-head"><span class="chain__detail-date">2026-03-21 (current)</span><span class="chain__detail-badge chain__detail-badge--fail">8/10 FAIL</span></div>
+      <div class="chain__detail-body"><div class="chain__diff"><div class="chain__diff-item"><strong>2</strong> updated</div><div class="chain__diff-item"><strong>1</strong> added</div><div class="chain__diff-item">7 unchanged</div></div></div>
+    </div>
+    <div class="chain__detail">
+      <div class="chain__detail-head"><span class="chain__detail-date">2026-03-18</span><span class="chain__detail-badge chain__detail-badge--pass">10/10 PASS</span></div>
+      <div class="chain__detail-body"><div class="chain__diff"><div class="chain__diff-item"><strong>1</strong> updated</div><div class="chain__diff-item">9 unchanged</div></div><a class="chain__link" href="#">Open this pack &rarr;</a></div>
+    </div>
+    <div class="chain__detail">
+      <div class="chain__detail-head"><span class="chain__detail-date">2026-03-12</span><span class="chain__detail-badge chain__detail-badge--pass">10/10 PASS</span></div>
+      <div class="chain__detail-body"><a class="chain__link" href="#">Open this pack &rarr;</a></div>
     </div>
   </div>
+
+  <!-- ═══ ADVANCED ═══ -->
+  <div class="screen" id="screen-advanced">
+    <details class="adv-section">
+      <summary>Cryptographic verification details</summary>
+      <div class="adv-field"><div class="adv-field__label">manifest_ref</div><div class="adv-field__value">mf-20260321-demo</div></div>
+      <div class="adv-field"><div class="adv-field__label">packet_hash</div><div class="adv-field__value">sha256:a3f7c9e1b2d4f8a6...</div></div>
+      <div class="adv-field"><div class="adv-field__label">seal</div><div class="adv-field__value">PX-A3F7-2026Q1-MIXED-10</div></div>
+      <div class="adv-field"><div class="adv-field__label">created_at</div><div class="adv-field__value">2026-03-21T02:03:31.271Z</div></div>
+      <div class="adv-field"><div class="adv-field__label">generator</div><div class="adv-field__value">px-cli/0.1.0</div></div>
+      <div class="adv-field"><div class="adv-field__label">submission_state</div><div class="adv-field__value">NOT_SUBMITTED</div></div>
+    </details>
+    <details class="adv-section">
+      <summary>Raw manifest JSON</summary>
+      <div class="adv-json">{ "manifest_type": "DRAFT_MANIFEST", ... }</div>
+    </details>
+  </div>
 </div>
+<div class="wrap"><div class="ft"><div class="ft__inner">
+  <span>PX Lens v2</span><span>Runs entirely in your browser. No data leaves this page.</span>
+</div></div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════════
-// THE SINGLE DERIVATION FUNCTION
-// ══════════════════════════════════════════
-//
-// This is the only place where state is determined.
-// No separate code paths for Draft vs Submission.
-// The JSON data dictates the UI.
+var RULES = [
+  {id:"iam.mfa_enforced", desc:"MFA is enforced for all IAM users", pass:true, path:"iam/mfa_enabled", got:true},
+  {id:"iam.root_key_disabled", desc:"Root account access keys are not active", pass:true, path:"iam/root_access_key_active", got:false},
+  {id:"iam.password_min_length", desc:"Password policy requires minimum 14 characters", pass:true, path:"iam/password_policy/minimum_length", got:14},
+  {id:"rds.encryption", desc:"RDS storage encryption is enabled", pass:true, path:"rds/storage_encrypted", got:true},
+  {id:"rds.no_public", desc:"RDS instances are not publicly accessible", pass:true, path:"rds/publicly_accessible", got:false},
+  {id:"s3.block_public", desc:"S3 public access block is enabled", pass:true, path:"s3/public_access_blocked", got:true},
+  {id:"s3.versioning", desc:"S3 bucket versioning is enabled", pass:true, path:"s3/versioning", got:true},
+  {id:"cloudtrail.logging", desc:"CloudTrail is logging", pass:true, path:"cloudtrail/is_logging", got:true},
+  {id:"patch_status.critical_zero", desc:"No outstanding critical patches", pass:false, path:"patch_status/outstanding_critical", got:2},
+  {id:"firewall_log.present", desc:"Firewall log file is present", pass:false, path:"firewall_log", got:null}
+];
 
-function deriveManifestState(manifest) {
-  // Structural validation first
-  if (!manifest || typeof manifest !== 'object') {
-    return { state: 'INVALID', reason: 'Not a valid JSON object.' };
+function esc(s){var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.body.classList.add('verdict-fail');
+
+  // Ring animation
+  var circ = 2*Math.PI*68;
+  var fg = document.getElementById('ring-fg');
+  var offset = circ - (8/10)*circ;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){ fg.style.strokeDashoffset = offset; });});
+
+  // Copy fix request
+  document.getElementById('btn-copy-fix').addEventListener('click', function(){
+    var text = 'PX verification result: 2 inconsistencies detected.\n';
+    text += ' - patch_status.critical_zero: There are 2 unapplied critical patches (rule requires 0)\n';
+    text += ' - firewall_log.present: firewall-log.json was not found in the pack\n';
+    text += 'Please regenerate and resend the pack after fixing.';
+    navigator.clipboard.writeText(text).then(function(){ showToast('\u2713 Copied'); });
+  });
+
+  // Mapping
+  var grid = document.getElementById('mapping-grid');
+  var qH = '<div class="mapping__col mapping__col--q"><div class="mapping__header">Rules</div>';
+  var eH = '<div class="mapping__col"><div class="mapping__header">Evidence</div>';
+  for(var i=0;i<RULES.length;i++){var r=RULES[i];
+    qH+='<div class="map-item" data-idx="'+i+'"><div class="map-item__id">'+esc(r.id)+'</div><div class="map-item__desc">'+esc(r.desc)+'</div><div class="map-item__status map-item__status--'+(r.pass?'pass':'fail')+'">'+(r.pass?'PASS':'FAIL')+'</div></div>';
+    eH+='<div class="evi-item" id="evi-'+i+'" data-idx="'+i+'"><div class="evi-item__name">'+esc(r.path)+'</div><div class="evi-item__path">= '+esc(JSON.stringify(r.got))+'</div><div class="evi-item__badge evi-item__badge--'+(r.pass?'pass':'fail')+'">'+(r.pass?'MATCH':'MISMATCH')+'</div></div>';
   }
-  if (!manifest.manifest_type) {
-    return { state: 'INVALID', reason: 'Missing manifest_type field.' };
+  grid.innerHTML=qH+'</div>'+eH+'</div>';
+
+  // Spotlight
+  var all=grid.querySelectorAll('.map-item,.evi-item');
+  function clear(){for(var j=0;j<all.length;j++){all[j].classList.remove('spotlight','spotlight-fail','dimmed');}}
+  function spot(idx){
+    for(var j=0;j<all.length;j++){all[j].classList.add('dimmed');all[j].classList.remove('spotlight','spotlight-fail');}
+    var qi=grid.querySelector('.map-item[data-idx="'+idx+'"]'),ei=document.getElementById('evi-'+idx);
+    if(qi){qi.classList.remove('dimmed');qi.classList.add('spotlight');}
+    if(ei){ei.classList.remove('dimmed');ei.classList.add(RULES[idx].pass?'spotlight':'spotlight-fail');}
   }
-  if (!manifest.evidence_summary) {
-    return { state: 'INVALID', reason: 'Missing evidence_summary field.' };
-  }
-  if (!manifest.packet_ref) {
-    return { state: 'INVALID', reason: 'Missing packet_ref field.' };
-  }
+  var items=grid.querySelectorAll('.map-item,.evi-item');
+  for(var i=0;i<items.length;i++){(function(it){
+    it.addEventListener('mouseenter',function(){spot(parseInt(it.getAttribute('data-idx')));});
+    it.addEventListener('mouseleave',clear);
+  })(items[i]);}
 
-  // State derivation: check the 4 boundary fields
-  var hasSubmissionId = manifest.submission_id !== null && manifest.submission_id !== undefined;
-  var hasSct = manifest.sct !== null && manifest.sct !== undefined;
-  var hasReceipt = manifest.acceptance_receipt !== null && manifest.acceptance_receipt !== undefined;
-  var hasRecipient = manifest.recipient_binding !== null && manifest.recipient_binding !== undefined;
-
-  if (hasSubmissionId && hasSct && hasReceipt && hasRecipient) {
-    return { state: 'GREEN' };
-  }
-
-  return { state: 'AMBER' };
-}
-
-// ══════════════════════════════════════════
-// Rendering
-// ══════════════════════════════════════════
-
-function renderManifest(manifest) {
-  var derived = deriveManifestState(manifest);
-
-  // Hide drop zone, show result
-  document.getElementById('drop-zone').style.display = 'none';
-  var result = document.getElementById('result');
-  result.classList.add('result--visible');
-
-  if (derived.state === 'INVALID') {
-    renderError(derived.reason);
-    return;
-  }
-
-  if (derived.state === 'GREEN') {
-    renderGreen(manifest);
-  } else {
-    renderAmber(manifest);
-  }
-
-  renderMeta(manifest);
-  renderEvidence(manifest);
-  renderBoundary(manifest, derived.state);
-}
-
-function renderGreen(manifest) {
-  var badge = document.getElementById('badge');
-  badge.className = 'badge badge--green';
-  document.getElementById('badge-icon').textContent = '\u2713';
-  document.getElementById('badge-label').textContent = 'Verified';
-  document.getElementById('badge-meaning').textContent =
-    'This submission is verified, sealed, and ready for external review.';
-  var action = document.getElementById('badge-action');
-  action.className = 'badge-action badge-action--green';
-  action.textContent = 'Proceed to external review.';
-}
-
-function renderAmber(manifest) {
-  var badge = document.getElementById('badge');
-  badge.className = 'badge badge--amber';
-  document.getElementById('badge-icon').textContent = '\u25CF';
-  document.getElementById('badge-label').textContent = 'Internal only';
-  document.getElementById('badge-meaning').textContent =
-    'The evidence is verified internally, but the formal submission step has not happened yet.';
-  var action = document.getElementById('badge-action');
-  action.className = 'badge-action badge-action--amber';
-  action.textContent = 'Review internally or move to Submission when PX Authority is available.';
-}
-
-function renderError(reason) {
-  var badge = document.getElementById('badge');
-  badge.className = 'badge badge--red';
-  document.getElementById('badge-icon').textContent = '\u2717';
-  document.getElementById('badge-label').textContent = 'Invalid Manifest';
-  document.getElementById('badge-meaning').textContent =
-    'This file could not be read as a valid PX manifest.';
-  var action = document.getElementById('badge-action');
-  action.className = '';
-  action.textContent = '';
-
-  // Show error detail below badge
-  var errorDiv = document.createElement('div');
-  errorDiv.className = 'error-detail';
-  errorDiv.textContent = reason;
-  document.querySelector('.badge-wrap').appendChild(errorDiv);
-
-  // Hide other sections
-  document.querySelector('.meta').style.display = 'none';
-  document.getElementById('evidence-section').style.display = 'none';
-  document.querySelector('.boundary').style.display = 'none';
-}
-
-function renderMeta(manifest) {
-  document.getElementById('m-ref').textContent = manifest.manifest_ref || '—';
-  document.getElementById('m-packet').textContent = manifest.packet_ref || '—';
-  document.getElementById('m-project').textContent = manifest.project || '—';
-  document.getElementById('m-framework').textContent = manifest.framework || '—';
-  document.getElementById('m-created').textContent = formatDate(manifest.created_at);
-  document.getElementById('m-hash').textContent = manifest.packet_hash || '—';
-}
-
-function renderEvidence(manifest) {
-  var summary = manifest.evidence_summary;
-  if (!summary) return;
-
-  var summaryEl = document.getElementById('ev-summary');
-  summaryEl.textContent = summary.passed + '/' + summary.total + ' passed';
-  summaryEl.style.color = summary.failed > 0 ? 'var(--red)' : 'var(--green)';
-  summaryEl.style.fontWeight = '600';
-  summaryEl.style.fontSize = '12px';
-  summaryEl.style.fontFamily = 'var(--fm)';
-
-  var container = document.getElementById('ev-rows');
-  container.innerHTML = '';
-
-  var profiles = summary.profiles || [];
-  for (var i = 0; i < profiles.length; i++) {
-    var p = profiles[i];
-    var row = document.createElement('div');
-    row.className = 'ev__row';
-
-    var pass = p.conformance === 'PASS';
-    row.innerHTML =
-      '<span class="ev__name">' + escapeHtml(p.profile_ref) + '</span>' +
-      '<span class="ev__class">' + escapeHtml(p.evidence_class || '') + '</span>' +
-      '<span class="ev__fields">' + p.fields_passed + '/' + p.fields_checked + '</span>' +
-      '<span class="ev__result ' + (pass ? 'ev__result--pass' : 'ev__result--fail') + '">' +
-        (pass ? 'PASS' : 'FAIL') +
-      '</span>';
-
-    container.appendChild(row);
-  }
-}
-
-function renderBoundary(manifest, state) {
-  setBoundaryField('b-subid', manifest.submission_id, state);
-  setBoundaryField('b-sct', manifest.sct, state);
-  setBoundaryField('b-receipt', manifest.acceptance_receipt, state);
-  setBoundaryField('b-recipient', manifest.recipient_binding, state);
-}
-
-function setBoundaryField(id, value, state) {
-  var el = document.getElementById(id);
-  if (value !== null && value !== undefined) {
-    el.textContent = typeof value === 'object' ? JSON.stringify(value) : String(value);
-    el.className = 'boundary__val boundary__val--present';
-  } else {
-    el.textContent = '\u2014  (not submitted)';
-    el.className = 'boundary__val boundary__val--null';
-  }
-}
-
-// ══════════════════════════════════════════
-// File handling
-// ══════════════════════════════════════════
-
-function handleFile(file) {
-  if (!file) return;
-
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var text = e.target.result;
-    var manifest;
-
-    try {
-      manifest = JSON.parse(text);
-    } catch (err) {
-      renderManifest(null);
-      // Re-render with parse error
-      reset();
-      document.getElementById('drop-zone').style.display = 'none';
-      var result = document.getElementById('result');
-      result.classList.add('result--visible');
-      renderError('Failed to parse JSON: ' + err.message);
-      return;
-    }
-
-    renderManifest(manifest);
-  };
-
-  reader.onerror = function() {
-    renderManifest(null);
-  };
-
-  reader.readAsText(file);
-}
-
-// ══════════════════════════════════════════
-// Drag and drop
-// ══════════════════════════════════════════
-
-var dropZone = document.getElementById('drop-zone');
-
-dropZone.addEventListener('dragover', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  dropZone.classList.add('drop--over');
+  // Tabs
+  var tabs=document.querySelectorAll('.tab'),screens=document.querySelectorAll('.screen');
+  window.switchTab=function(n){for(var j=0;j<tabs.length;j++){tabs[j].classList.toggle('active',tabs[j].getAttribute('data-screen')===n);}for(var j=0;j<screens.length;j++){screens[j].classList.toggle('active',screens[j].id==='screen-'+n);}};
+  for(var i=0;i<tabs.length;i++){tabs[i].addEventListener('click',function(){switchTab(this.getAttribute('data-screen'));});}
 });
-
-dropZone.addEventListener('dragleave', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  dropZone.classList.remove('drop--over');
-});
-
-dropZone.addEventListener('drop', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  dropZone.classList.remove('drop--over');
-  var files = e.dataTransfer.files;
-  if (files.length > 0) handleFile(files[0]);
-});
-
-// File input
-document.getElementById('file-input').addEventListener('change', function(e) {
-  if (e.target.files.length > 0) handleFile(e.target.files[0]);
-});
-
-// ══════════════════════════════════════════
-// Reset
-// ══════════════════════════════════════════
-
-function reset() {
-  document.getElementById('drop-zone').style.display = '';
-  var result = document.getElementById('result');
-  result.classList.remove('result--visible');
-
-  // Clear dynamic content
-  document.getElementById('ev-rows').innerHTML = '';
-  document.getElementById('badge-icon').textContent = '';
-  document.getElementById('badge-label').textContent = '';
-  document.getElementById('badge-meaning').textContent = '';
-  document.getElementById('badge-action').textContent = '';
-  document.getElementById('badge-action').className = 'badge-action';
-
-  // Remove any error details
-  var errors = document.querySelectorAll('.error-detail');
-  for (var i = 0; i < errors.length; i++) errors[i].remove();
-
-  // Restore hidden sections
-  document.querySelector('.meta').style.display = '';
-  document.getElementById('evidence-section').style.display = '';
-  document.querySelector('.boundary').style.display = '';
-
-  // Reset file input
-  document.getElementById('file-input').value = '';
-}
-
-// ══════════════════════════════════════════
-// Helpers
-// ══════════════════════════════════════════
-
-function escapeHtml(str) {
-  var div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-function formatDate(iso) {
-  if (!iso) return '—';
-  try {
-    var d = new Date(iso);
-    return d.toLocaleDateString(undefined, {
-      year: 'numeric', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  } catch (e) {
-    return iso;
-  }
-}
-
-// ══════════════════════════════════════════
-// DEMO: Auto-load sample manifest
-// ══════════════════════════════════════════
-(function() {
-  var demoManifest = {
-    "manifest_type": "DRAFT_MANIFEST",
-    "manifest_ref": "mf-20260321-demo",
-    "packet_ref": "draft-20260321-demo",
-    "created_at": "2026-03-21T02:03:31.271Z",
-    "generator": "px-cli/0.1.0",
-    "project": "my-saas-app",
-    "framework": "SOC2",
-    "verification_mode": "workspace",
-    "evidence_summary": {
-      "total": 4,
-      "passed": 3,
-      "failed": 1,
-      "all_pass": false,
-      "profiles": [
-        {"profile_ref":"soc2-access-control","evidence_class":"access-control","fields_checked":6,"fields_passed":6,"conformance":"PASS"},
-        {"profile_ref":"soc2-encryption","evidence_class":"encryption","fields_checked":4,"fields_passed":4,"conformance":"PASS"},
-        {"profile_ref":"soc2-monitoring","evidence_class":"monitoring","fields_checked":9,"fields_passed":9,"conformance":"PASS"},
-        {"profile_ref":"soc2-patch-management","evidence_class":"patch-management","fields_checked":6,"fields_passed":5,"conformance":"FAIL","failures":[{"field":"outstanding_critical_patches","reason":"value 2 exceeds maximum 0"}]}
-      ]
-    },
-    "packet_hash": "sha256:a3f7c9e1b2d4056839ef71ca2d8b4a6f0e19c5d73b8a2f1096e4d5c7b3a28f01",
-    "intended_recipient": null,
-    "stated_purpose": null,
-    "bundled_profile": null,
-    "bundled_evidence": null,
-    "submission_state": "NOT_SUBMITTED",
-    "submission_id": null,
-    "sct": null,
-    "acceptance_receipt": null,
-    "recipient_binding": null,
-    "parent_manifest_refs": [],
-    "clearing_batch_ref": null
-  };
-  renderManifest(demoManifest);
-})();
 </script>
-
 </body>
 </html>
