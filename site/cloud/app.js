@@ -43,7 +43,7 @@
   // NAVIGATION
   // ══════════════════════════════════════════
 
-  var SCREENS = ['drop', 'detect', 'structure', 'pack'];
+  var SCREENS = ['drop', 'detect', 'structure', 'pack', 'send'];
 
   function goTo(name) {
     state.screen = name;
@@ -787,13 +787,51 @@
     buildPack();
   });
 
-  $('btn-download').addEventListener('click', function() {
+  $('btn-download').addEventListener('click', function() { downloadPack(); });
+  $('btn-send-download').addEventListener('click', function() { downloadPack(); });
+
+  // Pack → Send
+  $('btn-to-send').addEventListener('click', function() {
+    goTo('send');
+    // Populate send screen
+    var m = state.manifest;
+    var totalR = state.packBundle ? Object.keys(state.packBundle).length : 0;
+    var qCount = state.questions.length;
+    var fCount = state.files.length;
+    var failCount = (m && m.evidence_summary) ? m.evidence_summary.failed : 0;
+    var summaryText = 'Pack complete';
+    if (qCount > 0) summaryText += ' (' + qCount + ' questions / ' + (fCount - 1) + ' evidence';
+    else summaryText += ' (' + fCount + ' files';
+    if (failCount > 0) summaryText += ' / ' + failCount + ' FAIL';
+    summaryText += ')';
+    $('send-summary').textContent = summaryText;
+    $('send-seal').textContent = m ? m.seal : '';
+  });
+
+  // Send email via mailto
+  $('btn-send-email').addEventListener('click', function() {
+    var email = $('send-email').value.trim();
+    if (!email) { showToast('Enter an email address'); $('send-email').focus(); return; }
+    var m = state.manifest;
+    var project = (m && m.project) || 'Pack';
+    var framework = (m && m.framework) || '';
+    var subject = encodeURIComponent(project + (framework ? ' ' + framework : '') + ' — verified pack (PX)');
+    var body = encodeURIComponent(
+      'Please find the verified pack attached.\n\n' +
+      'Open the attached lens-v2.html in your browser to review.\n' +
+      'No installation needed — it runs entirely offline.\n\n' +
+      (m ? 'Seal: ' + m.seal + '\n' : '') +
+      'Created: ' + (m ? m.created_at : '') + '\n\n' +
+      '— Sent via PX (https://px-registry.org)'
+    );
+    window.open('mailto:' + encodeURIComponent(email) + '?subject=' + subject + '&body=' + body, '_self');
+    showToast('Mail client opened — attach lens-v2.html');
+    // Also auto-download the Lens so they have it ready to attach
     downloadPack();
   });
 
-
-  $('btn-restart').addEventListener('click', function() {
-    // Reset state
+  // Restart (from any screen)
+  function resetState() {
     state.files = [];
     state.hashed = 0;
     state.questionnaire = null;
@@ -812,7 +850,9 @@
     $('review-queue').style.display = 'none';
     $('author-preview').style.display = '';
     goTo('drop');
-  });
+  }
+  $('btn-restart').addEventListener('click', resetState);
+  $('btn-send-restart').addEventListener('click', resetState);
 
   // ══════════════════════════════════════════
   // INIT

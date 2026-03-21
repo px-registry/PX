@@ -181,7 +181,7 @@ body.verdict-fail { background-color: var(--fail-bg); }
 .map-item:last-child { border-bottom: none; }
 .map-item:hover { background: var(--ink04); }
 .map-item.spotlight { background: #fff; opacity: 1 !important; }
-.map-item.dimmed { opacity: 0.12; }
+.map-item.dimmed { opacity: 0.45; }
 .map-item__id { font-size: 11px; font-weight: 600; color: var(--ink45); letter-spacing: 0.02em; }
 .map-item__desc { font-size: 13px; color: var(--ink); margin-top: 2px; font-weight: 500; }
 .map-item__status { margin-top: 4px; font-size: 11px; font-weight: 600; }
@@ -193,7 +193,7 @@ body.verdict-fail { background-color: var(--fail-bg); }
 .evi-item:last-child { border-bottom: none; }
 .evi-item.spotlight { background: var(--pass-card); border-left: 3px solid var(--pass); transform: scale(1.015); }
 .evi-item.spotlight-fail { background: var(--fail-card); border-left: 3px solid var(--fail); transform: scale(1.015); }
-.evi-item.dimmed { opacity: 0.12; }
+.evi-item.dimmed { opacity: 0.45; }
 .evi-item__name { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 6px; }
 .evi-item__name svg { flex-shrink: 0; }
 .evi-item__path { font-size: 11px; color: var(--ink45); font-family: var(--fm); margin-top: 2px; }
@@ -328,6 +328,14 @@ body.verdict-fail { background-color: var(--fail-bg); }
         </span>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ═══ What is this? ═══ -->
+<div class="wrap">
+  <div id="lens-intro" style="padding:12px 16px;margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);font-size:12px;color:var(--ink45);line-height:1.6;display:none">
+    This file is a verified pack created with PX. You can check the consistency of answers and evidence in your browser. No installation required.
+    <span style="cursor:pointer;margin-left:8px;color:var(--ink20)" onclick="this.parentNode.style.display='none'">&times;</span>
   </div>
 </div>
 
@@ -718,6 +726,20 @@ document.addEventListener('DOMContentLoaded', function() {
     vTitle.classList.add('verdict-msg__title--fail');
     vSub.textContent = failResults.length + ' inconsistencies found';
   }
+
+  // ── Context line (question count + evidence count) ──
+  var evidenceCount = MANIFEST.evidence_summary ? MANIFEST.evidence_summary.total : 0;
+  var contextParts = [];
+  contextParts.push(totalCount + ' rules');
+  if (evidenceCount > 0) contextParts.push(evidenceCount + ' files');
+  var contextLine = document.createElement('div');
+  contextLine.style.cssText = 'font-size:13px;color:var(--ink45);text-align:center;margin-top:6px';
+  contextLine.textContent = contextParts.join(' / ');
+  vSub.parentNode.appendChild(contextLine);
+
+  // ── Show intro banner for first-time viewers ──
+  var introEl = document.getElementById('lens-intro');
+  if (introEl) introEl.style.display = 'block';
 
   // ── Fail list (FAIL only) ──
   var failList = document.getElementById('fail-list');
