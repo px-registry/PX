@@ -126,13 +126,10 @@ p { color: var(--t2); }
 .hero::before { content: ''; position: absolute; top: -20%; left: 50%; transform: translateX(-50%);
   width: 800px; height: 800px; background: radial-gradient(circle, rgba(16,185,129,.12) 0%, transparent 60%);
   pointer-events: none; filter: blur(40px); z-index: -1; }
+.hero__label { font-size: var(--ts-sm); font-weight: 600; color: var(--green); letter-spacing: 0.08em; text-transform: none; margin-bottom: var(--sp-md); }
 .hero h1 { max-width: 780px; margin: 0 auto 24px; }
 .hero__sub { font-size: 1.125rem; color: var(--t2); max-width: 680px; margin: 0 auto 40px; line-height: 1.7; }
-.hero__actions { display: flex; gap: var(--sp-lg); justify-content: center; }
-.hero__integrations { display: flex; gap: 16px; align-items: center; justify-content: center;
-  margin-top: 64px; color: var(--t3); font-size: var(--ts-sm); flex-wrap: wrap; }
-.hero__integrations span { padding: 6px 12px; border: 1px solid var(--border); border-radius: 20px;
-  background: var(--surface); color: var(--t2); font-size: var(--ts-xs); }
+.hero__cta { display: flex; gap: var(--sp-lg); justify-content: center; }
 
 /* ── Profile cards (3 columns) ── */
 .profiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
@@ -451,7 +448,7 @@ p { color: var(--t2); }
     background: var(--ink); border-bottom: 1px solid var(--border); padding: 16px 24px; gap: 16px; z-index: 99; }
   .nav__ham { display: block; }
   .hero { padding: 140px 0 80px; }
-  .hero__actions { flex-direction: column; align-items: center; }
+  .hero__cta { flex-direction: column; align-items: center; }
   .gap-table { font-size: var(--ts-xs); }
   .gap-table th, .gap-table td { padding: .4rem .5rem; }
   .lens__kpis { flex-wrap: wrap; }
