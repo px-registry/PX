@@ -123,12 +123,14 @@
       <div class="pack-ready__sub" id="pack-sub"></div>
       <div class="pack-files" id="pack-files"></div>
       <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn btn--pass btn--lg" id="btn-download">Download Lens</button>
+        <button class="btn btn--pass btn--lg" id="btn-download">Lens をダウンロード</button>
         <button class="btn btn--ghost" id="btn-restart">New pack</button>
       </div>
-      <div style="margin-top:12px;text-align:center">
-        <button class="btn btn--ghost btn--sm" id="btn-export-details" style="font-size:12px;color:var(--ink45)">Export all files (manifest, evidence, profile)</button>
-      </div>
+      <div style="margin-top:4px;text-align:center;font-size:12px;color:var(--ink20)">このファイルを相手に送るだけで完結します</div>
+      <details style="margin-top:20px;font-size:13px;color:var(--ink45)">
+        <summary style="cursor:pointer;user-select:none">記録用ファイル</summary>
+        <div id="record-files" style="margin-top:8px"></div>
+      </details>
     </div>
   </div>
 
