@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PX Lens v2 — PASS Demo</title>
+<style>
+:root {
+  --pass: #059669; --pass-light: #10b981; --pass-bg: rgba(16,185,129,0.05);
+  --pass-ring: #10b981; --pass-border: #6ee7b7; --pass-card: #ecfdf5;
+  --fail: #dc2626; --fail-light: #ef4444; --fail-bg: rgba(239,68,68,0.04);
+  --fail-ring: #ef4444; --fail-border: #fca5a5; --fail-card: #fef2f2;
+  --ink: #111827; --ink70: rgba(17,24,39,0.7); --ink45: rgba(17,24,39,0.45);
+  --ink20: rgba(17,24,39,0.2); --ink08: rgba(17,24,39,0.08); --ink04: rgba(17,24,39,0.03);
+  --bg: #ffffff; --surface: #f9fafb; --border: #e5e7eb;
+  --amber: #d97706; --amber-bg: #fffbeb;
+  --fd: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --fm: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --r: 16px; --rs: 10px; --rr: 8px;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--fd); background: var(--bg); color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; transition: background-color 0.5s ease; }
+body.verdict-pass { background-color: var(--pass-bg); }
+body.verdict-fail { background-color: var(--fail-bg); }
+.wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+.hd { padding: 14px 0; border-bottom: 1px solid var(--ink08); }
+.hd__inner { display: flex; align-items: center; gap: 10px; }
+.hd__logo { font-weight: 800; font-size: 15px; letter-spacing: -0.02em; }
+.hd__sep { color: var(--ink20); font-weight: 300; }
+.hd__badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.hd__badge--pass { background: var(--pass-card); color: var(--pass); }
+.hd__badge--fail { background: var(--fail-card); color: var(--fail); }
+.hd__right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.hd__privacy { font-size: 11px; color: var(--ink45); display: flex; align-items: center; gap: 4px; }
+.tabs { display: flex; gap: 2px; padding: 12px 0 0; background: var(--bg); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--ink08); }
+.tab { background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--ink45); cursor: pointer; font-family: var(--fd); transition: all 0.15s; }
+.tab:hover { color: var(--ink70); }
+.tab.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.screen { display: none; padding: 32px 0 60px; }
+.screen.active { display: block; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.ring-wrap { display: flex; flex-direction: column; align-items: center; padding: 20px 0 28px; }
+.ring { position: relative; width: 160px; height: 160px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring__bg { fill: none; stroke: var(--ink08); stroke-width: 8; }
+.ring__fg { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s; }
+.ring__fg--pass { stroke: var(--pass-ring); }
+.ring__fg--fail { stroke: var(--fail-ring); }
+.ring__label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+.ring__num { font-size: 40px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+.ring__num--pass { color: var(--pass); }
+.ring__num--fail { color: var(--fail); }
+.ring__denom { font-size: 16px; color: var(--ink45); font-weight: 500; }
+.ring__pct { font-size: 13px; color: var(--ink45); margin-top: 8px; font-weight: 500; }
+.verdict-msg { text-align: center; margin-bottom: 32px; }
+.verdict-msg__title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.verdict-msg__title--pass { color: var(--pass); }
+.verdict-msg__title--fail { color: var(--fail); }
+.verdict-msg__sub { font-size: 14px; color: var(--ink45); }
+.pass-summary { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rs); padding: 18px 22px; margin-bottom: 28px; }
+.pass-summary__row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; }
+.pass-summary__label { font-size: 13px; color: var(--ink45); }
+.pass-summary__value { font-size: 14px; font-weight: 600; color: var(--ink); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; font-size: 14px; font-weight: 600; font-family: var(--fd); border: none; border-radius: var(--rs); cursor: pointer; transition: all 0.15s; }
+.btn--pass { background: var(--pass); color: #fff; }
+.btn--pass:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.3); }
+.btn--ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+.btn--ghost:hover { background: var(--border); }
+.btn--disabled { opacity: 0.4; pointer-events: none; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--ink); color: #fff; padding: 10px 24px; border-radius: var(--rs); font-size: 13px; font-weight: 500; z-index: 999; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.acceptance { background: var(--pass-card); border: 1px solid var(--pass-border); border-radius: var(--rs); padding: 22px; text-align: center; margin-top: 20px; display: none; animation: fadeIn 0.3s ease; }
+.acceptance.show { display: block; }
+.acceptance__icon { font-size: 32px; margin-bottom: 8px; }
+.acceptance__title { font-size: 16px; font-weight: 700; color: var(--pass); margin-bottom: 4px; }
+.acceptance__time { font-size: 12px; color: var(--ink45); margin-bottom: 12px; }
+.acceptance__note { font-size: 12px; color: var(--ink45); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--pass-border); }
+.acceptance__id { font-family: var(--fm); font-size: 11px; color: var(--ink45); margin-top: 4px; }
+.meta-line { font-size: 12px; color: var(--ink20); text-align: center; margin-top: 16px; }
+.mapping { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.mapping__col { padding: 0; }
+.mapping__col--q { border-right: 1px solid var(--border); }
+.mapping__header { padding: 10px 18px; background: var(--surface); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink45); border-bottom: 1px solid var(--border); }
+.map-item { padding: 14px 18px; border-bottom: 1px solid var(--ink04); cursor: pointer; transition: all 0.15s; }
+.map-item:last-child { border-bottom: none; }
+.map-item.spotlight { background: #fff; opacity: 1 !important; }
+.map-item.dimmed { opacity: 0.18; }
+.map-item__id { font-size: 11px; font-weight: 600; color: var(--ink45); letter-spacing: 0.02em; }
+.map-item__desc { font-size: 13px; color: var(--ink); margin-top: 2px; font-weight: 500; }
+.map-item__status { margin-top: 4px; font-size: 11px; font-weight: 600; }
+.map-item__status--pass { color: var(--pass); }
+.evi-item { padding: 14px 18px; border-bottom: 1px solid var(--ink04); transition: all 0.15s; }
+.evi-item:last-child { border-bottom: none; }
+.evi-item.spotlight { background: var(--pass-card); border-left: 3px solid var(--pass); }
+.evi-item.dimmed { opacity: 0.18; }
+.evi-item__name { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.evi-item__path { font-size: 11px; color: var(--ink45); font-family: var(--fm); margin-top: 2px; }
+.evi-item__badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-top: 4px; }
+.evi-item__badge--pass { background: var(--pass-card); color: var(--pass); }
+.adv-section { margin-bottom: 20px; }
+.adv-section summary { font-size: 13px; font-weight: 600; color: var(--ink45); cursor: pointer; padding: 12px 0; list-style: none; display: flex; align-items: center; gap: 8px; }
+.adv-section summary::before { content: '+'; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: var(--ink04); font-size: 14px; font-weight: 700; color: var(--ink45); transition: all 0.15s; }
+.adv-section[open] summary::before { content: '\2212'; background: var(--ink08); }
+.adv-field { padding: 8px 0; border-bottom: 1px solid var(--ink04); display: flex; }
+.adv-field__label { width: 180px; flex-shrink: 0; font-size: 12px; font-weight: 500; color: var(--ink45); padding-top: 2px; }
+.adv-field__value { font-size: 13px; font-family: var(--fm); color: var(--ink70); word-break: break-all; }
+.adv-json { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rr); padding: 16px; font-family: var(--fm); font-size: 11px; line-height: 1.7; overflow-x: auto; max-height: 400px; overflow-y: auto; color: var(--ink70); white-space: pre-wrap; margin-top: 12px; }
+.pull-cta { text-align: center; padding: 24px 0; margin-top: 20px; border-top: 1px solid var(--ink04); }
+.pull-cta__text { font-size: 12px; color: var(--ink20); }
+.pull-cta__text a { color: var(--ink45); text-decoration: none; font-weight: 600; }
+.pull-cta__text a:hover { color: var(--pass); }
+.ft { padding: 20px 0; border-top: 1px solid var(--ink08); margin-top: 40px; }
+.ft__inner { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink20); }
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  .mapping { grid-template-columns: 1fr; }
+  .mapping__col--q { border-right: none; border-bottom: 1px solid var(--border); }
+  .ring { width: 130px; height: 130px; }
+  .ring__num { font-size: 32px; }
+  .actions { flex-direction: column; }
+  .btn { width: 100%; }
+}
+@media print {
+  body { background: #fff !important; }
+  .tabs, .btn, .toast, .pull-cta { display: none !important; }
+  .screen { display: block !important; page-break-before: always; }
+}
+</style>
+</head>
+<body>
+<div class="hd"><div class="wrap"><div class="hd__inner">
+  <span class="hd__logo">PX</span><span class="hd__sep">|</span>
+  <span style="font-size:14px;color:var(--ink45);font-weight:500">Lens</span>
+  <span class="hd__badge" id="hd-badge">--</span>
+  <div class="hd__right"><span class="hd__privacy">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4v4c0 3.3 2.6 6.4 6 7 3.4-.6 6-3.7 6-7V4L8 1z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+    Offline</span></div>
+</div></div></div>
+<div class="wrap">
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-screen="verdict">Verdict</button>
+    <button class="tab" data-screen="mapping">Mapping</button>
+    <button class="tab" data-screen="advanced">Advanced</button>
+  </div>
+</div>
+<div class="wrap">
+  <div class="screen active" id="screen-verdict">
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg viewBox="0 0 160 160">
+          <circle class="ring__bg" cx="80" cy="80" r="68"/>
+          <circle class="ring__fg" id="ring-fg" cx="80" cy="80" r="68" stroke-dasharray="427.26" stroke-dashoffset="427.26"/>
+        </svg>
+        <div class="ring__label">
+          <div class="ring__num" id="ring-num">--</div>
+          <div class="ring__denom" id="ring-denom">--</div>
+        </div>
+      </div>
+      <div class="ring__pct" id="ring-pct"></div>
+    </div>
+    <div class="verdict-msg">
+      <div class="verdict-msg__title" id="verdict-title"></div>
+      <div class="verdict-msg__sub" id="verdict-sub"></div>
+    </div>
+    <div class="pass-summary" id="pass-summary" style="display:none">
+      <div class="pass-summary__row"><span class="pass-summary__label">Files</span><span class="pass-summary__value" id="ps-files">--</span></div>
+      <div class="pass-summary__row"><span class="pass-summary__label">Rules</span><span class="pass-summary__value" id="ps-rules">--</span></div>
+      <div class="pass-summary__row"><span class="pass-summary__label">Profile</span><span class="pass-summary__value" id="ps-profile">--</span></div>
+      <div class="pass-summary__row"><span class="pass-summary__label">Created</span><span class="pass-summary__value" id="ps-created">--</span></div>
+    </div>
+    <div id="verdict-actions"></div>
+    <div class="acceptance" id="acceptance">
+      <div class="acceptance__icon">&#10003;</div>
+      <div class="acceptance__title" id="acc-title">Accepted</div>
+      <div class="acceptance__time" id="acc-time"></div>
+      <div class="acceptance__note">This acceptance record is tamper-evident.</div>
+      <div class="acceptance__id" id="acc-id"></div>
+    </div>
+    <div class="meta-line" id="meta-line"></div>
+  </div>
+  <div class="screen" id="screen-mapping"><div class="mapping" id="mapping-grid"></div></div>
+  <div class="screen" id="screen-advanced">
+    <details class="adv-section"><summary>Cryptographic verification details</summary><div id="adv-fields"></div></details>
+    <details class="adv-section"><summary>Raw manifest JSON</summary><div class="adv-json" id="adv-json"></div></details>
+  </div>
+</div>
+<div class="pull-cta" id="pull-cta" style="display:none">
+  <div class="pull-cta__text">Verified via PX &mdash; <a href="https://proofexchange.org" target="_blank" rel="noopener">Create your own pack</a></div>
+</div>
+<div class="wrap"><div class="ft"><div class="ft__inner">
+  <span>PX Lens v2</span><span>Runs entirely in your browser. No data leaves this page.</span>
+</div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ALL PASS demo data
+var MANIFEST = {
+  "manifest_type":"DRAFT_MANIFEST","manifest_ref":"mf-20260322-pass","packet_ref":"draft-20260322-pass",
+  "seal":"PX-B2D4-2026Q1-PASS-10","artifact_kind":"proof-pack",
+  "created_at":"2026-03-22T09:15:00.000Z","generator":"px-cli/0.1.0",
+  "project":"aws-core-controls-v1","framework":"CUSTOM_PROFILE","verification_mode":"custom",
+  "evidence_summary":{"total":1,"passed":1,"failed":0,"all_pass":true,
+    "profiles":[{"profile_ref":"aws-core-controls-v1","evidence_class":"aws-core-controls-v1","fields_checked":10,"fields_passed":10,"conformance":"PASS"}]},
+  "packet_hash":"sha256:b2d4f6a8c0e2d4f6a8c0e2d4f6a8c0e2d4f6a8c0e2d4f6a8c0e2d4f6a8c0e2d4",
+  "intended_recipient":"auditor@example.com","stated_purpose":"Q1 2026 SOC2 compliance review",
+  "bundled_profile":"bundled-profile.json","bundled_evidence":"bundled-evidence.json",
+  "submission_state":"NOT_SUBMITTED","submission_id":null,"sct":null,"acceptance_receipt":null,"recipient_binding":null,
+  "parent_manifest_refs":[],"clearing_batch_ref":null
+};
+var EVIDENCE = {
+  "_meta":{"source":"Manual export","exported_at":"2026-03-22T00:00:00Z","account_id":"123456789012","region":"ap-northeast-1"},
+  "iam":{"mfa_enabled":true,"root_access_key_active":false,"password_policy":{"minimum_length":16,"require_symbols":true,"require_numbers":true,"require_uppercase":true,"require_lowercase":true,"max_age_days":90}},
+  "rds":{"storage_encrypted":true,"publicly_accessible":false},"s3":{"public_access_blocked":true,"versioning":true},
+  "cloudtrail":{"is_logging":true,"is_multi_region":true},"vpc":{"flow_logs_enabled":true},
+  "patch_status":{"outstanding_critical":0,"outstanding_high":0,"last_scan":"2026-03-21"},
+  "firewall_log":true
+};
+var PROFILE = {
+  "profile_id":"aws-core-controls-v1","profile_version":"1.0.0","name":"AWS Core Controls",
+  "description":"Basic security checks for AWS infrastructure.","source_type":"aws-account",
+  "rules":[
+    {"id":"iam.mfa_enforced","description":"MFA is enforced for all IAM users","path":"iam.mfa_enabled","expected":true},
+    {"id":"iam.root_key_disabled","description":"Root account access keys are not active","path":"iam.root_access_key_active","expected":false},
+    {"id":"iam.password_min_length","description":"Password policy requires minimum 14 characters","path":"iam.password_policy.minimum_length","operator":"gte","expected":14},
+    {"id":"rds.encryption","description":"RDS storage encryption is enabled","path":"rds.storage_encrypted","expected":true},
+    {"id":"rds.no_public","description":"RDS instances are not publicly accessible","path":"rds.publicly_accessible","expected":false},
+    {"id":"s3.block_public","description":"S3 public access block is enabled","path":"s3.public_access_blocked","expected":true},
+    {"id":"s3.versioning","description":"S3 bucket versioning is enabled","path":"s3.versioning","expected":true},
+    {"id":"cloudtrail.logging","description":"CloudTrail is logging","path":"cloudtrail.is_logging","expected":true},
+    {"id":"patch.critical_zero","description":"No outstanding critical patches","path":"patch_status.outstanding_critical","operator":"lte","expected":0},
+    {"id":"firewall.log_present","description":"Firewall log file is present","path":"firewall_log","expected":true}
+  ]
+};
+
+function resolvePath(o,p){var s=p.split('.');var c=o;for(var i=0;i<s.length;i++){if(c===null||c===undefined||typeof c!=='object')return undefined;c=c[s[i]];}return c;}
+function verifyRule(v,r){if(v===undefined||v===null)return{pass:false,reason:'not found'};var op=r.operator||'eq';if(op==='eq')return v===r.expected?{pass:true,reason:'ok'}:{pass:false,reason:'mismatch'};if(op==='gte')return(typeof v==='number'&&v>=r.expected)?{pass:true,reason:'ok'}:{pass:false,reason:'below'};if(op==='lte')return(typeof v==='number'&&v<=r.expected)?{pass:true,reason:'ok'}:{pass:false,reason:'exceeds'};return{pass:false,reason:'unknown'};}
+function esc(s){var d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2200);}
+function formatDate(iso){if(!iso)return'--';var d=new Date(iso);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var results=[];
+  for(var i=0;i<PROFILE.rules.length;i++){var r=PROFILE.rules[i];var v=resolvePath(EVIDENCE,r.path);var c=verifyRule(v,r);results.push({id:r.id,description:r.description,pass:c.pass,reason:c.reason,path:r.path,expected:r.expected,got:v});}
+  var passCount=results.filter(function(r){return r.pass}).length;
+  var totalCount=results.length;
+  var allPass=passCount===totalCount;
+  document.body.classList.add('verdict-pass');
+  var badge=document.getElementById('hd-badge');badge.className='hd__badge hd__badge--pass';badge.textContent='PASS';
+
+  // Ring
+  var circ=2*Math.PI*68;var fg=document.getElementById('ring-fg');
+  fg.classList.add('ring__fg--pass');
+  requestAnimationFrame(function(){requestAnimationFrame(function(){fg.style.strokeDashoffset=0;});});
+  document.getElementById('ring-num').textContent=passCount;document.getElementById('ring-num').classList.add('ring__num--pass');
+  document.getElementById('ring-denom').textContent='/ '+totalCount;
+  document.getElementById('ring-pct').textContent='100% compatible';
+
+  // Verdict
+  document.getElementById('verdict-title').textContent='This submission pack is consistent';
+  document.getElementById('verdict-title').classList.add('verdict-msg__title--pass');
+  document.getElementById('verdict-sub').textContent='No changes since sealing';
+
+  // Pass summary
+  document.getElementById('pass-summary').style.display='block';
+  document.getElementById('ps-files').textContent=(MANIFEST.evidence_summary.total||1)+' matched';
+  document.getElementById('ps-rules').textContent=passCount+'/'+totalCount+' conforming';
+  document.getElementById('ps-profile').textContent=PROFILE.name+' v'+PROFILE.profile_version;
+  document.getElementById('ps-created').textContent=formatDate(MANIFEST.created_at);
+
+  // Actions
+  var actEl=document.getElementById('verdict-actions');
+  actEl.innerHTML='<div class="actions"><button class="btn btn--pass" id="btn-accept">Accept</button><button class="btn btn--ghost" onclick="switchTab(\'mapping\')">View contents</button></div>';
+  document.getElementById('btn-accept').addEventListener('click',function(){
+    var now=new Date();var rid='ar-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).substr(2,4);
+    var receipt={type:'acceptance_receipt',manifest_ref:MANIFEST.manifest_ref,accepted_at:now.toISOString(),receipt_id:rid,verdict:'PASS'};
+    document.getElementById('acc-title').textContent='Accepted';
+    document.getElementById('acc-time').textContent=formatDate(now.toISOString());
+    document.getElementById('acc-id').textContent='Receipt ID: '+rid;
+    document.getElementById('acceptance').classList.add('show');
+    this.classList.add('btn--disabled');this.textContent='\u2713 Accepted';
+    var blob=new Blob([JSON.stringify(receipt,null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='acceptance-receipt-'+rid+'.json';a.click();URL.revokeObjectURL(url);
+    showToast('\u2713 Acceptance receipt downloaded');
+  });
+  document.getElementById('meta-line').textContent='Generated by '+MANIFEST.generator+' on '+formatDate(MANIFEST.created_at);
+  document.getElementById('pull-cta').style.display='block';
+
+  // Mapping
+  var grid=document.getElementById('mapping-grid');
+  var qH='<div class="mapping__col mapping__col--q"><div class="mapping__header">Rules</div>';
+  var eH='<div class="mapping__col"><div class="mapping__header">Evidence</div>';
+  for(var i=0;i<results.length;i++){var r=results[i];
+    qH+='<div class="map-item" data-idx="'+i+'"><div class="map-item__id">'+esc(r.id)+'</div><div class="map-item__desc">'+esc(r.description)+'</div><div class="map-item__status map-item__status--pass">PASS</div></div>';
+    eH+='<div class="evi-item" id="evi-'+i+'" data-idx="'+i+'"><div class="evi-item__name">'+esc(r.path.replace(/\./g,'/'))+'</div><div class="evi-item__path">'+esc(r.path)+' = '+esc(JSON.stringify(r.got))+'</div><div class="evi-item__badge evi-item__badge--pass">MATCH</div></div>';
+  }
+  grid.innerHTML=qH+'</div>'+eH+'</div>';
+  var qItems=grid.querySelectorAll('.map-item'),eItems=grid.querySelectorAll('.evi-item'),all=grid.querySelectorAll('.map-item,.evi-item');
+  function clear(){for(var j=0;j<all.length;j++){all[j].classList.remove('spotlight','dimmed');}}
+  function spot(idx){for(var j=0;j<all.length;j++){all[j].classList.add('dimmed');all[j].classList.remove('spotlight');}
+    var qi=grid.querySelector('.map-item[data-idx="'+idx+'"]'),ei=document.getElementById('evi-'+idx);
+    if(qi){qi.classList.remove('dimmed');qi.classList.add('spotlight');}if(ei){ei.classList.remove('dimmed');ei.classList.add('spotlight');}}
+  for(var i=0;i<qItems.length;i++){(function(it){it.addEventListener('mouseenter',function(){spot(parseInt(it.getAttribute('data-idx')));});it.addEventListener('mouseleave',clear);})(qItems[i]);}
+  for(var i=0;i<eItems.length;i++){(function(it){it.addEventListener('mouseenter',function(){spot(parseInt(it.getAttribute('data-idx')));});it.addEventListener('mouseleave',clear);})(eItems[i]);}
+
+  // Advanced
+  var fields=[['manifest_ref',MANIFEST.manifest_ref],['packet_hash',MANIFEST.packet_hash],['seal',MANIFEST.seal],['created_at',MANIFEST.created_at],['generator',MANIFEST.generator],['verification_mode',MANIFEST.verification_mode],['submission_state',MANIFEST.submission_state]];
+  var fH='';for(var i=0;i<fields.length;i++){fH+='<div class="adv-field"><div class="adv-field__label">'+esc(fields[i][0])+'</div><div class="adv-field__value">'+esc(fields[i][1])+'</div></div>';}
+  document.getElementById('adv-fields').innerHTML=fH;
+  document.getElementById('adv-json').textContent=JSON.stringify(MANIFEST,null,2);
+
+  // Tabs
+  var tabs=document.querySelectorAll('.tab'),screens=document.querySelectorAll('.screen');
+  window.switchTab=function(n){for(var j=0;j<tabs.length;j++){tabs[j].classList.toggle('active',tabs[j].getAttribute('data-screen')===n);}for(var j=0;j<screens.length;j++){screens[j].classList.toggle('active',screens[j].id==='screen-'+n);}};
+  for(var i=0;i<tabs.length;i++){tabs[i].addEventListener('click',function(){switchTab(this.getAttribute('data-screen'));});}
+});
+</script>
+</body>
+</html>

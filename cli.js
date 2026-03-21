@@ -304,6 +304,41 @@ function generateLensHtml(manifest, evidenceData, profileData, verifyResults) {
     .replace('/*__RESULTS__*/null', JSON.stringify(verifyResults));
 }
 
+function generateLensV2Html(manifest, evidenceData, profileData, verifyResults) {
+  // Read the v2 template from lens-v2.html alongside cli.js
+  const v2Path = path.join(__dirname, 'lens-v2.html');
+  let template;
+  try {
+    template = fs.readFileSync(v2Path, 'utf8');
+  } catch (e) {
+    console.error('lens-v2.html not found, falling back to v1');
+    return generateLensHtml(manifest, evidenceData, profileData, verifyResults);
+  }
+  // Replace each data injection point: /*__NAME__*/<json-until-semicolon>
+  // Pattern: from the marker through the trailing semicolon on the same logical block
+  function injectData(tmpl, marker, data) {
+    const tag = '/*' + marker + '*/';
+    const idx = tmpl.indexOf(tag);
+    if (idx === -1) return tmpl;
+    // Find the semicolon that ends this var declaration
+    const afterTag = idx + tag.length;
+    // Find matching end: scan for the semicolon that closes the assignment
+    // We need to find the end of the JSON value (could be object, array, or null)
+    const prefix = tmpl.substring(0, afterTag);
+    const suffix = tmpl.substring(afterTag);
+    // Find the next 'const ' or 'var ' as boundary, or use semicolon + newline
+    const endMatch = suffix.match(/;\s*\n/);
+    if (!endMatch) return tmpl;
+    const endIdx = endMatch.index;
+    return prefix + JSON.stringify(data) + suffix.substring(endIdx);
+  }
+  template = injectData(template, '__MANIFEST__', manifest);
+  template = injectData(template, '__EVIDENCE__', evidenceData);
+  template = injectData(template, '__PROFILE__', profileData);
+  template = injectData(template, '__RESULTS__', verifyResults);
+  return template;
+}
+
 // ══════════════════════════════════════════
 // Summary / Answer Pack generators
 // ══════════════════════════════════════════
@@ -1946,10 +1981,14 @@ function cmdPack(args) {
     writeJSON(path.join(outputDir, 'bundled-evidence.json'), evidenceData);
     success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
 
-    // Generate self-contained lens.html
+    // Generate self-contained lens.html (v1 + v2)
     const lensHtml = generateLensHtml(manifest, evidenceData, profileData, lensResults);
     fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
     success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
+
+    const lensV2Html = generateLensV2Html(manifest, evidenceData, profileData, lensResults);
+    fs.writeFileSync(path.join(outputDir, 'lens-v2.html'), lensV2Html, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'lens-v2.html')}`);
 
     // Generate summary.txt
     const summaryTxt = generateSummaryTxt(seal, profileData, lensResults, manifest);
@@ -2224,6 +2263,50 @@ Draft is fully functional for internal use today.
     evidence: allEvidence,
   });
   success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
+
+  // Generate Lens v2 HTML
+  // Workspace profiles use field/minimum/maximum structure, not path/operator.
+  // Build a unified results array from the already-verified evidence.
+  const lensV2AllResults = [];
+  for (const ev of allEvidence) {
+    if (ev.verification_result && ev.verification_result.failures) {
+      const vr = ev.verification_result;
+      // Each field checked is a result
+      const profileMatch = allProfiles.find(p => p.profile_id === ev.profile_ref) || {};
+      const rules = profileMatch.rules || [];
+      for (const rule of rules) {
+        const fieldName = rule.field || rule.path || rule.id || 'unknown';
+        const failure = vr.failures.find(f => f.field === fieldName);
+        lensV2AllResults.push({
+          id: (ev.profile_ref || 'rule') + '.' + fieldName,
+          description: rule.description || fieldName,
+          pass: !failure,
+          reason: failure ? failure.reason : 'ok',
+          path: fieldName,
+          expected: rule.expected !== undefined ? rule.expected : (rule.minimum !== undefined ? '>=' + rule.minimum : rule.maximum !== undefined ? '<=' + rule.maximum : '?'),
+          got: ev.data ? ev.data[fieldName] : undefined,
+        });
+      }
+    }
+  }
+  const lensV2BundledProfile = {
+    profile_id: 'workspace-bundle',
+    profile_version: '1.0.0',
+    name: config.project || 'Workspace',
+    description: allProfiles.length + ' profiles combined',
+    rules: lensV2AllResults.map(r => ({ id: r.id, description: r.description, path: r.path })),
+  };
+  const lensV2BundledEvidence = {};
+  for (const ev of allEvidence) {
+    if (ev.data) Object.assign(lensV2BundledEvidence, ev.data);
+  }
+  try {
+    const lensV2Html = generateLensV2Html(manifest, lensV2BundledEvidence, lensV2BundledProfile, lensV2AllResults);
+    fs.writeFileSync(pxPath(OUTPUT_DIR, 'lens-v2.html'), lensV2Html, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'lens-v2.html')}`);
+  } catch (e) {
+    log(`  ${CLR.dim}Lens v2 generation skipped: ${e.message}${CLR.reset}`);
+  }
 
   // ── Summary ──
   log();
