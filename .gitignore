@@ -1,6 +1,7 @@
 px/
 .px/
 node_modules/
+.wrangler/
 examples/draft-manifest.json
 examples/draft-packet.json
 
