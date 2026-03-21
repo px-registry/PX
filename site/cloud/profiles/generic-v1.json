@@ -1,0 +1,8 @@
+{
+  "profile_id": "generic-evidence-v1",
+  "profile_version": "1.0.0",
+  "name": "Generic Evidence Pack",
+  "description": "Accepts any files. Verifies presence and integrity only.",
+  "framework": "GENERIC",
+  "rules": []
+}

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PX Cloud — Pack Builder</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══ Header ═══ -->
+<div class="hd">
+  <div class="wrap">
+    <div class="hd__inner">
+      <span class="hd__logo">P<b>X</b></span>
+      <span class="hd__sep">|</span>
+      <span class="hd__label">Cloud</span>
+      <div class="hd__right">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4v4c0 3.3 2.6 6.4 6 7 3.4-.6 6-3.7 6-7V4L8 1z" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+        Browser-only
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ═══ Step Indicator ═══ -->
+  <div class="steps" id="steps">
+    <div class="step">
+      <div class="step__num step__num--active" id="sn-1">1</div>
+      <span class="step__text step__text--active" id="st-1">Drop</span>
+    </div>
+    <div class="step__line" id="sl-1"></div>
+    <div class="step">
+      <div class="step__num" id="sn-2">2</div>
+      <span class="step__text" id="st-2">Detect</span>
+    </div>
+    <div class="step__line" id="sl-2"></div>
+    <div class="step">
+      <div class="step__num" id="sn-3">3</div>
+      <span class="step__text" id="st-3">Review</span>
+    </div>
+    <div class="step__line" id="sl-3"></div>
+    <div class="step">
+      <div class="step__num" id="sn-4">4</div>
+      <span class="step__text" id="st-4">Pack</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       Screen 1: DROP INBOX
+       ═══════════════════════════════════════════════ -->
+  <div class="screen active" id="screen-drop">
+    <div class="drop" id="drop-zone">
+      <div class="drop__icon">&#128193;</div>
+      <div class="drop__title">Drop files or folders here</div>
+      <div class="drop__sub">Everything you'd normally send — questionnaires, evidence, configs, screenshots.</div>
+      <div class="drop__examples">
+        e.g. Questionnaire CSV + evidence folder<br>
+        Release folder + SBOM<br>
+        Just the questionnaire is fine too
+      </div>
+      <button class="drop__btn" id="btn-browse">Choose files</button>
+      <div class="drop__hint">Folders supported. All processing stays in your browser.</div>
+    </div>
+    <input type="file" id="file-input" multiple>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       Screen 2: DETECT
+       ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-detect">
+    <div class="detect-header">
+      <h2 id="detect-title">Scanning...</h2>
+      <span id="detect-count"></span>
+    </div>
+    <div class="progress" id="hash-progress">
+      <div class="progress__bar"><div class="progress__fill" id="hash-fill"></div></div>
+      <div class="progress__text" id="hash-text">Computing hashes...</div>
+    </div>
+    <div class="type-groups" id="type-groups"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end" id="detect-actions">
+      <button class="btn btn--ghost" id="btn-back-drop">Back</button>
+      <button class="btn btn--primary btn--disabled" id="btn-to-structure">Next: review mapping</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       Screen 3: STRUCTURE (Author Preview + Review Queue)
+       ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-structure">
+
+    <!-- Author Preview -->
+    <div id="author-preview">
+      <div class="preview-head">
+        <div class="preview-head__count" id="preview-count"></div>
+        <div class="preview-head__sub" id="preview-sub"></div>
+      </div>
+      <div class="stat-cards" id="stat-cards"></div>
+    </div>
+
+    <!-- Review Queue -->
+    <div id="review-queue" style="display:none">
+      <div class="review-counter" id="review-counter"></div>
+      <div id="review-card-container"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px" id="structure-actions">
+      <button class="btn btn--ghost" id="btn-back-detect">Back</button>
+      <button class="btn btn--primary" id="btn-start-review" style="display:none">Review remaining items</button>
+      <button class="btn btn--pass btn--lock btn--disabled" id="btn-pack">Pack &amp; Download</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       Screen 4: PACK COMPLETE
+       ═══════════════════════════════════════════════ -->
+  <div class="screen" id="screen-pack">
+    <div class="pack-ready">
+      <div class="pack-ready__icon">&#9989;</div>
+      <div class="pack-ready__title" id="pack-title">Pack ready</div>
+      <div class="pack-ready__sub" id="pack-sub"></div>
+      <div class="pack-files" id="pack-files"></div>
+      <div style="margin-top:24px;display:flex;gap:10px;justify-content:center">
+        <button class="btn btn--pass btn--lg" id="btn-download">Download Pack (.zip)</button>
+        <button class="btn btn--ghost" id="btn-restart">New pack</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="wrap">
+  <div class="ft">
+    <div class="ft__inner">
+      <span>PX Cloud v0.1</span>
+      <span>Runs entirely in your browser. No data leaves this page.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="px-core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
