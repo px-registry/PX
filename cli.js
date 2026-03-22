@@ -1816,6 +1816,331 @@ function cmdVerify(args) {
 
 // ── px pack ──────────────────────────────
 
+// ══════════════════════════════════════════
+// Class-based verification (directory of files)
+// Used by software-release, AI/ML model packs, etc.
+// ══════════════════════════════════════════
+
+function globMatch(fileName, pattern) {
+  // Simple glob: *.ext, PREFIX*, *CONTAINS*
+  const p = pattern.toLowerCase();
+  const f = fileName.toLowerCase();
+  if (p.startsWith('*') && p.endsWith('*')) {
+    return f.indexOf(p.slice(1, -1)) !== -1;
+  }
+  if (p.startsWith('*.')) {
+    // Handle compound extensions like *.spdx.json
+    const ext = p.slice(1); // ".spdx.json"
+    return f.endsWith(ext);
+  }
+  if (p.startsWith('*')) {
+    return f.endsWith(p.slice(1));
+  }
+  if (p.endsWith('*')) {
+    return f.startsWith(p.slice(0, -1));
+  }
+  return f === p;
+}
+
+function classifyFile(fileName, evidenceClasses) {
+  for (const ec of evidenceClasses) {
+    for (const pattern of (ec.file_patterns || [])) {
+      if (globMatch(fileName, pattern)) {
+        return ec.class;
+      }
+    }
+  }
+  return 'unclassified';
+}
+
+function runClassBasedVerify(profileData, fileEntries) {
+  const classes = {};
+  const evidenceClasses = profileData.evidence_classes || [];
+
+  // Classify all files
+  for (const fe of fileEntries) {
+    const cls = classifyFile(fe.name, evidenceClasses);
+    fe.evidenceClass = cls;
+    if (!classes[cls]) classes[cls] = [];
+    classes[cls].push(fe);
+  }
+
+  // Run rules
+  const results = [];
+  for (const rule of (profileData.rules || [])) {
+    const severity = rule.severity || 'FAIL';
+
+    if (rule.check === 'class_count') {
+      const count = (classes[rule.class] || []).length;
+      const op = rule.operator || 'gte';
+      let pass = false;
+      if (op === 'gte' || op === '>=') pass = count >= rule.expected;
+      else if (op === 'lte' || op === '<=') pass = count <= rule.expected;
+      else if (op === 'eq' || op === '==') pass = count === rule.expected;
+      results.push({
+        id: rule.id, description: rule.description, pass, severity,
+        reason: pass ? `${count} file(s) found` : `${count} file(s) found, need ${rule.operator || '>='} ${rule.expected}`,
+        path: rule.class, expected: rule.expected, got: count,
+      });
+    } else if (rule.check === 'file_contains_field') {
+      const filesInClass = classes[rule.class] || [];
+      let found = false;
+      let checkedFile = '';
+      for (const fe of filesInClass) {
+        if (fe.content && typeof fe.content === 'object') {
+          checkedFile = fe.name;
+          for (const field of (rule.fields || [])) {
+            if (fe.content[field] !== undefined) { found = true; break; }
+          }
+        }
+        if (found) break;
+      }
+      results.push({
+        id: rule.id, description: rule.description, pass: found, severity,
+        reason: found ? `field found in ${checkedFile}` : `none of [${(rule.fields||[]).join(', ')}] found in ${rule.class} files`,
+        path: rule.class, expected: (rule.fields||[]).join('|'), got: found ? 'present' : 'missing',
+      });
+    } else if (rule.check === 'all_hashed') {
+      const unhashed = fileEntries.filter(fe => !fe.hash);
+      const pass = unhashed.length === 0;
+      results.push({
+        id: rule.id, description: rule.description, pass, severity,
+        reason: pass ? `all ${fileEntries.length} files hashed` : `${unhashed.length} file(s) not hashed`,
+        path: 'all', expected: 'all hashed', got: pass ? 'all hashed' : unhashed.map(f=>f.name).join(', '),
+      });
+    }
+  }
+
+  return { results, classes };
+}
+
+function cmdPackClassBased(profileData, profilePath, evidencePath, flags) {
+  heading('Packing release directory...');
+
+  // ── Scan directory ──
+  const allFiles = [];
+  function scanDir(dir, prefix) {
+    const entries = fs.readdirSync(dir);
+    for (const entry of entries) {
+      if (entry.startsWith('.')) continue;
+      const full = path.join(dir, entry);
+      const stat = fs.statSync(full);
+      if (stat.isDirectory()) {
+        scanDir(full, prefix + entry + '/');
+      } else {
+        const content_buf = fs.readFileSync(full);
+        const hash = 'sha256:' + crypto.createHash('sha256').update(content_buf).digest('hex');
+        let content = null;
+        // Parse JSON files for field validation
+        if (entry.endsWith('.json') || entry.endsWith('.jsonl')) {
+          try { content = JSON.parse(content_buf.toString('utf8')); } catch(e) {}
+        }
+        allFiles.push({
+          name: entry,
+          path: prefix + entry,
+          size: stat.size,
+          hash,
+          content,
+          fullPath: full,
+        });
+      }
+    }
+  }
+  scanDir(evidencePath, '');
+
+  info(`${allFiles.length} files found in ${flags.evidence}`);
+  log();
+
+  // ── Classify + verify ──
+  const { results, classes } = runClassBasedVerify(profileData, allFiles);
+
+  // Print results
+  let failCount = 0;
+  let warnCount = 0;
+  let passCount = 0;
+  for (const r of results) {
+    if (r.pass) {
+      passCount++;
+      success(`${r.id}: ${r.reason}`);
+    } else if (r.severity === 'WARN') {
+      warnCount++;
+      log(`  ${CLR.yellow}▸${CLR.reset} ${r.id}: ${r.reason} ${CLR.dim}(recommended)${CLR.reset}`);
+    } else {
+      failCount++;
+      fail(`${r.id}: ${r.reason}`);
+    }
+  }
+  log();
+
+  // Print class summary
+  heading('File classification:');
+  for (const ec of (profileData.evidence_classes || [])) {
+    const files = classes[ec.class] || [];
+    const mark = files.length > 0 ? CLR.green + '✓' + CLR.reset : (ec.required ? CLR.red + '✗' + CLR.reset : CLR.dim + '-' + CLR.reset);
+    log(`  ${mark} ${ec.class}: ${files.length} file(s)${files.length > 0 ? ' — ' + files.map(f=>f.name).join(', ') : ''}`);
+  }
+  const unclassified = classes['unclassified'] || [];
+  if (unclassified.length > 0) {
+    log(`  ${CLR.dim}? unclassified: ${unclassified.length} file(s) — ${unclassified.map(f=>f.name).join(', ')}${CLR.reset}`);
+  }
+  log();
+
+  // ── FAIL-CLOSE on FAIL severity ──
+  if (failCount > 0) {
+    fail(`FAIL-CLOSE: ${failCount} required check(s) failed.`);
+    info('Pack not generated.');
+    log();
+    process.exit(1);
+  }
+
+  // ── Build packet ──
+  const now = new Date();
+  const packetId = `draft-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getTime()).slice(-4)}`;
+  const manifestRef = `mf-${now.toISOString().slice(0, 10).replace(/-/g, '')}-${String(now.getTime()).slice(-4)}`;
+
+  // Evidence data: file metadata + parsed JSON content
+  const evidenceData = {};
+  for (const fe of allFiles) {
+    const key = fe.name.replace(/[^a-zA-Z0-9]/g, '_');
+    if (fe.content) {
+      evidenceData[key] = fe.content;
+    } else {
+      evidenceData[key] = { _file: fe.name, _size: fe.size, _hash: fe.hash, _class: fe.evidenceClass };
+    }
+  }
+
+  // Build class summary for manifest
+  const classSummary = {};
+  for (const ec of (profileData.evidence_classes || [])) {
+    const files = classes[ec.class] || [];
+    if (files.length > 0) {
+      const entry = { count: files.length, files: files.map(f => f.name) };
+      // Detect SBOM format
+      if (ec.class === 'sbom') {
+        for (const f of files) {
+          if (f.content) {
+            if (f.content.spdxVersion) entry.format = 'spdx';
+            else if (f.content.bomFormat) entry.format = 'cyclonedx';
+          }
+        }
+      }
+      classSummary[ec.class] = entry;
+    }
+  }
+
+  const totalRules = results.length;
+  const passedRules = results.filter(r => r.pass).length;
+  const failedRules = results.filter(r => !r.pass && r.severity === 'FAIL').length;
+  const allPass = failedRules === 0;
+
+  const packetContent = JSON.stringify({ files: allFiles.map(f => ({ name: f.path, size: f.size, hash: f.hash, class: f.evidenceClass })) });
+  const packetHash = 'sha256:' + crypto.createHash('sha256').update(packetContent).digest('hex');
+  const seal = generateSeal(packetHash, now.toISOString(), allPass, totalRules);
+
+  const manifest = {
+    manifest_type: 'DRAFT_MANIFEST',
+    manifest_ref: manifestRef,
+    packet_ref: packetId,
+    seal,
+    artifact_kind: 'proof-pack',
+    created_at: now.toISOString(),
+    generator: `px-cli/${VERSION}`,
+    project: profileData.profile_id,
+    framework: profileData.framework || 'CUSTOM_PROFILE',
+    verification_mode: 'directory',
+    evidence_summary: {
+      total: allFiles.length,
+      passed: passedRules,
+      failed: failedRules,
+      warnings: warnCount,
+      all_pass: allPass,
+      classes: classSummary,
+      profiles: [{
+        profile_ref: profileData.profile_id,
+        evidence_class: profileData.profile_id,
+        fields_checked: totalRules,
+        fields_passed: passedRules,
+        conformance: allPass ? 'PASS' : 'FAIL',
+        failures: results.filter(r => !r.pass && r.severity === 'FAIL').map(r => ({ field: r.id, reason: r.reason })),
+      }],
+    },
+    packet_hash: packetHash,
+    intended_recipient: flags.recipient || null,
+    stated_purpose: flags.purpose || null,
+    bundled_profile: 'bundled-profile.json',
+    bundled_evidence: 'bundled-evidence.json',
+    submission_state: 'NOT_SUBMITTED',
+    submission_id: null,
+    sct: null,
+    acceptance_receipt: null,
+    recipient_binding: null,
+    parent_manifest_refs: [],
+    clearing_batch_ref: null,
+  };
+
+  // Lens results
+  const lensResults = results.map(r => ({
+    id: r.id, description: r.description, pass: r.pass,
+    reason: r.reason, path: r.path, expected: r.expected, got: r.got,
+  }));
+
+  // Lens profile (simplified for display)
+  const lensProfile = {
+    profile_id: profileData.profile_id,
+    profile_version: profileData.profile_version,
+    name: profileData.name,
+    description: profileData.description,
+    rules: results.map(r => ({ id: r.id, description: r.description, path: r.path })),
+  };
+
+  // ── Write output ──
+  const outputDir = pxPath(OUTPUT_DIR);
+  ensureDir(outputDir);
+
+  writeJSON(path.join(outputDir, 'draft-manifest.json'), manifest);
+  success(`Created ${relativePx(OUTPUT_DIR, 'draft-manifest.json')}`);
+
+  writeJSON(path.join(outputDir, 'draft-packet.json'), { files: allFiles.map(f => ({ name: f.path, size: f.size, hash: f.hash, class: f.evidenceClass })) });
+  success(`Created ${relativePx(OUTPUT_DIR, 'draft-packet.json')}`);
+
+  writeJSON(path.join(outputDir, 'bundled-profile.json'), profileData);
+  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-profile.json')}`);
+
+  writeJSON(path.join(outputDir, 'bundled-evidence.json'), evidenceData);
+  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
+
+  // Generate Lens v1
+  const lensHtml = generateLensHtml(manifest, evidenceData, lensProfile, lensResults);
+  fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
+  success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
+
+  // Generate Lens v2
+  try {
+    const lensV2Html = generateLensV2Html(manifest, evidenceData, lensProfile, lensResults);
+    fs.writeFileSync(path.join(outputDir, 'lens-v2.html'), lensV2Html, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'lens-v2.html')}`);
+  } catch (e) {
+    log(`  ${CLR.dim}Lens v2 skipped: ${e.message}${CLR.reset}`);
+  }
+
+  // Summary
+  log();
+  log(`  ${CLR.bold}Software Release Pack created.${CLR.reset}`);
+  log();
+  info(`Packet ID:  ${packetId}`);
+  info(`Seal:       ${seal}`);
+  info(`Files:      ${allFiles.length}`);
+  info(`Rules:      ${passedRules}/${totalRules} passed` + (warnCount > 0 ? `, ${warnCount} warning(s)` : ''));
+  info(`Hash:       ${packetHash.slice(0, 20)}...`);
+  log();
+  if (warnCount > 0) {
+    log(`  ${CLR.yellow}▸${CLR.reset} ${warnCount} recommendation(s) not met. Pack is valid but could be improved.`);
+    log();
+  }
+  log(`  ${CLR.bold}${CLR.green}Pack ready.${CLR.reset} Open ${CLR.reset}lens-v2.html${CLR.dim} to review.${CLR.reset}`);
+  log();
+}
+
 function cmdPack(args) {
   const flags = parseFlags(args);
 
@@ -1837,7 +2162,7 @@ function cmdPack(args) {
       process.exit(1);
     }
 
-    let profileData, evidenceData;
+    let profileData;
     try {
       profileData = readJSON(profilePath);
     } catch (e) {
@@ -1846,6 +2171,20 @@ function cmdPack(args) {
       log();
       process.exit(1);
     }
+
+    // ── Detect: is evidence a directory (class-based) or a JSON file (rule-based)? ──
+    const isDir = fs.statSync(evidencePath).isDirectory();
+
+    if (isDir && profileData.evidence_classes) {
+      // ═══════════════════════════════════════════
+      // CLASS-BASED VERIFICATION (software-release, etc.)
+      // Evidence is a directory of files.
+      // ═══════════════════════════════════════════
+      return cmdPackClassBased(profileData, profilePath, evidencePath, flags);
+    }
+
+    // ── Legacy: evidence is a single JSON file ──
+    let evidenceData;
     try {
       evidenceData = readJSON(evidencePath);
     } catch (e) {

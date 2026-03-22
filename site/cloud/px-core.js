@@ -165,6 +165,11 @@ var PXCore = (function() {
   };
 
   function detectFileType(fileName) {
+    var lower = fileName.toLowerCase();
+    // Check compound extensions first (e.g. .spdx.json, .cdx.json, .intoto.jsonl)
+    if (lower.endsWith('.spdx.json') || lower.endsWith('.cdx.json') || lower.endsWith('.cdx.xml')) return 'sbom';
+    if (lower.endsWith('.intoto.jsonl') || lower.endsWith('.sigstore.json')) return 'evidence-structured';
+    if (lower.indexOf('sbom') !== -1) return 'sbom';
     var ext = (fileName.split('.').pop() || '').toLowerCase();
     return TYPE_MAP[ext] || 'unknown';
   }
@@ -363,6 +368,17 @@ var PXCore = (function() {
     }
   }
 
+  // ── SBOM detection ──
+
+  function detectSBOMFormat(content) {
+    try {
+      var json = typeof content === 'string' ? JSON.parse(content) : content;
+      if (json.spdxVersion) return { format: 'spdx', version: json.spdxVersion };
+      if (json.bomFormat === 'CycloneDX') return { format: 'cyclonedx', version: json.specVersion };
+    } catch (e) {}
+    return null;
+  }
+
   // ── Format helpers ──
 
   function formatBytes(bytes) {
@@ -392,6 +408,7 @@ var PXCore = (function() {
     generateLensHtml: generateLensHtml,
     loadLensTemplate: loadLensTemplate,
     formatBytes: formatBytes,
+    detectSBOMFormat: detectSBOMFormat,
   };
 
 })();

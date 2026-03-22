@@ -1,0 +1,34 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "myapp-v2.1.0",
+  "documentNamespace": "https://example.com/myapp-v2.1.0",
+  "creationInfo": {
+    "created": "2026-03-22T00:00:00Z",
+    "creators": ["Tool: syft-1.0.0", "Organization: ACME Corp"]
+  },
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Package-myapp",
+      "name": "myapp",
+      "versionInfo": "2.1.0",
+      "supplier": "Organization: ACME Corp",
+      "downloadLocation": "https://github.com/acme/myapp/releases/v2.1.0"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-express",
+      "name": "express",
+      "versionInfo": "4.18.2",
+      "supplier": "Organization: OpenJS Foundation",
+      "downloadLocation": "https://registry.npmjs.org/express/-/express-4.18.2.tgz"
+    },
+    {
+      "SPDXID": "SPDXRef-Package-lodash",
+      "name": "lodash",
+      "versionInfo": "4.17.21",
+      "supplier": "Organization: Lodash",
+      "downloadLocation": "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
+    }
+  ]
+}

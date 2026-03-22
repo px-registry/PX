@@ -1,0 +1,125 @@
+{
+  "profile_id": "software-release-v1",
+  "profile_version": "1.0.0",
+  "name": "Software Release Pack",
+  "description": "Binary + SBOM + provenance verification for software distribution",
+  "framework": "SLSA",
+  "source_type": "directory",
+  "evidence_classes": [
+    {
+      "class": "binary",
+      "description": "Distributable binary or archive",
+      "required": true,
+      "file_patterns": ["*.exe", "*.dmg", "*.deb", "*.rpm", "*.tar.gz", "*.zip", "*.whl", "*.jar", "*.msi", "*.AppImage", "*.snap", "*.tgz"],
+      "min_count": 1
+    },
+    {
+      "class": "sbom",
+      "description": "Software Bill of Materials (SPDX or CycloneDX)",
+      "required": true,
+      "file_patterns": ["*.spdx.json", "*.cdx.json", "*.spdx", "*.cdx.xml", "*sbom*"],
+      "min_count": 1,
+      "validation": {
+        "format": ["spdx", "cyclonedx"],
+        "must_contain_field": ["spdxVersion", "bomFormat"]
+      }
+    },
+    {
+      "class": "provenance",
+      "description": "Build provenance (SLSA provenance or in-toto attestation)",
+      "required": false,
+      "recommended": true,
+      "file_patterns": ["*.intoto.jsonl", "*.sigstore.json", "*provenance*", "*attestation*"],
+      "min_count": 0
+    },
+    {
+      "class": "signature",
+      "description": "Cryptographic signature (Sigstore bundle or detached signature)",
+      "required": false,
+      "recommended": true,
+      "file_patterns": ["*.sig", "*.sigstore", "*.asc", "*.pem"],
+      "min_count": 0
+    },
+    {
+      "class": "changelog",
+      "description": "Change log or release notes",
+      "required": false,
+      "file_patterns": ["CHANGELOG*", "CHANGES*", "RELEASE*", "release-notes*"],
+      "min_count": 0
+    },
+    {
+      "class": "license",
+      "description": "License file",
+      "required": false,
+      "file_patterns": ["LICENSE*", "LICENCE*", "COPYING*"],
+      "min_count": 0
+    },
+    {
+      "class": "vex",
+      "description": "Vulnerability Exploitability eXchange",
+      "required": false,
+      "file_patterns": ["*.vex.json", "*.csaf.json", "*vex*"],
+      "min_count": 0
+    },
+    {
+      "class": "scan_result",
+      "description": "Vulnerability scan results",
+      "required": false,
+      "file_patterns": ["*trivy*", "*grype*", "*snyk*", "*scan*"],
+      "min_count": 0
+    }
+  ],
+  "rules": [
+    {
+      "id": "binary-exists",
+      "description": "At least one distributable binary is included",
+      "check": "class_count",
+      "class": "binary",
+      "operator": "gte",
+      "expected": 1,
+      "severity": "FAIL"
+    },
+    {
+      "id": "sbom-exists",
+      "description": "At least one SBOM is included",
+      "check": "class_count",
+      "class": "sbom",
+      "operator": "gte",
+      "expected": 1,
+      "severity": "FAIL"
+    },
+    {
+      "id": "sbom-format-valid",
+      "description": "SBOM is valid SPDX or CycloneDX format",
+      "check": "file_contains_field",
+      "class": "sbom",
+      "fields": ["spdxVersion", "bomFormat"],
+      "operator": "any",
+      "severity": "FAIL"
+    },
+    {
+      "id": "provenance-recommended",
+      "description": "Build provenance is recommended",
+      "check": "class_count",
+      "class": "provenance",
+      "operator": "gte",
+      "expected": 1,
+      "severity": "WARN"
+    },
+    {
+      "id": "signature-recommended",
+      "description": "Cryptographic signature is recommended",
+      "check": "class_count",
+      "class": "signature",
+      "operator": "gte",
+      "expected": 1,
+      "severity": "WARN"
+    },
+    {
+      "id": "all-files-hashed",
+      "description": "All files have SHA-256 hashes computed",
+      "check": "all_hashed",
+      "severity": "FAIL"
+    }
+  ]
+}
