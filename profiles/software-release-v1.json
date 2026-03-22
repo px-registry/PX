@@ -1,6 +1,6 @@
 {
   "profile_id": "software-release-v1",
-  "profile_version": "1.0.0",
+  "profile_version": "1.1.0",
   "name": "Software Release Pack",
   "description": "Binary + SBOM + provenance verification for software distribution",
   "framework": "SLSA",
@@ -15,9 +15,9 @@
     },
     {
       "class": "sbom",
-      "description": "Software Bill of Materials (SPDX or CycloneDX)",
+      "description": "Software Bill of Materials (SPDX or CycloneDX, JSON only)",
       "required": true,
-      "file_patterns": ["*.spdx.json", "*.cdx.json", "*.spdx", "*.cdx.xml", "*sbom*"],
+      "file_patterns": ["*.spdx.json", "*.cdx.json", "*sbom*.json"],
       "min_count": 1,
       "validation": {
         "format": ["spdx", "cyclonedx"],
@@ -29,7 +29,7 @@
       "description": "Build provenance (SLSA provenance or in-toto attestation)",
       "required": false,
       "recommended": true,
-      "file_patterns": ["*.intoto.jsonl", "*.sigstore.json", "*provenance*", "*attestation*"],
+      "file_patterns": ["*.intoto.json", "*.intoto.jsonl", "*.sigstore.json", "*provenance*", "*attestation*"],
       "min_count": 0
     },
     {
@@ -37,7 +37,7 @@
       "description": "Cryptographic signature (Sigstore bundle or detached signature)",
       "required": false,
       "recommended": true,
-      "file_patterns": ["*.sig", "*.sigstore", "*.asc", "*.pem"],
+      "file_patterns": ["*.sig", "*.sigstore", "*.sigstore.json", "*.asc"],
       "min_count": 0
     },
     {
@@ -65,7 +65,7 @@
       "class": "scan_result",
       "description": "Vulnerability scan results",
       "required": false,
-      "file_patterns": ["*trivy*", "*grype*", "*snyk*", "*scan*"],
+      "file_patterns": ["*trivy*.json", "*grype*.json", "*snyk*.json", "*vulnscan*.json", "*scan-result*.json"],
       "min_count": 0
     }
   ],
@@ -107,6 +107,12 @@
       "severity": "WARN"
     },
     {
+      "id": "provenance-binds-binary",
+      "description": "Provenance subject digest matches binary SHA-256",
+      "check": "provenance_subject_matches_binary",
+      "severity": "WARN"
+    },
+    {
       "id": "signature-recommended",
       "description": "Cryptographic signature is recommended",
       "check": "class_count",
@@ -117,7 +123,7 @@
     },
     {
       "id": "all-files-hashed",
-      "description": "All files have SHA-256 hashes computed",
+      "description": "All included files have SHA-256 recorded in the manifest",
       "check": "all_hashed",
       "severity": "FAIL"
     }

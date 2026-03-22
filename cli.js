@@ -1900,6 +1900,38 @@ function runClassBasedVerify(profileData, fileEntries) {
         reason: found ? `field found in ${checkedFile}` : `none of [${(rule.fields||[]).join(', ')}] found in ${rule.class} files`,
         path: rule.class, expected: (rule.fields||[]).join('|'), got: found ? 'present' : 'missing',
       });
+    } else if (rule.check === 'provenance_subject_matches_binary') {
+      const provFiles = classes['provenance'] || [];
+      const binFiles = classes['binary'] || [];
+      let pass = false;
+      let reason = 'no provenance or binary files';
+      if (provFiles.length > 0 && binFiles.length > 0) {
+        const binHash = binFiles[0].hash ? binFiles[0].hash.replace('sha256:', '') : '';
+        for (const pf of provFiles) {
+          if (pf.content) {
+            const subjects = pf.content.subject || [];
+            for (const s of subjects) {
+              if (s.digest && s.digest.sha256 === binHash) {
+                pass = true;
+                reason = `${pf.name} subject matches ${binFiles[0].name}`;
+                break;
+              }
+            }
+          }
+          if (pass) break;
+        }
+        if (!pass && provFiles.length > 0 && binHash) {
+          reason = `provenance subject digest does not match binary hash`;
+        }
+      } else if (provFiles.length === 0) {
+        // No provenance → skip (not applicable)
+        pass = true;
+        reason = 'no provenance file (skipped)';
+      }
+      results.push({
+        id: rule.id, description: rule.description, pass, severity,
+        reason, path: 'provenance↔binary', expected: 'digest match', got: pass ? 'match' : 'mismatch',
+      });
     } else if (rule.check === 'all_hashed') {
       const unhashed = fileEntries.filter(fe => !fe.hash);
       const pass = unhashed.length === 0;
