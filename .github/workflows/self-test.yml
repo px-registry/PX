@@ -1,0 +1,54 @@
+name: PX Self-Test
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PX Pack — full release (6 files)
+        uses: ./.github/actions/px-pack
+        id: px-full
+        with:
+          evidence-path: ./examples/software-release
+          profile: software-release-v1
+          project: px-registry/PX
+
+      - name: Verify full pack result
+        shell: bash
+        run: |
+          echo "Result: ${{ steps.px-full.outputs.pack-result }}"
+          echo "Warnings: ${{ steps.px-full.outputs.warnings }}"
+          test -f "${{ steps.px-full.outputs.manifest-path }}"
+          test -f "${{ steps.px-full.outputs.lens-path }}"
+          echo "All output files present."
+
+      - name: PX Pack — minimal (binary + SBOM only)
+        uses: ./.github/actions/px-pack
+        id: px-min
+        with:
+          evidence-path: ./examples/software-release-minimal
+          profile: software-release-v1
+          project: px-registry/PX
+          output-path: ./px-output-min
+
+      - name: Verify minimal pack result
+        shell: bash
+        run: |
+          echo "Result: ${{ steps.px-min.outputs.pack-result }}"
+          echo "Warnings: ${{ steps.px-min.outputs.warnings }}"
+          test -f ./px-output-min/draft-manifest.json
+          test -f ./px-output-min/lens-v2.html
+          echo "Minimal pack OK."
+
+      - name: Summary
+        run: |
+          echo "## PX Self-Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | Result | Warnings |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Full release (6 files) | ${{ steps.px-full.outputs.pack-result }} | ${{ steps.px-full.outputs.warnings }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Minimal (binary+SBOM) | ${{ steps.px-min.outputs.pack-result }} | ${{ steps.px-min.outputs.warnings }} |" >> $GITHUB_STEP_SUMMARY

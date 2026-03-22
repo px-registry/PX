@@ -2077,7 +2077,7 @@ function cmdPackClassBased(profileData, profilePath, evidencePath, flags) {
     artifact_kind: 'proof-pack',
     created_at: now.toISOString(),
     generator: `px-cli/${VERSION}`,
-    project: profileData.profile_id,
+    project: flags.project || profileData.profile_id,
     framework: profileData.framework || 'CUSTOM_PROFILE',
     verification_mode: 'directory',
     evidence_summary: {
@@ -2126,31 +2126,32 @@ function cmdPackClassBased(profileData, profilePath, evidencePath, flags) {
   };
 
   // ── Write output ──
-  const outputDir = pxPath(OUTPUT_DIR);
+  const outputDir = flags.output ? path.resolve(process.cwd(), flags.output) : pxPath(OUTPUT_DIR);
   ensureDir(outputDir);
+  const outLabel = flags.output ? flags.output.replace(/\/?$/, '/') : relativePx(OUTPUT_DIR, '');
 
   writeJSON(path.join(outputDir, 'draft-manifest.json'), manifest);
-  success(`Created ${relativePx(OUTPUT_DIR, 'draft-manifest.json')}`);
+  success(`Created ${outLabel}draft-manifest.json`);
 
   writeJSON(path.join(outputDir, 'draft-packet.json'), { files: allFiles.map(f => ({ name: f.path, size: f.size, hash: f.hash, class: f.evidenceClass })) });
-  success(`Created ${relativePx(OUTPUT_DIR, 'draft-packet.json')}`);
+  success(`Created ${outLabel}draft-packet.json`);
 
   writeJSON(path.join(outputDir, 'bundled-profile.json'), profileData);
-  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-profile.json')}`);
+  success(`Created ${outLabel}bundled-profile.json`);
 
   writeJSON(path.join(outputDir, 'bundled-evidence.json'), evidenceData);
-  success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
+  success(`Created ${outLabel}bundled-evidence.json`);
 
   // Generate Lens v1
   const lensHtml = generateLensHtml(manifest, evidenceData, lensProfile, lensResults);
   fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
-  success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
+  success(`Created ${outLabel}lens.html`);
 
   // Generate Lens v2
   try {
     const lensV2Html = generateLensV2Html(manifest, evidenceData, lensProfile, lensResults);
     fs.writeFileSync(path.join(outputDir, 'lens-v2.html'), lensV2Html, 'utf8');
-    success(`Created ${relativePx(OUTPUT_DIR, 'lens-v2.html')}`);
+    success(`Created ${outLabel}lens-v2.html`);
   } catch (e) {
     log(`  ${CLR.dim}Lens v2 skipped: ${e.message}${CLR.reset}`);
   }
@@ -2284,7 +2285,7 @@ function cmdPack(args) {
       packet_id: packetId,
       created_at: now.toISOString(),
       generator: `px-cli/${VERSION}`,
-      project: profileData.profile_id,
+      project: flags.project || profileData.profile_id,
       framework: 'CUSTOM_PROFILE',
       evidence_count: evidenceRefs.length,
       verification_result: 'ALL_PASS',
@@ -2305,7 +2306,7 @@ function cmdPack(args) {
       artifact_kind: 'proof-pack',
       created_at: now.toISOString(),
       generator: `px-cli/${VERSION}`,
-      project: profileData.profile_id,
+      project: flags.project || profileData.profile_id,
       framework: 'CUSTOM_PROFILE',
       verification_mode: 'custom',
       evidence_summary: {
@@ -2335,36 +2336,37 @@ function cmdPack(args) {
       clearing_batch_ref: null,
     };
 
-    // Write to px/output/
-    const outputDir = pxPath(OUTPUT_DIR);
+    // Write to output directory
+    const outputDir = flags.output ? path.resolve(process.cwd(), flags.output) : pxPath(OUTPUT_DIR);
     ensureDir(outputDir);
+    const outLabel = flags.output ? flags.output + '/' : relativePx(OUTPUT_DIR, '');
 
     writeJSON(path.join(outputDir, 'draft-manifest.json'), manifest);
-    success(`Created ${relativePx(OUTPUT_DIR, 'draft-manifest.json')}`);
+    success(`Created ${outLabel}draft-manifest.json`);
 
     writeJSON(path.join(outputDir, 'draft-packet.json'), packet);
-    success(`Created ${relativePx(OUTPUT_DIR, 'draft-packet.json')}`);
+    success(`Created ${outLabel}draft-packet.json`);
 
     // Bundle exact inputs for recipient replay
     writeJSON(path.join(outputDir, 'bundled-profile.json'), profileData);
-    success(`Created ${relativePx(OUTPUT_DIR, 'bundled-profile.json')}`);
+    success(`Created ${outLabel}bundled-profile.json`);
 
     writeJSON(path.join(outputDir, 'bundled-evidence.json'), evidenceData);
-    success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
+    success(`Created ${outLabel}bundled-evidence.json`);
 
     // Generate self-contained lens.html (v1 + v2)
     const lensHtml = generateLensHtml(manifest, evidenceData, profileData, lensResults);
     fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
-    success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
+    success(`Created ${outLabel}lens.html`);
 
     const lensV2Html = generateLensV2Html(manifest, evidenceData, profileData, lensResults);
     fs.writeFileSync(path.join(outputDir, 'lens-v2.html'), lensV2Html, 'utf8');
-    success(`Created ${relativePx(OUTPUT_DIR, 'lens-v2.html')}`);
+    success(`Created ${outLabel}lens-v2.html`);
 
     // Generate summary.txt
     const summaryTxt = generateSummaryTxt(seal, profileData, lensResults, manifest);
     fs.writeFileSync(path.join(outputDir, 'summary.txt'), summaryTxt, 'utf8');
-    success(`Created ${relativePx(OUTPUT_DIR, 'summary.txt')}`);
+    success(`Created ${outLabel}summary.txt`);
 
     // Generate send-these-files.txt
     const packFiles = ['summary.txt', 'lens.html', 'draft-manifest.json', 'bundled-profile.json', 'bundled-evidence.json'];

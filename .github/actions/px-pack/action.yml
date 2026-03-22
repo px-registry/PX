@@ -1,0 +1,99 @@
+name: 'PX Pack'
+description: 'Package release artifacts into a verifiable PX pack'
+branding:
+  icon: 'package'
+  color: 'green'
+
+inputs:
+  evidence-path:
+    description: 'Directory containing files to pack'
+    required: true
+    default: './dist'
+  profile:
+    description: 'Profile name or path (built-in: software-release-v1)'
+    required: false
+    default: 'software-release-v1'
+  output-path:
+    description: 'Output directory for pack'
+    required: false
+    default: './px-output'
+  project:
+    description: 'Project name (recorded in manifest)'
+    required: false
+    default: '${{ github.repository }}'
+  recipient:
+    description: 'Intended recipient (recorded in manifest)'
+    required: false
+    default: ''
+
+outputs:
+  manifest-path:
+    description: 'Path to generated manifest'
+    value: ${{ steps.pack.outputs.manifest-path }}
+  lens-path:
+    description: 'Path to generated Lens HTML'
+    value: ${{ steps.pack.outputs.lens-path }}
+  pack-result:
+    description: 'PASS, WARN, or FAIL'
+    value: ${{ steps.pack.outputs.result }}
+  warnings:
+    description: 'Number of warnings'
+    value: ${{ steps.pack.outputs.warnings }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Run PX Pack
+      id: pack
+      shell: bash
+      run: |
+        # Resolve profile path
+        PROFILE="${{ inputs.profile }}"
+        if [[ ! "$PROFILE" == *"/"* ]]; then
+          PROFILE="${{ github.action_path }}/../../../profiles/${PROFILE}.json"
+        fi
+
+        # Resolve CLI path
+        CLI="${{ github.action_path }}/../../../cli.js"
+
+        # Build flags
+        FLAGS="--profile=$PROFILE"
+        FLAGS="$FLAGS --evidence=${{ inputs.evidence-path }}"
+        FLAGS="$FLAGS --output=${{ inputs.output-path }}"
+        FLAGS="$FLAGS --project=${{ inputs.project }}"
+        if [ -n "${{ inputs.recipient }}" ]; then
+          FLAGS="$FLAGS --recipient=${{ inputs.recipient }}"
+        fi
+
+        # Run px pack
+        set +e
+        OUTPUT=$(node "$CLI" pack $FLAGS 2>&1)
+        EXIT_CODE=$?
+        set -e
+
+        echo "$OUTPUT"
+
+        # Count warnings
+        WARN_COUNT=$(echo "$OUTPUT" | grep -c "(recommended)" || true)
+        echo "warnings=$WARN_COUNT" >> $GITHUB_OUTPUT
+
+        # Determine result
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "result=FAIL" >> $GITHUB_OUTPUT
+          echo "::error::PX Pack failed. See output above."
+          exit 1
+        elif [ "$WARN_COUNT" -gt 0 ]; then
+          echo "result=WARN" >> $GITHUB_OUTPUT
+          echo "::warning::PX Pack completed with $WARN_COUNT recommendation(s) not met."
+        else
+          echo "result=PASS" >> $GITHUB_OUTPUT
+        fi
+
+        # Set output paths
+        echo "manifest-path=${{ inputs.output-path }}/draft-manifest.json" >> $GITHUB_OUTPUT
+        echo "lens-path=${{ inputs.output-path }}/lens-v2.html" >> $GITHUB_OUTPUT
