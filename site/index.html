@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PX — まとめて、渡して、その場で確かめられる</title>
-  <meta name="description" content="PXは手元のファイルをひとつの検証可能な一式にし、受信者はLensを開くだけで確認できます。回答票、証拠、配布物——何でもそのまま。">
+  <title>PX — 検証可能なソフトウェアリリースパック</title>
+  <meta name="description" content="binary + SBOM + provenance + 署名を1つのpackにまとめる。受信者はLensを開くだけで検証できる。GitHub Action対応。EU CRA対応。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -33,12 +33,16 @@
 <!-- ═══ Hero ═══ -->
 <section class="hero">
   <div class="wrap reveal">
-    <p class="hero__label">検証可能な「一式」へ</p>
-    <h1>まとめて、渡して、<br>受け取った人がその場で確かめられる。</h1>
-    <p class="hero__sub">回答票でも、証拠でも、配布物でも。<br>PXは手元のファイルをひとつの検証可能な一式にし、受信者は Lens を開くだけで確認できます。</p>
-    <div class="hero__cta">
+    <p class="hero__label">Verifiable Release Pack</p>
+    <h1>署名は進んだ。<br>受け渡しは止まったまま。</h1>
+    <p class="hero__sub">binary, SBOM, provenance, 署名。バラバラに配布していませんか？<br>PXは1コマンドでリリースの成果物を検証可能なpackにまとめます。</p>
+    <div style="margin-top:20px;text-align:center">
+      <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px pack --profile=software-release-v1 --evidence=./dist/</code>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
       <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
       <a href="https://github.com/px-registry/PX" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="software.html" class="btn btn--s btn--lg">詳しく見る</a>
     </div>
   </div>
 </section>
@@ -53,68 +57,56 @@
     </div>
 
     <div class="profiles reveal">
-      <div class="pcard">
+      <div class="pcard" style="border-color:rgba(16,185,129,0.2);background:rgba(16,185,129,0.03)">
         <div class="pcard__icon">📦</div>
         <div class="pcard__title">ソフトウェアリリース</div>
-        <p class="pcard__desc">binary + SBOM + provenanceを検証可能な一式にして渡せる。受け取った人がLensで「全部揃ってる、改竄なし」と5秒で確認。</p>
+        <p class="pcard__desc">binary + SBOM + provenance + 署名を1つのpackに。GitHub Actionで自動生成。受信者はLensで検証。</p>
+        <div style="margin-top:12px">
+          <code style="font-size:11px;color:var(--green);background:var(--raised);padding:4px 8px;border-radius:4px">software-release-v1</code>
+          <span style="font-size:11px;color:var(--t3);margin-left:8px">CI PASS &#10003;</span>
+        </div>
         <a href="software.html" class="pcard__link">詳しく見る &rarr;</a>
-      </div>
-      <div class="pcard">
-        <div class="pcard__icon">📋</div>
-        <div class="pcard__title">質問票 / コンプライアンス</div>
-        <p class="pcard__desc">回答と証拠をまとめて、受信者が確認の往復なしで済む。質問票Excelをそのまま入れるだけ。回答時間を数日から数分に。</p>
-        <a href="compliance.html" class="pcard__link">詳しく見る &rarr;</a>
       </div>
       <div class="pcard">
         <div class="pcard__icon">🧠</div>
         <div class="pcard__title">AI / MLモデル</div>
-        <p class="pcard__desc">モデル + config + eval を一式で、受信者がLensで確認。規制当局にモデルの挙動が変わっていないことを証明できる。</p>
+        <p class="pcard__desc">weights + config + eval + lineageを一式で。渡したモデルが渡した後に変わっていないことを証明。</p>
         <a href="ai-ml.html" class="pcard__link">詳しく見る &rarr;</a>
+      </div>
+      <div class="pcard">
+        <div class="pcard__icon">📋</div>
+        <div class="pcard__title">質問票 / コンプライアンス</div>
+        <p class="pcard__desc">回答と証拠をまとめて提出。確認の往復を減らす。</p>
+        <a href="compliance.html" class="pcard__link">詳しく見る &rarr;</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ ZIP+メールとの違い ═══ -->
+<!-- ═══ 既存ツール比較 ═══ -->
 <section class="sec">
   <div class="wrap">
     <div class="sec-head reveal">
-      <h2>ZIP + メールからの脱却</h2>
+      <h2>既存ツールはバラバラ。一式のhandoffがない。</h2>
     </div>
-    <div class="reveal" style="overflow-x:auto;max-width:960px;margin:0 auto">
-      <table class="cmp">
+    <div class="reveal" style="overflow-x:auto;max-width:var(--w-n);margin:0 auto">
+      <table class="comparison">
         <thead>
-          <tr><th>要件</th><th>従来の ZIP + メール</th><th class="hi" style="text-align:center">PX Pack</th></tr>
+          <tr><th>成果物</th><th>既存ツール</th><th style="text-align:center">一式で検証?</th></tr>
         </thead>
         <tbody>
           <tr>
-            <td style="color:var(--t1);font-weight:600">一式が全部揃っているか</td>
-            <td class="n">開いて探すまで分からない</td>
-            <td class="hi"><span class="y">✓</span> マニフェスト照合（1つ欠ければFail）</td>
+            <td style="color:var(--t1);font-weight:600">バイナリ</td>
+            <td>GitHub Release</td>
+            <td rowspan="4" style="text-align:center;color:var(--t3);vertical-align:middle"><span style="font-size:var(--ts-lg)">&#10005;</span><br><span style="font-size:var(--ts-xs)">一式としての受領単位は<br>未整備</span></td>
           </tr>
-          <tr>
-            <td style="color:var(--t1);font-weight:600">送った後に変わっていないか</td>
-            <td class="n">分からない</td>
-            <td class="hi"><span class="y">✓</span> ハッシュ検証（1bitでも変わればRed）</td>
-          </tr>
-          <tr>
-            <td style="color:var(--t1);font-weight:600">誰が作ったか</td>
-            <td class="n">メール送信者（偽装可能）</td>
-            <td class="hi"><span class="y">✓</span> SHA-256 ハッシュ検証</td>
-          </tr>
-          <tr>
-            <td style="color:var(--t1);font-weight:600">回答と証拠の対応</td>
-            <td class="n">受信者が手作業で突き合わせ</td>
-            <td class="hi"><span class="y">✓</span> 構造化リンク（slice_ref）</td>
-          </tr>
-          <tr>
-            <td style="color:var(--t1);font-weight:600">受信者の確認方法</td>
-            <td class="n">1つずつ全ファイルを目視確認</td>
-            <td class="hi"><span class="y">✓</span> Lensを1つ開くだけ（5秒）</td>
-          </tr>
+          <tr><td style="color:var(--t1);font-weight:600">SBOM</td><td>Syft / Trivy</td></tr>
+          <tr><td style="color:var(--t1);font-weight:600">署名</td><td>Sigstore cosign</td></tr>
+          <tr><td style="color:var(--t1);font-weight:600">来歴</td><td>SLSA / in-toto</td></tr>
         </tbody>
       </table>
     </div>
+    <p class="reveal" style="text-align:center;margin-top:12px;color:var(--t2);font-size:var(--ts-sm);max-width:var(--w-n);margin-left:auto;margin-right:auto">個別の検証は成熟した。PXは「一式として渡して、受信者がまとめて確認する」パッケージを作る。</p>
   </div>
 </section>
 
@@ -293,20 +285,31 @@
       <table class="gap-table">
         <thead><tr><th>市場</th><th>署名/ハッシュ</th><th>パッケージング</th><th>受信者検証UI</th></tr></thead>
         <tbody>
-          <tr><td style="color:var(--t1)">ソフトウェア配布</td><td>Sigstore, GitHub Attestations</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">AI/ML</td><td>OpenSSF Model Signing</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">質問票/コンプラ</td><td>なし（GRCツールは収集のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">ベンダーリスク</td><td>SecurityScorecard（外部スコア）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">AIエージェント</td><td>MCP Gateway（認証のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">CoA/検査成績書</td><td>QMS内蔵（作成側のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">研究データ</td><td>RO-Crate（構造のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">機械可読コンプラ</td><td>OSCAL/CycloneDX</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">M&Aデューデリ</td><td>VDR（共有のみ）</td><td class="empty">✕</td><td class="empty">✕</td></tr>
-          <tr><td style="color:var(--t1)">インシデント証拠保全</td><td>フォレンジクスツール</td><td class="empty">✕</td><td class="empty">✕</td></tr>
+          <tr><td style="color:var(--t1)">ソフトウェア配布</td><td>Sigstore, GitHub Attestations</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">AI/ML</td><td>OpenSSF Model Signing</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">質問票/コンプラ</td><td>なし（GRCツールは収集のみ）</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">ベンダーリスク</td><td>SecurityScorecard（外部スコア）</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">AIエージェント</td><td>MCP Gateway（認証のみ）</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">CoA/検査成績書</td><td>QMS内蔵（作成側のみ）</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">研究データ</td><td>RO-Crate（構造のみ）</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">機械可読コンプラ</td><td>OSCAL/CycloneDX</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">M&Aデューデリ</td><td>VDR（共有のみ）</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
+          <tr><td style="color:var(--t1)">インシデント証拠保全</td><td>フォレンジクスツール</td><td class="empty">未整備</td><td class="empty">未整備</td></tr>
         </tbody>
       </table>
     </div>
     <p class="reveal" style="text-align:center;color:var(--t3);font-size:var(--ts-sm);margin-top:var(--sp-xl)">署名する仕組みはある。でも「まとめて渡して、相手がその場で確認する」仕組みは、まだどこにもない。</p>
+  </div>
+</section>
+
+<!-- ═══ Bridge ═══ -->
+<section class="sec sec--bg reveal">
+  <div class="wrap" style="text-align:center">
+    <p style="font-size:var(--ts-sm);color:var(--t2);max-width:520px;margin:0 auto;line-height:1.8">
+      ソフトウェアリリースだけではありません。<br>
+      質問票の回答、AIモデル、研究データ、製造証明書&mdash;<br>
+      あらゆるデジタルハンドオフに同じ仕組みで対応します。
+    </p>
   </div>
 </section>
 
@@ -515,12 +518,15 @@
 <!-- ═══ CTA ═══ -->
 <section class="cta-band">
   <div class="wrap reveal">
-    <h2>御社の質問票1本で試す</h2>
-    <p>既存のツールを捨てる必要はない。次回の提出で、1回だけ並行して使ってみてください。<br>組織内でパックを作り、Lensで確認するまでは永久に無料。</p>
+    <h2>リリースをPackにする</h2>
+    <p>手元のリリースファイルで試せます。</p>
+    <div style="text-align:center;margin-bottom:24px">
+      <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px pack --profile=software-release-v1 --evidence=./dist/</code>
+    </div>
     <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
       <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
+      <a href="cloud/" class="btn btn--s btn--lg" target="_blank">Cloud PXで作る</a>
       <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
-      <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
     </div>
     <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:var(--sp-xl)">テスト期間中は全機能無料。</p>
   </div>
