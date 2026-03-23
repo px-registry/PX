@@ -499,7 +499,7 @@ p { color: var(--t2); }
     <h1>署名は進んだ。<br>受け渡しは止まったまま。</h1>
     <p class="hero__sub">binary, SBOM, provenance, 署名。バラバラに配布していませんか？<br>PXは1コマンドでリリースの成果物を検証可能なpackにまとめます。</p>
     <div style="margin-top:20px;text-align:center">
-      <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px pack --profile=software-release-v1 --evidence=./dist/</code>
+      <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px-pack pack --profile=software-release-v1 --evidence=./dist/</code>
     </div>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
       <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
@@ -888,7 +888,7 @@ p { color: var(--t2); }
         <div class="pull__step">誰でもLensで再検証</div>
       </div>
       <div style="margin-top:var(--sp-xl);text-align:center">
-        <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px pack ./evidence-folder/</code>
+        <code style="font-size:var(--ts-sm);color:var(--green);background:var(--raised);padding:8px 16px;border-radius:var(--r-sm);border:1px solid var(--border)">$ npx px-pack pack ./evidence-folder/</code>
         <p style="font-size:var(--ts-xs);color:var(--t3);margin-top:8px">APIキー不要。依存関係ゼロ。このコマンドだけ。</p>
       </div>
     </div>
@@ -985,7 +985,7 @@ p { color: var(--t2); }
     <p>既存のツールを捨てる必要はない。次回の提出で、1回だけ並行して使ってみてください。<br>組織内でパックを作り、Lensで確認するまでは永久に無料。</p>
     <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
       <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
-      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+      <a href="https://github.com/px-registry/PX" class="btn btn--s btn--lg" target="_blank">GitHub</a>
       <a href="mailto:hello@px-registry.org" class="btn btn--s btn--lg">お問い合わせ</a>
     </div>
     <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:var(--sp-xl)">テスト期間中は全機能無料。</p>
@@ -1026,7 +1026,7 @@ p { color: var(--t2); }
       </div>
     </div>
     <div class="footer__bottom">
-      <span>&copy; 2026 PX Registry KK</span>
+      <span>&copy; 2026 PX</span>
       <span>MIT License</span>
     </div>
   </div>

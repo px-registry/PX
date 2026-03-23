@@ -1,20 +1,19 @@
-/* PX Site — Script v4
-   Nav scroll, Lens PASS/FAIL, FAQ accordion, scroll reveal
-   ─────────────────────────────────────────────────────────── */
+/* PX Site — Script v8
+   Nav, reveal, FAQ, copy, interactive demo
+   ────────────────────────────────────────── */
 
 (function () {
   'use strict';
 
-  /* ── Nav scroll effect (Gemini) ── */
+  /* ── Nav scroll ── */
   var nav = document.getElementById('navbar');
   if (nav) {
     window.addEventListener('scroll', function () {
-      if (window.scrollY > 20) nav.classList.add('scrolled');
-      else nav.classList.remove('scrolled');
-    });
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
   }
 
-  /* ── Mobile nav toggle ── */
+  /* ── Mobile nav ── */
   var ham = document.querySelector('.nav__ham');
   var links = document.querySelector('.nav__links');
   if (ham && links) {
@@ -22,51 +21,33 @@
       links.classList.toggle('open');
       ham.setAttribute('aria-expanded', links.classList.contains('open'));
     });
-    // Close menu when a link is clicked
     links.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        links.classList.remove('open');
-      });
+      a.addEventListener('click', function () { links.classList.remove('open'); });
     });
   }
-
-  /* ── Lens PASS/FAIL toggle ── */
-  var lensTabs = document.querySelectorAll('.lens__tab');
-  lensTabs.forEach(function (tab) {
-    tab.addEventListener('click', function () {
-      // Remove all tab active states
-      lensTabs.forEach(function (t) {
-        t.classList.remove('on--pass', 'on--fail');
-      });
-      // Hide all screens
-      document.querySelectorAll('.lens-screen').forEach(function (s) {
-        s.classList.remove('active');
-      });
-      // Activate clicked
-      var target = tab.getAttribute('data-target');
-      if (target === 'lens-pass') {
-        tab.classList.add('on--pass');
-      } else {
-        tab.classList.add('on--fail');
-      }
-      var screen = document.getElementById(target);
-      if (screen) screen.classList.add('active');
-    });
-  });
 
   /* ── FAQ accordion ── */
   document.querySelectorAll('.faq__q').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var item = btn.parentElement;
       var wasOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq__item').forEach(function (i) {
-        i.classList.remove('open');
-      });
+      document.querySelectorAll('.faq__item').forEach(function (i) { i.classList.remove('open'); });
       if (!wasOpen) item.classList.add('open');
     });
   });
 
-  /* ── Scroll reveal (Gemini IntersectionObserver) ── */
+  /* ── Copy to clipboard ── */
+  document.querySelectorAll('.cta-code').forEach(function (el) {
+    el.addEventListener('click', function () {
+      var text = el.textContent.replace(/^\$\s*/, '').trim();
+      navigator.clipboard.writeText(text).then(function () {
+        el.classList.add('copied');
+        setTimeout(function () { el.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+
+  /* ── Scroll reveal ── */
   if ('IntersectionObserver' in window) {
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
@@ -75,16 +56,96 @@
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
 
     document.querySelectorAll('.reveal').forEach(function (el) {
       observer.observe(el);
     });
   } else {
-    // Fallback: show everything immediately
     document.querySelectorAll('.reveal').forEach(function (el) {
       el.classList.add('visible');
     });
+  }
+
+  /* ════════════════════════════════════
+     Interactive Demo — drag & drop → verify → Lens
+     ════════════════════════════════════ */
+  var demoFiles = document.getElementById('demo-files');
+  var demoPack = document.getElementById('demo-pack');
+  var packIdle = document.getElementById('pack-idle');
+  var packVerify = document.getElementById('pack-verify');
+  var demoResult = document.getElementById('demo-result');
+  var demoRan = false;
+
+  if (demoFiles && demoPack) {
+    // Drag events on individual files
+    demoFiles.querySelectorAll('.demo-file').forEach(function (file) {
+      file.addEventListener('dragstart', function (e) {
+        e.dataTransfer.setData('text/plain', 'px');
+        file.classList.add('dragging');
+      });
+      file.addEventListener('dragend', function () {
+        file.classList.remove('dragging');
+      });
+    });
+
+    // Drop zone
+    demoPack.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      if (!demoRan) demoPack.classList.add('drag-over');
+    });
+    demoPack.addEventListener('dragleave', function () {
+      demoPack.classList.remove('drag-over');
+    });
+    demoPack.addEventListener('drop', function (e) {
+      e.preventDefault();
+      demoPack.classList.remove('drag-over');
+      if (demoRan) return;
+      runDemo();
+    });
+
+    // Also allow clicking the drop zone
+    demoPack.addEventListener('click', function () {
+      if (demoRan) return;
+      runDemo();
+    });
+  }
+
+  function runDemo() {
+    demoRan = true;
+
+    // Dim file list
+    demoFiles.classList.add('dimmed');
+
+    // Show verification
+    packIdle.style.display = 'none';
+    packVerify.style.display = 'block';
+
+    var checks = packVerify.querySelectorAll('.demo-check');
+    checks.forEach(function (check) {
+      setTimeout(function () {
+        check.classList.add('visible');
+      }, parseInt(check.dataset.delay));
+    });
+
+    // After all checks, transition to result
+    var lastDelay = 0;
+    checks.forEach(function (c) {
+      var d = parseInt(c.dataset.delay);
+      if (d > lastDelay) lastDelay = d;
+    });
+
+    setTimeout(function () {
+      // Fade out left + right
+      demoFiles.style.display = 'none';
+      demoPack.classList.add('hidden');
+
+      // Show result
+      demoResult.style.display = 'block';
+      // Force reflow then add visible
+      demoResult.offsetHeight;
+      demoResult.classList.add('visible');
+    }, lastDelay + 800);
   }
 
 })();

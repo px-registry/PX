@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PX Lens v2</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- No external fonts — Lens must work fully offline -->
 <style>
 /* ══════════════════════════════════════════
    PX Lens v2 — Zero-dependency, self-contained
@@ -12,37 +12,37 @@
    ══════════════════════════════════════════ */
 
 :root {
-  /* Pass */
-  --pass: #059669;
-  --pass-light: #10b981;
-  --pass-bg: rgba(16,185,129,0.05);
-  --pass-ring: #10b981;
-  --pass-border: #6ee7b7;
-  --pass-card: #ecfdf5;
+  /* Pass — monochrome with subtle sage hint */
+  --pass: #1a1a1a;
+  --pass-light: #3a3a3a;
+  --pass-bg: #eef3f0;
+  --pass-ring: #1a1a1a;
+  --pass-border: rgba(26,26,26,0.12);
+  --pass-card: #eef3f0;
 
-  /* Fail */
-  --fail: #dc2626;
-  --fail-light: #ef4444;
-  --fail-bg: rgba(239,68,68,0.04);
-  --fail-ring: #ef4444;
-  --fail-border: #fca5a5;
-  --fail-card: #fef2f2;
+  /* Fail — monochrome with subtle warm hint */
+  --fail: #1a1a1a;
+  --fail-light: #3a3a3a;
+  --fail-bg: #f3eeee;
+  --fail-ring: rgba(26,26,26,0.35);
+  --fail-border: rgba(26,26,26,0.12);
+  --fail-card: #f3eeee;
 
   /* Neutral */
-  --ink: #111827;
-  --ink70: rgba(17,24,39,0.7);
-  --ink45: rgba(17,24,39,0.45);
-  --ink20: rgba(17,24,39,0.2);
-  --ink08: rgba(17,24,39,0.08);
-  --ink04: rgba(17,24,39,0.03);
+  --ink: #1a1a1a;
+  --ink70: rgba(26,26,26,0.7);
+  --ink45: rgba(26,26,26,0.45);
+  --ink20: rgba(26,26,26,0.2);
+  --ink08: rgba(26,26,26,0.06);
+  --ink04: rgba(26,26,26,0.03);
   --bg: #ffffff;
-  --surface: #f9fafb;
-  --border: #e5e7eb;
-  --amber: #d97706;
-  --amber-bg: #fffbeb;
+  --surface: #f5f5f3;
+  --border: #e5e5e3;
+  --amber: #8a7040;
+  --amber-bg: #f5f0e8;
 
   /* Type */
-  --fd: 'Instrument Sans', 'Noto Sans JP', system-ui, sans-serif;
+  --fd: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --fm: 'JetBrains Mono', 'SF Mono', monospace;
 
   /* Radii */
@@ -439,7 +439,7 @@ body.verdict-fail { background-color: var(--fail-bg); }
 
 <!-- ═══ Pull CTA ═══ -->
 <div class="pull-cta" id="pull-cta" style="display:none">
-  <div class="pull-cta__text">Verified via PX &mdash; <a href="https://proofexchange.org" target="_blank" rel="noopener">Create your own pack</a></div>
+  <div class="pull-cta__text">Verified via PX &mdash; <a href="https://px-registry.org" target="_blank" rel="noopener">Create your own pack</a></div>
 </div>
 
 <!-- ═══ Footer ═══ -->

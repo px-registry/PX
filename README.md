@@ -1,124 +1,98 @@
-# PX — Proof You Can Hand Off
+# PX
 
-PX packages evidence into a verifiable envelope that anyone can check by opening a single HTML file. No install. No login. Offline. Five seconds.
+Portable release packs for software you hand off.
 
-**[Live Demo →](https://px-registry.org/demo/lens.html)** — See a SOC 2 verification report in your browser.
+Bundle binary, SBOM, provenance, and signature into one verifiable pack.
+Recipients open one HTML file to verify — offline, no install, no account.
 
-## What PX Does
+[Lens Demo (PASS)](https://px-registry.org/demo/lens-v2-pass.html) ·
+[Lens Demo (FAIL)](https://px-registry.org/demo/lens-v2-fail.html) ·
+[Website](https://px-registry.org) ·
+[Cloud PX](https://px-registry.org/cloud/)
 
-1. **Collect** evidence from your systems (AWS, GitHub, or any JSON)
-2. **Verify** it against declared rules — deterministically, locally
-3. **Pack** it into a Draft Packet with SHA-256 integrity
-4. **Hand off** — the recipient opens Lens in any browser and sees the result
+## Quick start
 
-Zero dependencies. Nothing leaves your machine until you decide to share.
-
-## Quick Start
-
-```bash
-git clone https://github.com/px-registry/PX.git
-cd PX
-
-# Try the demo (SOC 2 sample with one deliberate failure)
-node cli.js init --demo
-node cli.js generate
-node cli.js verify        # ← patch-management will FAIL
-# Fix the evidence, re-verify, then:
-node cli.js pack
+```sh
+npx px-pack init --demo
 ```
 
-Open `px/output/draft-manifest.json` in [`lens.html`](lens.html) to see your verification badge.
+One command. Creates a demo workspace, generates demo evidence, verifies it,
+builds a draft pack, and opens the path to Lens for offline review.
+
+## With your own files
+
+```sh
+npx px-pack pack --profile=software-release-v1 --evidence=./dist/ --sign
+```
+
+## What's in a pack
+
+```
+px/output/
+  draft-manifest.json      4KB — hashes, rules, Ed25519 signature
+  lens-v2.html             Offline review UI (zero dependencies)
+  bundled-evidence.json    All artifacts bundled
+  bundled-profile.json     Profile rules used
+```
+
+```json
+// package.json — Yes, really.
+"dependencies": {}
+```
+
+## Current Limitations
+
+- **Lens is a review surface, not a verification engine.** It displays the manifest's recorded results.
+- **File-based, not OCI-native.** PX works with files on disk, not container registries.
+- **SBOM format check only.** PX verifies SBOM presence and format, not contents.
+- **Ephemeral keys by default.** `--sign` generates a one-time key pair unless `--key` is specified.
+
+## What PX is NOT
+
+- Not a replacement for Sigstore (PX consumes Sigstore output)
+- Not a SaaS (zero network, zero account, zero upload)
+- Not a container tool (files on disk, any ecosystem)
+
+## GitHub Action
+
+```yaml
+- uses: ./.github/actions/px-pack
+  with:
+    evidence-path: ./dist
+    profile: software-release-v1
+```
+
+Self-test CI: Full release → **PASS** (7/7) · Minimal (binary + SBOM) → **WARN** (5/7 + 2)
+
+## Profiles
+
+| Profile | Required | Recommended |
+|---------|----------|-------------|
+| `software-release-v1` | binary, SBOM | provenance, signature |
 
 ## Commands
 
-| Command | What it does |
+| Command | Description |
 |---------|-------------|
-| `px init --demo` | Create a SOC 2 demo workspace |
-| `px init --genesis` | Verify PX's own governance files |
+| `px init --demo` | One-command demo (workspace + evidence + verify + pack + Lens) |
 | `px generate` | Generate evidence from system state |
-| `px verify` | Check evidence against profiles |
-| `px pack` | Bundle into a Draft Packet (fail-close) |
+| `px verify` | Verify evidence against profiles |
+| `px pack` | Create a Draft Packet |
+| `px pack --sign --evidence=./dist/` | Create a signed pack |
+| `px pack --sign --key=path/to/key` | Sign with existing key |
+| `px verify --manifest=draft-manifest.json` | Verify a pack (hashes + signature) |
 | `px check --profile=<file>` | Collect + verify in one step |
-| `px answer-pack --profile=<file> --evidence=<file>` | Generate questionnaire-ready outputs |
-| `px status` | Show workspace state |
 
-## Custom Profiles
+## Statement
 
-Verify any evidence against any rules:
-
-```bash
-# Verify
-node cli.js verify --profile=profiles/aws-core-controls-v1.json --evidence=your-state.json
-
-# Pack (all checks must pass)
-node cli.js pack --profile=profiles/aws-core-controls-v1.json --evidence=your-state.json
-
-# With recipient metadata
-node cli.js pack --profile=profiles/aws-core-controls-v1.json \
-  --evidence=your-state.json \
-  --recipient=auditor@example.com \
-  --purpose="Q1 compliance review"
-```
-
-### Included Profiles
-
-| Profile | Rules | Domain |
-|---------|-------|--------|
-| `aws-core-controls-v1` | 10 | IAM, RDS, S3, CloudTrail, VPC |
-| `github-org-security-v1` | 10 | Org settings, branch protection, secret scanning |
-
-## Recipient Replay
-
-Recipients re-run verification with zero setup:
-
-```bash
-node cli.js verify --manifest=draft-manifest.json
-```
-
-Send `draft-manifest.json`, `bundled-profile.json`, and `bundled-evidence.json`. Replay confirms the result matches the claim.
-
-## Lens
-
-Lens is a self-contained HTML verification viewer. Drop a manifest JSON onto it — verification runs in your browser. No server. No network. Works on a USB drive.
-
-Three views: **Summary** → **Controls** (each rule, pass/fail) → **Replay** (execution trace + CLI command).
-
-## Draft vs Submission
-
-Every packet starts as a **Draft** (amber in Lens). Four null fields mark the boundary:
-
-```json
-"submission_id": null,
-"sct": null,
-"acceptance_receipt": null,
-"recipient_binding": null
-```
-
-When PX Authority is established, these fields get populated. Same packet becomes a Submission. Lens turns green.
-
-**Draft is fully functional today.**
-
-## Genesis
-
-This repo contains PX's first Draft Packet — PX verifying its own governance files against its own rules. No mocks. Real files, real hashes.
-
-```bash
-node cli.js init --genesis
-node cli.js generate
-node cli.js verify
-node cli.js pack
-```
+PX v1 release artifacts are packed with PX.
 
 ## Technical
 
-- ~2,680 lines of vanilla Node.js
+- ~2,800 lines of vanilla Node.js
 - Zero external dependencies (`fs`, `path`, `crypto` only)
-- SHA-256 for integrity, Ed25519 signing planned
-- Lens: single HTML file, zero network calls
-
-## What PX Is Not
-
-PX does not decide fault, determine damages, or interpret contracts. It proves that evidence existed, was not altered, and conforms to declared rules. Interpretation is for the reviewer.
+- SHA-256 hash integrity + Ed25519 manifest signature
+- Lens: single HTML file, zero network calls, works on a USB drive
 
 ## License
 

@@ -2,17 +2,13 @@
 'use strict';
 
 /**
- * PX CLI — Proof Exchange Command Line Interface
- *
- * PX makes proof you can hand off.
+ * PX CLI — Portable release packs for software you hand off.
  *
  * Zero external dependencies. Node.js built-ins only.
- * Every byte of dependency is a cost multiplier when
- * Traffic Clock activates. This CLI sets the weight standard.
  *
  * Commands:
- *   px init              Create an empty PX workspace
- *   px init --demo       Create a workspace with sample profiles
+ *   px init              Create a PX workspace
+ *   px init --demo       One-command demo (workspace + evidence + verify + pack + Lens)
  *   px init --genesis    Create a workspace that verifies PX itself
  *   px generate          Generate evidence from system state
  *   px verify            Verify evidence against profiles
@@ -34,6 +30,107 @@ const CONFIG_FILE = 'px.config.json';
 const PROFILES_DIR = 'profiles';
 const EVIDENCE_DIR = 'evidence';
 const OUTPUT_DIR = 'output';
+
+// ══════════════════════════════════════════
+// Ed25519 Signing (Node.js crypto native)
+// ══════════════════════════════════════════
+
+function generateSigningKey() {
+  const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519', {
+    publicKeyEncoding: { type: 'spki', format: 'pem' },
+    privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+  });
+  return { publicKey, privateKey };
+}
+
+function signManifest(manifestJson, privateKeyPem) {
+  const signature = crypto.sign(null, Buffer.from(manifestJson), privateKeyPem);
+  return signature.toString('base64');
+}
+
+function verifyManifestSignature(manifestJson, signatureBase64, publicKeyPem) {
+  const signature = Buffer.from(signatureBase64, 'base64');
+  return crypto.verify(null, Buffer.from(manifestJson), publicKeyPem, signature);
+}
+
+/**
+ * Sign a manifest object in-place. Adds .signature field.
+ * Returns the manifest with signature attached.
+ */
+function applySignature(manifest, flags) {
+  let privateKeyPem, publicKeyPem;
+  const keyPath = flags.key ? path.resolve(process.cwd(), flags.key) : null;
+
+  if (keyPath) {
+    if (!fs.existsSync(keyPath)) {
+      fail(`Signing key not found: ${flags.key}`);
+      process.exit(1);
+    }
+    privateKeyPem = fs.readFileSync(keyPath, 'utf8');
+    const privateKey = crypto.createPrivateKey(privateKeyPem);
+    const publicKey = crypto.createPublicKey(privateKey);
+    publicKeyPem = publicKey.export({ type: 'spki', format: 'pem' });
+    success('Using signing key: ' + flags.key);
+  } else {
+    const keys = generateSigningKey();
+    privateKeyPem = keys.privateKey;
+    publicKeyPem = keys.publicKey;
+    // Save ephemeral keys to .px/
+    const keyDir = path.join(process.cwd(), '.px');
+    ensureDir(keyDir);
+    fs.writeFileSync(path.join(keyDir, 'signing.key'), privateKeyPem, { mode: 0o600 });
+    fs.writeFileSync(path.join(keyDir, 'signing.pub'), publicKeyPem);
+    success('Generated ephemeral Ed25519 key pair (.px/signing.key, .px/signing.pub)');
+  }
+
+  // Sign the manifest without signature field
+  const manifestJson = JSON.stringify(manifest, null, 2);
+  const sig = signManifest(manifestJson, privateKeyPem);
+
+  manifest.signature = {
+    algorithm: 'ed25519',
+    public_key: publicKeyPem,
+    value: sig,
+    signed_at: new Date().toISOString(),
+    signed_fields_hash: crypto.createHash('sha256').update(manifestJson).digest('hex'),
+  };
+
+  success('Ed25519 signature applied');
+  return manifest;
+}
+
+/**
+ * Verify signature on a loaded manifest object.
+ * Returns { signed: boolean, valid: boolean, error: string|null }
+ */
+function checkSignature(manifest) {
+  if (!manifest.signature) {
+    return { signed: false, valid: false, error: null };
+  }
+  const sig = manifest.signature;
+  if (sig.algorithm !== 'ed25519') {
+    return { signed: true, valid: false, error: `Unsupported algorithm: ${sig.algorithm}` };
+  }
+
+  // Reconstruct the signed content
+  const manifestCopy = JSON.parse(JSON.stringify(manifest));
+  delete manifestCopy.signature;
+  const manifestJson = JSON.stringify(manifestCopy, null, 2);
+
+  // Check hash of signed fields
+  const actualHash = crypto.createHash('sha256').update(manifestJson).digest('hex');
+  if (actualHash !== sig.signed_fields_hash) {
+    return { signed: true, valid: false, error: 'Manifest content modified after signing' };
+  }
+
+  // Verify cryptographic signature
+  try {
+    const isValid = verifyManifestSignature(manifestJson, sig.value, sig.public_key);
+    return { signed: true, valid: isValid, error: isValid ? null : 'Signature does not match' };
+  } catch (e) {
+    return { signed: true, valid: false, error: e.message };
+  }
+}
 
 // ══════════════════════════════════════════
 // Verification Seal
@@ -1084,24 +1181,82 @@ function cmdInit(args) {
     info(`Genesis workspace ready. ${GENESIS_TARGETS.length} profiles targeting ./v1/ governance files.`);
 
   } else if (demo) {
+    // ── One-command ignition: init → generate → verify → pack → lens ──
     // Write config
     const config = demoConfig();
     writeJSON(pxPath(CONFIG_FILE), config);
     success(`Created ${relativePx(CONFIG_FILE)}`);
-    info(`  Project: ${config.project}`);
-    info(`  Framework: ${config.target_framework}`);
 
     // Write profiles
     const profiles = demoProfiles();
     for (const [name, profile] of Object.entries(profiles)) {
       const fileName = `${name}.json`;
       writeJSON(pxPath(PROFILES_DIR, fileName), profile);
-      const ruleCount = profile.rules.length;
-      success(`Created ${relativePx(PROFILES_DIR, fileName)} ${dimText(`(${ruleCount} rules)`)}`);
     }
 
+    // Generate demo evidence
+    const demoData = demoEvidenceData();
+    let generated = 0;
+    for (const [profileId, data] of Object.entries(demoData)) {
+      const evidenceFile = buildEvidenceFile(profileId, data, config);
+      const fileName = `${profileId}.evidence.json`;
+      writeJSON(pxPath(EVIDENCE_DIR, fileName), evidenceFile);
+      generated++;
+    }
+    success(`Generated demo evidence ${dimText(`(${generated} files)`)}`);
+
+    // Verify all evidence
+    const profileFiles = fs.readdirSync(pxPath(PROFILES_DIR)).filter(f => f.endsWith('.json'));
+    const profileMap = {};
+    for (const pf of profileFiles) {
+      const profile = readJSON(pxPath(PROFILES_DIR, pf));
+      profileMap[profile.profile_id] = profile;
+    }
+
+    const evidenceFiles = fs.readdirSync(pxPath(EVIDENCE_DIR)).filter(f => f.endsWith('.evidence.json'));
+    let totalPassed = 0;
+    let totalFailed = 0;
+    for (const ef of evidenceFiles) {
+      const evidence = readJSON(pxPath(EVIDENCE_DIR, ef));
+      const profile = profileMap[evidence.profile_ref];
+      if (!profile) continue;
+      const result = verifyEvidence(evidence, profile);
+      totalPassed += result.passed;
+      totalFailed += result.failed;
+      evidence.verification_state = result.failed === 0 ? 'VERIFIED' : 'FAILED';
+      evidence.verification_result = {
+        verified_at: new Date().toISOString(),
+        profile_id: profile.profile_id,
+        profile_version: profile.profile_version,
+        fields_checked: result.total,
+        fields_passed: result.passed,
+        fields_failed: result.failed,
+        failures: result.results.filter(r => !r.pass).map(r => ({ field: r.field, reason: r.reason })),
+      };
+      writeJSON(pxPath(EVIDENCE_DIR, ef), evidence);
+    }
+    success(`Verified profiles ${dimText(`(${totalPassed} fields passed)`)}`);
+
+    if (totalFailed > 0) {
+      fail(`${totalFailed} field(s) failed verification. Run px verify for details.`);
+      log();
+      process.exit(1);
+    }
+
+    // Pack
+    cmdPack([]);
+
+    // Show ignition complete message
     log();
-    info(`Demo workspace ready with ${Object.keys(profiles).length} SOC 2 profiles.`);
+    log(`  ${CLR.bold}PX demo is ready.${CLR.reset}`);
+    log(`  Open ${CLR.cyan}${relativePx(OUTPUT_DIR, 'lens-v2.html')}${CLR.reset} in your browser.`);
+    log();
+    log(`  You can re-run step by step with:`);
+    log(`    ${CLR.cyan}px generate${CLR.reset}`);
+    log(`    ${CLR.cyan}px verify${CLR.reset}`);
+    log(`    ${CLR.cyan}px pack${CLR.reset}`);
+    log();
+    return;
   } else {
     // Write minimal config
     const config = {
@@ -1153,7 +1308,7 @@ function demoEvidenceData() {
       critical_patch_sla_hours: 48,
       high_patch_sla_days: 10,
       auto_update_enabled: true,
-      outstanding_critical_patches: 2,   // ← deliberate failure
+      outstanding_critical_patches: 0,
       last_scan_days_ago: 3,
       dependency_audit_enabled: true,
     },
@@ -1564,6 +1719,20 @@ function cmdVerify(args) {
       process.exit(1);
     }
 
+    // ── Signature verification ──
+    const sigResult = checkSignature(manifestData);
+    if (sigResult.signed) {
+      if (sigResult.valid) {
+        success('Ed25519 signature: valid');
+      } else {
+        fail(`Ed25519 signature: INVALID — ${sigResult.error}`);
+      }
+      log();
+    } else {
+      info('Unsigned draft — no cryptographic signature');
+      log();
+    }
+
     const bundledProfile = readJSON(bundledProfilePath);
     const bundledEvidence = readJSON(bundledEvidencePath);
 
@@ -1946,7 +2115,7 @@ function runClassBasedVerify(profileData, fileEntries) {
   return { results, classes };
 }
 
-function cmdPackClassBased(profileData, profilePath, evidencePath, flags) {
+function cmdPackClassBased(profileData, profilePath, evidencePath, flags, args) {
   heading('Packing release directory...');
 
   // ── Scan directory ──
@@ -2110,6 +2279,11 @@ function cmdPackClassBased(profileData, profilePath, evidencePath, flags) {
     clearing_batch_ref: null,
   };
 
+  // ── Ed25519 signing ──
+  if (args.includes('--sign')) {
+    applySignature(manifest, flags);
+  }
+
   // Lens results
   const lensResults = results.map(r => ({
     id: r.id, description: r.description, pass: r.pass,
@@ -2213,7 +2387,7 @@ function cmdPack(args) {
       // CLASS-BASED VERIFICATION (software-release, etc.)
       // Evidence is a directory of files.
       // ═══════════════════════════════════════════
-      return cmdPackClassBased(profileData, profilePath, evidencePath, flags);
+      return cmdPackClassBased(profileData, profilePath, evidencePath, flags, args);
     }
 
     // ── Legacy: evidence is a single JSON file ──
@@ -3058,13 +3232,13 @@ function cmdStatus(args) {
 function cmdHelp() {
   log();
   log(`  ${CLR.bold}PX${CLR.reset} ${dimText(`v${VERSION}`)}`);
-  log(`  ${dimText('PX makes proof you can hand off.')}`);
+  log(`  ${dimText('Portable release packs for software you hand off.')}`);
   log();
   log(`  ${CLR.bold}Usage:${CLR.reset}  px <command> [options]`);
   log();
   log(`  ${CLR.bold}Commands:${CLR.reset}`);
   log(`    init              Create a PX workspace`);
-  log(`    init --demo       Create a workspace with SOC 2 sample profiles`);
+  log(`    init --demo       One-command demo (workspace + evidence + verify + pack + Lens)`);
   log(`    init --genesis    Create a workspace that verifies PX's own governance files`);
   log(`    generate          Generate evidence from system state`);
   log(`    verify            Verify evidence against profiles`);
@@ -3075,17 +3249,17 @@ function cmdHelp() {
   log(`    verify --profile=<file> --evidence=<file>   Verify evidence against a custom profile`);
   log(`    verify --manifest=<file>                    Replay verification from a packed Draft`);
   log(`    pack   --profile=<file> --evidence=<file>   Pack after custom verification`);
+  log(`    pack   --sign                               Sign manifest with Ed25519`);
+  log(`    pack   --sign --key=<file>                  Sign with existing private key`);
   log(`    pack   --recipient=<val> --purpose=<val>    Add metadata to Draft manifest (optional)`);
   log(`    answer-pack --profile=<file> --evidence=<file>   Generate questionnaire-ready Answer Pack`);
   log(`    check  --profile=<file>                     Collect evidence + verify in one step`);
   log();
   log(`  ${CLR.bold}Examples:${CLR.reset}`);
-  log(`    ${CLR.cyan}px init --demo${CLR.reset}     Set up a demo workspace and explore`);
-  log(`    ${CLR.cyan}px init --genesis${CLR.reset}  Verify PX's own governance files`);
-  log(`    ${CLR.cyan}px generate${CLR.reset}        Generate evidence (after init)`);
-  log(`    ${CLR.cyan}px verify${CLR.reset}          Check evidence against rules`);
-  log(`    ${CLR.cyan}px pack${CLR.reset}            Bundle into a Draft Packet`);
-  log(`    ${CLR.cyan}px verify --profile=profiles/aws-core-controls-v1.json --evidence=my-state.json${CLR.reset}`);
+  log(`    ${CLR.cyan}px init --demo${CLR.reset}     Try PX in one command`);
+  log(`    ${CLR.cyan}px pack --profile=software-release-v1 --evidence=./dist/ --sign${CLR.reset}`);
+  log(`    ${CLR.cyan}px verify --manifest=draft-manifest.json${CLR.reset}`);
+  log(`    ${CLR.cyan}px pack --demo${CLR.reset}     Software-release demo (signs + opens Lens)`);
   log();
   log(`  ${dimText('Draft is free. Submission is when it leaves the building.')}`);
   log();
@@ -3110,6 +3284,82 @@ const COMMANDS = {
   '-v':       () => { log(`px ${VERSION}`); },
 };
 
+function cmdPackDemo() {
+  const os = require('os');
+  const demoDir = path.join(os.tmpdir(), 'px-demo-' + Date.now());
+  const evidenceDir = path.join(demoDir, 'dist');
+  const outputDir = path.join(demoDir, 'output');
+  fs.mkdirSync(evidenceDir, { recursive: true });
+
+  heading('PX Demo — generating sample release artifacts...');
+
+  // Generate demo files
+  const binContent = crypto.randomBytes(256);
+  fs.writeFileSync(path.join(evidenceDir, 'myapp-v1.0.0.tar.gz'), binContent);
+  const binHash = crypto.createHash('sha256').update(binContent).digest('hex');
+  success('myapp-v1.0.0.tar.gz (binary)');
+
+  fs.writeFileSync(path.join(evidenceDir, 'myapp-v1.0.0.spdx.json'), JSON.stringify({
+    spdxVersion: 'SPDX-2.3',
+    SPDXID: 'SPDXRef-DOCUMENT',
+    name: 'myapp-v1.0.0',
+    dataLicense: 'CC0-1.0',
+    documentNamespace: 'https://example.com/myapp-v1.0.0',
+    creationInfo: { created: new Date().toISOString(), creators: ['Tool: px-demo'] },
+    packages: [{ SPDXID: 'SPDXRef-Package', name: 'myapp', versionInfo: '1.0.0', downloadLocation: 'https://example.com/myapp' }],
+  }, null, 2));
+  success('myapp-v1.0.0.spdx.json (SBOM)');
+
+  fs.writeFileSync(path.join(evidenceDir, 'myapp-v1.0.0.intoto.jsonl'), JSON.stringify({
+    _type: 'https://in-toto.io/Statement/v1',
+    subject: [{ name: 'myapp-v1.0.0.tar.gz', digest: { sha256: binHash } }],
+    predicateType: 'https://slsa.dev/provenance/v1',
+    predicate: { buildType: 'https://github.com/actions/runner' },
+  }, null, 2));
+  success('myapp-v1.0.0.intoto.jsonl (provenance)');
+
+  fs.writeFileSync(path.join(evidenceDir, 'myapp-v1.0.0.sig'), 'demo-detached-signature-' + Date.now());
+  success('myapp-v1.0.0.sig (signature)');
+
+  fs.writeFileSync(path.join(evidenceDir, 'CHANGELOG.md'), '# Changelog\n\n## v1.0.0\n\n- Initial release\n- Zero dependencies\n');
+  success('CHANGELOG.md');
+
+  fs.writeFileSync(path.join(evidenceDir, 'LICENSE'), 'MIT License\n\nCopyright (c) 2026 PX Demo\n');
+  success('LICENSE');
+
+  log();
+  info(`Demo files: ${evidenceDir}`);
+  log();
+
+  // Run pack with --sign
+  const profilePath = path.join(__dirname, 'profiles', 'software-release-v1.json');
+  if (!fs.existsSync(profilePath)) {
+    fail('Profile not found: profiles/software-release-v1.json');
+    info('Make sure you are running from the PX repo root, or install via npx.');
+    process.exit(1);
+  }
+
+  cmdPack([
+    `--profile=${profilePath}`,
+    `--evidence=${evidenceDir}`,
+    `--output=${outputDir}`,
+    '--project=px-demo',
+    '--sign',
+  ]);
+
+  // Open Lens in browser
+  const lensPath = path.join(outputDir, 'lens-v2.html');
+  if (fs.existsSync(lensPath)) {
+    log();
+    info(`Opening Lens: ${lensPath}`);
+    log();
+    const { exec } = require('child_process');
+    const openCmd = process.platform === 'darwin' ? 'open' :
+                    process.platform === 'win32' ? 'start ""' : 'xdg-open';
+    exec(`${openCmd} "${lensPath}"`);
+  }
+}
+
 function main() {
   const args = process.argv.slice(2);
   const command = args[0];
@@ -3117,6 +3367,12 @@ function main() {
   // No command → show help
   if (!command) {
     cmdHelp();
+    return;
+  }
+
+  // ── pack --demo shortcut ──
+  if (command === 'pack' && args.includes('--demo')) {
+    cmdPackDemo();
     return;
   }
 

@@ -1,13 +1,15 @@
 {
-  "name": "px",
+  "name": "px-pack",
   "version": "0.1.0",
-  "description": "PX makes proof you can hand off.",
+  "description": "Portable release pack — bundle binaries, SBOMs and provenance into one offline-verifiable package",
   "main": "cli.js",
   "bin": {
-    "px": "./cli.js"
+    "px-pack": "cli.js",
+    "px": "cli.js"
   },
   "files": [
     "cli.js",
+    "lens-v2.html",
     "collectors/",
     "profiles/",
     "README.md"

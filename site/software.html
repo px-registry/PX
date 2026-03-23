@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PX — ソフトウェアリリース Profile</title>
-  <meta name="description" content="Signing improved. Handoff did not. PX creates a portable software release pack — binary + SBOM + provenance in one verifiable bundle.">
+  <title>Software Release Profile — PX</title>
+  <meta name="description" content="Bundle binary, SBOM, provenance, and signature into one verifiable software release pack. GitHub Action ready. EU CRA compliant.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,15 +15,13 @@
 <!-- Nav -->
 <nav class="nav" id="navbar">
   <div class="nav__in">
-    <a href="index.html" class="nav__logo">P<b>X</b></a>
+    <a href="index.html" class="nav__logo">PX</a>
     <ul class="nav__links">
-      <li><a href="software.html" class="active">ソフトウェア</a></li>
-      <li><a href="compliance.html">質問票</a></li>
-      <li><a href="ai-ml.html">AI/ML</a></li>
-      <li><a href="examples.html">事例</a></li>
-      <li><a href="pricing.html">料金</a></li>
+      <li><a href="software.html" class="active">Software</a></li>
+      <li><a href="trust.html">Trust</a></li>
+      <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
+      <li><a href="mailto:hello@px-registry.org">Contact</a></li>
     </ul>
-    <a href="demo/lens.html" class="nav__cta" target="_blank">Lensデモを開く</a>
     <button class="nav__ham" aria-label="Menu">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
     </button>
@@ -30,316 +29,224 @@
 </nav>
 
 <!-- Hero -->
-<section class="phero">
-  <div class="wrap">
-    <p class="phero__label">Release Profile</p>
-    <h1>Signing improved. Handoff did not.</h1>
-    <p>PX creates a portable software release pack. Binary, SBOM, provenance, signature &mdash; 検証可能な一式にまとめて渡す。受信者はLensを開くだけで、packの検証結果と収録物の対応を確認できる。</p>
-  </div>
-</section>
+<div class="page-hero reveal">
+  <p class="label">Release Profile</p>
+  <h1>Signing improved. Handoff did not.</h1>
+  <p>Binary, SBOM, provenance, signature — scattered across emails, CI artifacts, and vendor portals. PX bundles them into one verifiable pack. Recipients open Lens to confirm everything in five seconds.</p>
+</div>
 
 <!-- The Problem -->
-<section class="sec sec--bg">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2>バラバラに渡していませんか？</h2>
-    </div>
-    <div style="max-width:var(--w-n);margin:0 auto;display:flex;flex-direction:column;gap:var(--sp-xl)">
-      <div style="padding:var(--sp-xl);border:1px solid var(--border);border-radius:var(--r-lg)">
-        <h4 style="margin-bottom:var(--sp-sm)">1. binaryとSBOMが別メールで届く</h4>
-        <p style="font-size:var(--ts-sm);line-height:1.7">受信者はどのSBOMがどのbinaryに対応するか分からず、確認作業が発生する。</p>
+<section class="page-section page-section--bg">
+  <div style="max-width:var(--max-text);margin:0 auto">
+    <h2 class="reveal">The problem with scattered artifacts</h2>
+    <div style="display:flex;flex-direction:column;gap:24px;margin-top:24px">
+      <div class="reveal" style="padding:24px;border:1px solid var(--border);border-radius:var(--radius)">
+        <h3 style="font-size:17px;margin-bottom:8px">Binary and SBOM arrive separately</h3>
+        <p style="font-size:var(--text-small);line-height:1.7">Recipients cannot tell which SBOM corresponds to which binary without manual cross-referencing.</p>
       </div>
-      <div style="padding:var(--sp-xl);border:1px solid var(--border);border-radius:var(--r-lg)">
-        <h4 style="margin-bottom:var(--sp-sm)">2. provenanceがGitHub UIの奥に埋まっている</h4>
-        <p style="font-size:var(--ts-sm);line-height:1.7">ビルドの証明があっても、受信者がたどり着けなければ意味がない。</p>
+      <div class="reveal" style="padding:24px;border:1px solid var(--border);border-radius:var(--radius)">
+        <h3 style="font-size:17px;margin-bottom:8px">Provenance is buried in CI</h3>
+        <p style="font-size:var(--text-small);line-height:1.7">Build provenance exists, but recipients cannot easily find or verify it outside the CI platform.</p>
       </div>
-      <div style="padding:var(--sp-xl);border:1px solid var(--border);border-radius:var(--r-lg)">
-        <h4 style="margin-bottom:var(--sp-sm)">3. 受け取った人がどこから確認すればいいか分からない</h4>
-        <p style="font-size:var(--ts-sm);line-height:1.7">ファイルは揃っていても、検証の起点がないと信頼を確認できない。</p>
+      <div class="reveal" style="padding:24px;border:1px solid var(--border);border-radius:var(--radius)">
+        <h3 style="font-size:17px;margin-bottom:8px">No starting point for verification</h3>
+        <p style="font-size:var(--text-small);line-height:1.7">Files may all be present, but without a verification entry point, trust cannot be confirmed.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Comparison table -->
-<section class="sec">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2>署名の上に、受領単位を加える</h2>
-      <p>個別の署名・attestation検証は既にある。一式をまとめて渡し、受信者がオフラインで確認できるhandoff packageが未整備。</p>
-    </div>
-    <div style="max-width:var(--w-n);margin:0 auto">
-      <table class="cmp">
+<!-- Comparison -->
+<section class="page-section">
+  <div style="max-width:var(--max-text);margin:0 auto">
+    <h2 class="reveal">Adding the handoff layer on top of signing</h2>
+    <p class="reveal" style="margin-bottom:32px">Individual signing and attestation tools are mature. What is missing is a portable handoff package that bundles everything for the recipient.</p>
+
+    <div class="reveal">
+      <table class="diff-table" style="max-width:100%">
         <thead>
           <tr>
             <th></th>
             <th>Sigstore / GitHub Attestations</th>
-            <th class="hi">PX Release Pack</th>
+            <th style="color:var(--ink-70)">PX Release Pack</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>Binary署名</td>
-            <td><span class="y">&check;</span> 可能</td>
-            <td class="hi"><span class="y">&check;</span> 収録 + ハッシュ</td>
+            <td>Binary signing</td>
+            <td><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Supported</td>
+            <td style="background:var(--ink-04)"><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Included + hashed</td>
           </tr>
           <tr>
-            <td>SBOM添付</td>
-            <td><span class="y">&check;</span> 個別に生成</td>
-            <td class="hi"><span class="y">&check;</span> 収録 + 形式検証</td>
+            <td>SBOM attachment</td>
+            <td><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Generated separately</td>
+            <td style="background:var(--ink-04)"><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Included + format check</td>
           </tr>
           <tr>
             <td>Provenance</td>
-            <td><span class="y">&check;</span> attestation</td>
-            <td class="hi"><span class="y">&check;</span> 収録 + binary紐付け検証</td>
+            <td><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Attestation</td>
+            <td style="background:var(--ink-04)"><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Included + binary binding</td>
           </tr>
           <tr>
-            <td>一式の受領単位</td>
-            <td><span class="n">&times; 未整備</span></td>
-            <td class="hi"><span class="y">&check;</span> 1つのpack</td>
+            <td>Bundle as a set</td>
+            <td><span style="color:var(--ink-20)">&mdash;</span></td>
+            <td style="background:var(--ink-04)"><span style="color:var(--ink-70);font-weight:700">&#10003;</span> One portable pack</td>
           </tr>
           <tr>
-            <td>受信者の検証手段</td>
-            <td><span class="n">&times; CLIが必要</span></td>
-            <td class="hi"><span class="y">&check;</span> Lens（ブラウザで完結）</td>
+            <td>Recipient verification</td>
+            <td><span style="color:var(--ink-20)">&mdash; CLI required</span></td>
+            <td style="background:var(--ink-04)"><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Lens (browser only)</td>
           </tr>
           <tr>
-            <td>オフライン検証</td>
-            <td><span class="y">&check;</span> 個別に可能</td>
-            <td class="hi"><span class="y">&check;</span> 一式まとめてオフライン</td>
+            <td>Offline verification</td>
+            <td><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Individual files</td>
+            <td style="background:var(--ink-04)"><span style="color:var(--ink-70);font-weight:700">&#10003;</span> Full set offline</td>
           </tr>
           <tr>
-            <td>リリース履歴の連鎖</td>
-            <td><span class="n">&times; 未整備</span></td>
-            <td class="hi"><span class="y">&check;</span> parent_manifest_refs</td>
+            <td>Release lineage</td>
+            <td><span style="color:var(--ink-20)">&mdash;</span></td>
+            <td style="background:var(--ink-04)"><span style="color:var(--ink-70);font-weight:700">&#10003;</span> parent_manifest_refs</td>
           </tr>
         </tbody>
       </table>
-    </div>
-  </div>
-</section>
-
-<!-- How PX solves it -->
-<section class="sec sec--bg">
-  <div class="wrap">
-    <div class="frow reveal">
-      <div class="frow__text">
-        <h3>1コマンドでパック</h3>
-        <p><code style="color:var(--green);font-size:var(--ts-sm)">px pack --profile=software-release-v1 --evidence=./dist/</code></p>
-        <p style="margin-top:var(--sp-md)">Binary、SBOM、provenance、署名をまとめて検証。受信者にはlens-v2.htmlが1つ付く。</p>
-      </div>
-      <div class="frow__vis">
-        <div class="code-block" style="font-size:var(--ts-sm)">
-<span class="cmd">$</span> px pack --profile=software-release-v1 --evidence=./dist/
-<br><br>
-<span class="comment"># File classification:</span>
-<span style="color:var(--green)">&#10003;</span> binary: myapp-v2.1.0-linux-amd64.tar.gz
-<span style="color:var(--green)">&#10003;</span> sbom: myapp-v2.1.0.spdx.json <span class="comment">(SPDX 2.3)</span>
-<span style="color:var(--green)">&#10003;</span> provenance: myapp-v2.1.0.intoto.json
-<span style="color:var(--green)">&#10003;</span> signature: myapp-v2.1.0.sig
-<span style="color:var(--green)">&#10003;</span> changelog: CHANGELOG.md
-<span style="color:var(--green)">&#10003;</span> license: LICENSE
-<br><br>
-<span class="comment"># Rules: 7/7 passed</span>
-<span class="comment"># Seal: PX-35A3-2026Q1-PASS-7</span>
-<br>
-<span style="color:var(--green);font-weight:700">Pack ready.</span> Open lens-v2.html to review.
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Lens experience -->
-<section class="sec">
-  <div class="wrap">
-    <div class="frow frow--flip reveal">
-      <div class="frow__text">
-        <h3>受信者はLensを開くだけ</h3>
-        <p>インストール不要。アカウント不要。オフラインで動く。lens-v2.htmlをブラウザで開けば、packの検証結果と収録物の対応を確認できる。技術的知識は不要。</p>
-      </div>
-      <div class="frow__vis">
-        <div class="lens" style="max-width:100%;box-shadow:none;border:none;background:transparent">
-          <div class="lens__bar">
-            <div class="lens__dots">
-              <div class="lens__dot lens__dot--r"></div>
-              <div class="lens__dot lens__dot--y"></div>
-              <div class="lens__dot lens__dot--g"></div>
-            </div>
-            <span class="lens__title">lens-v2.html</span>
-            <span></span>
-          </div>
-          <div class="lens__body" style="padding:var(--sp-lg)">
-            <div class="verdict verdict--pass show">
-              <div class="verdict__title"><span style="font-size:1.5rem;margin-right:8px">&#10003;</span> Software Release Pack</div>
-              <p class="verdict__sub">7/7 rules passed &middot; 6 files &middot; SBOM: SPDX 2.3 &middot; provenance bound to binary</p>
-            </div>
-            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:var(--sp-md)">
-              <span style="background:#ecfdf5;color:#059669;padding:4px 12px;border-radius:6px;font-size:var(--ts-xs);font-weight:600">binary &#10003;</span>
-              <span style="background:#ecfdf5;color:#059669;padding:4px 12px;border-radius:6px;font-size:var(--ts-xs);font-weight:600">SBOM &#10003;</span>
-              <span style="background:#ecfdf5;color:#059669;padding:4px 12px;border-radius:6px;font-size:var(--ts-xs);font-weight:600">provenance &#10003;</span>
-              <span style="background:#ecfdf5;color:#059669;padding:4px 12px;border-radius:6px;font-size:var(--ts-xs);font-weight:600">signature &#10003;</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
 
 <!-- Profile rules -->
-<section class="sec sec--bg">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2>software-release-v1 プロファイル</h2>
-      <p>何を含めるべきか。何が必須か。プロファイルが定義する。</p>
-    </div>
-    <div style="max-width:var(--w-n);margin:0 auto">
-      <table class="gap-table">
-        <thead>
-          <tr>
-            <th>クラス</th>
-            <th>必須</th>
-            <th>検証内容</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>binary</strong></td>
-            <td style="color:var(--green);font-weight:700">必須</td>
-            <td>配布バイナリが1つ以上含まれること</td>
-          </tr>
-          <tr>
-            <td><strong>sbom</strong></td>
-            <td style="color:var(--green);font-weight:700">必須</td>
-            <td>SPDX or CycloneDX JSON形式であること</td>
-          </tr>
-          <tr>
-            <td><strong>provenance</strong></td>
-            <td style="color:var(--amber);font-weight:700">推奨</td>
-            <td>SLSA provenanceのsubject digestがbinaryのSHA-256と一致すること</td>
-          </tr>
-          <tr>
-            <td><strong>signature</strong></td>
-            <td style="color:var(--amber);font-weight:700">推奨</td>
-            <td>Sigstore bundle or detached signature</td>
-          </tr>
-          <tr>
-            <td>changelog</td>
-            <td style="color:var(--t3)">任意</td>
-            <td>変更履歴</td>
-          </tr>
-          <tr>
-            <td>license</td>
-            <td style="color:var(--t3)">任意</td>
-            <td>ライセンスファイル</td>
-          </tr>
-          <tr>
-            <td>vex</td>
-            <td style="color:var(--t3)">任意</td>
-            <td>脆弱性悪用可能性情報</td>
-          </tr>
-          <tr>
-            <td>scan_result</td>
-            <td style="color:var(--t3)">任意</td>
-            <td>脆弱性スキャン結果（JSON）</td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="font-size:var(--ts-sm);color:var(--t3);margin-top:var(--sp-lg)">必須項目が欠けるとFAIL-CLOSE &mdash; packは生成されない。推奨項目が欠けるとWARN &mdash; packは生成されるが警告が出る。</p>
-    </div>
+<section class="page-section page-section--bg">
+  <div style="max-width:var(--max-text);margin:0 auto">
+    <h2 class="reveal">software-release-v1 profile</h2>
+    <p class="reveal">The profile defines what must be included, what is recommended, and what is optional.</p>
+
+    <table class="comparison reveal">
+      <thead>
+        <tr><th>Class</th><th>Required</th><th>Verification</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>binary</strong></td>
+          <td style="color:var(--ink-70);font-weight:700">Required</td>
+          <td>At least one distributable binary present</td>
+        </tr>
+        <tr>
+          <td><strong>sbom</strong></td>
+          <td style="color:var(--ink-70);font-weight:700">Required</td>
+          <td>SPDX or CycloneDX JSON format</td>
+        </tr>
+        <tr>
+          <td><strong>provenance</strong></td>
+          <td style="color:var(--ink-40);font-weight:700">Recommended</td>
+          <td>SLSA provenance subject digest matches binary SHA-256</td>
+        </tr>
+        <tr>
+          <td><strong>signature</strong></td>
+          <td style="color:var(--ink-40);font-weight:700">Recommended</td>
+          <td>Sigstore bundle or detached signature</td>
+        </tr>
+        <tr>
+          <td>changelog</td>
+          <td style="color:var(--ink-40)">Optional</td>
+          <td>Change log</td>
+        </tr>
+        <tr>
+          <td>license</td>
+          <td style="color:var(--ink-40)">Optional</td>
+          <td>License file</td>
+        </tr>
+        <tr>
+          <td>vex</td>
+          <td style="color:var(--ink-40)">Optional</td>
+          <td>Vulnerability Exploitability eXchange</td>
+        </tr>
+        <tr>
+          <td>scan_result</td>
+          <td style="color:var(--ink-40)">Optional</td>
+          <td>Vulnerability scan result (JSON)</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="reveal" style="font-size:var(--text-xs);color:var(--ink-40)">Missing a required item triggers FAIL-CLOSE — the pack is not created. Missing a recommended item triggers WARN — the pack is created with a warning.</p>
   </div>
 </section>
 
 <!-- GitHub Action -->
-<section class="sec">
-  <div class="wrap">
-    <div class="frow reveal">
-      <div class="frow__text">
-        <h3>GitHub Actionで自動化</h3>
-        <p>リリースワークフローに3行追加するだけ。ビルド後に自動でpackが生成され、リリースに添付される。</p>
-      </div>
-      <div class="frow__vis">
-        <div class="code-block" style="font-size:var(--ts-sm)">
-<span class="comment"># .github/workflows/release.yml</span>
-- <span class="cmd">name:</span> PX Pack
-  <span class="cmd">uses:</span> ./.github/actions/px-pack
-  <span class="cmd">with:</span>
-    <span class="flag">evidence-path:</span> <span class="string">./dist</span>
-    <span class="flag">profile:</span> <span class="string">software-release-v1</span>
-        </div>
-      </div>
+<section class="page-section">
+  <div style="max-width:var(--max-text);margin:0 auto">
+    <h2 class="reveal">GitHub Action</h2>
+    <p class="reveal">Add three lines to your release workflow. Packs are generated automatically after build.</p>
+
+    <div class="code-block reveal">
+<span style="color:#484f58"># .github/workflows/release.yml</span>
+- <span style="color:#79c0ff">name:</span> PX Pack
+  <span style="color:#79c0ff">uses:</span> ./.github/actions/px-pack
+  <span style="color:#79c0ff">with:</span>
+    <span style="color:#d2a8ff">evidence-path:</span> <span style="color:#a5d6ff">./dist</span>
+    <span style="color:#d2a8ff">profile:</span> <span style="color:#a5d6ff">software-release-v1</span>
     </div>
 
     <!-- Self-test CI -->
-    <div style="max-width:var(--w-n);margin:var(--sp-2x) auto 0;padding:var(--sp-xl);border:1px solid var(--border);border-radius:var(--r-lg)">
-      <h4 style="margin-bottom:var(--sp-md);display:flex;align-items:center;gap:8px">
-        <span style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span>
-        Self-test CI（mainで稼働中）
-      </h4>
-      <table class="gap-table" style="margin:0">
+    <div class="reveal" style="margin-top:40px;padding:24px;border:1px solid var(--border);border-radius:var(--radius)">
+      <h3 style="font-size:17px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+        <span style="width:10px;height:10px;border-radius:50%;background:var(--ink-70);display:inline-block"></span>
+        Self-test CI (running on main)
+      </h3>
+      <table class="comparison" style="margin:0">
         <thead>
           <tr><th>Test</th><th>Fixture</th><th>Result</th></tr>
         </thead>
         <tbody>
           <tr>
             <td>Full release</td>
-            <td style="color:var(--t2)">binary + SBOM + provenance + signature + changelog + LICENSE</td>
-            <td><span style="color:var(--green);font-weight:700">PASS</span> <span style="color:var(--t3);font-size:var(--ts-xs)">7/7</span></td>
+            <td style="color:var(--ink-60)">binary + SBOM + provenance + signature + changelog + LICENSE</td>
+            <td><span style="color:var(--ink-70);font-weight:700">PASS</span> <span style="color:var(--ink-40);font-size:var(--text-xs)">7/7</span></td>
           </tr>
           <tr>
             <td>Minimal</td>
-            <td style="color:var(--t2)">binary + SBOM only</td>
-            <td><span style="color:var(--amber);font-weight:700">WARN</span> <span style="color:var(--t3);font-size:var(--ts-xs)">5/7 + 2 recommendations</span></td>
+            <td style="color:var(--ink-60)">binary + SBOM only</td>
+            <td><span style="color:var(--ink-40);font-weight:700">WARN</span> <span style="color:var(--ink-40);font-size:var(--text-xs)">5/7 + 2 recommendations</span></td>
           </tr>
         </tbody>
       </table>
-      <p style="font-size:var(--ts-xs);color:var(--t3);margin-top:var(--sp-sm)"><a href="https://github.com/px-registry/PX/actions" target="_blank" style="color:var(--t3)">GitHub Actions &rarr;</a></p>
+      <p style="font-size:var(--text-xs);color:var(--ink-40);margin-top:8px"><a href="https://github.com/px-registry/PX/actions" target="_blank" style="color:var(--ink-40)">GitHub Actions &rarr;</a></p>
     </div>
   </div>
 </section>
 
 <!-- Release Lineage -->
-<section class="sec sec--bg">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2>Release Lineage（継続した履歴）</h2>
-    </div>
-    <div style="max-width:var(--w-n);margin:0 auto">
-      <p style="font-size:var(--ts-base);line-height:1.7">parent_manifest_refs[] で前のリリースを参照。受信者は「このv2.1がv2.0の次であること」を検証できる。1回のリリースで終わらない。リリースの連続性を検証可能にし、継続した信頼の履歴を構築する。</p>
-    </div>
+<section class="page-section page-section--bg">
+  <div style="max-width:var(--max-text);margin:0 auto">
+    <h2 class="reveal">Release lineage</h2>
+    <p class="reveal" style="line-height:1.7">Each pack can reference its predecessor via <code style="font-size:var(--text-small);background:var(--ink-04);padding:2px 6px;border-radius:4px">parent_manifest_refs[]</code>. Recipients can verify that v2.1 follows v2.0. This builds a chain of trust across releases, not just within a single one.</p>
   </div>
 </section>
 
 <!-- EU CRA -->
-<section class="sec">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <h2>EU Cyber Resilience Act（CRA）への備え</h2>
-    </div>
-    <div style="max-width:var(--w-n);margin:0 auto">
-      <p style="font-size:var(--ts-base);line-height:1.7;margin-bottom:var(--sp-xl)">EU CRAは2024年12月10日に発効。報告義務は2026年9月11日から、主要義務は2027年12月11日から適用。最大制裁金は1,500万ユーロまたは全世界年間売上高の2.5%のいずれか高い方。SBOMの提供とセキュリティアップデートの追跡が求められる。</p>
-      <div style="display:flex;flex-direction:column;gap:var(--sp-md)">
-        <div style="padding:var(--sp-lg);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:flex-start;gap:var(--sp-md)">
-          <span style="color:var(--green);font-weight:700;font-size:var(--ts-lg);flex-shrink:0">&#10003;</span>
-          <div>
-            <strong style="display:block;margin-bottom:4px">SBOM義務</strong>
-            <p style="font-size:var(--ts-sm);line-height:1.7;color:var(--t2)">PX packにはSBOM（SPDX/CycloneDX）が必須。形式検証済み。受信者にそのまま渡せる。</p>
-          </div>
+<section class="page-section">
+  <div style="max-width:var(--max-text);margin:0 auto">
+    <h2 class="reveal">EU Cyber Resilience Act (CRA)</h2>
+    <p class="reveal" style="line-height:1.7;margin-bottom:32px">The CRA entered into force on December 10, 2024. Reporting obligations begin September 11, 2026. Full obligations apply from December 11, 2027. Maximum penalty: &euro;15M or 2.5% of global annual revenue, whichever is higher.</p>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="reveal" style="padding:20px;border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:flex-start;gap:16px">
+        <span style="color:var(--ink-70);font-weight:700;font-size:18px;flex-shrink:0">&#10003;</span>
+        <div>
+          <strong style="display:block;margin-bottom:4px">SBOM obligation</strong>
+          <p style="font-size:var(--text-small);line-height:1.7">PX packs require SBOM (SPDX/CycloneDX). Format-validated. Delivered to recipient as part of the pack.</p>
         </div>
-        <div style="padding:var(--sp-lg);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:flex-start;gap:var(--sp-md)">
-          <span style="color:var(--green);font-weight:700;font-size:var(--ts-lg);flex-shrink:0">&#10003;</span>
-          <div>
-            <strong style="display:block;margin-bottom:4px">脆弱性管理の証跡</strong>
-            <p style="font-size:var(--ts-sm);line-height:1.7;color:var(--t2)">VEXとスキャン結果をpackに含めることで、脆弱性対応の証跡を一式で渡せる。</p>
-          </div>
+      </div>
+      <div class="reveal" style="padding:20px;border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:flex-start;gap:16px">
+        <span style="color:var(--ink-70);font-weight:700;font-size:18px;flex-shrink:0">&#10003;</span>
+        <div>
+          <strong style="display:block;margin-bottom:4px">Vulnerability management trail</strong>
+          <p style="font-size:var(--text-small);line-height:1.7">Include VEX and scan results in the pack to provide a complete vulnerability response trail.</p>
         </div>
-        <div style="padding:var(--sp-lg);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:flex-start;gap:var(--sp-md)">
-          <span style="color:var(--green);font-weight:700;font-size:var(--ts-lg);flex-shrink:0">&#10003;</span>
-          <div>
-            <strong style="display:block;margin-bottom:4px">アップデートの連続性</strong>
-            <p style="font-size:var(--ts-sm);line-height:1.7;color:var(--t2)">Release Lineageで各バージョンの更新履歴を検証可能に。監査時に「セキュリティアップデートを継続的に提供している」ことの証明になる。</p>
-          </div>
+      </div>
+      <div class="reveal" style="padding:20px;border:1px solid var(--border);border-radius:var(--radius-sm);display:flex;align-items:flex-start;gap:16px">
+        <span style="color:var(--ink-70);font-weight:700;font-size:18px;flex-shrink:0">&#10003;</span>
+        <div>
+          <strong style="display:block;margin-bottom:4px">Update continuity</strong>
+          <p style="font-size:var(--text-small);line-height:1.7">Release lineage proves continuous security updates across versions — evidence that the CRA requires.</p>
         </div>
       </div>
     </div>
@@ -347,56 +254,21 @@
 </section>
 
 <!-- CTA -->
-<section class="cta-band">
-  <div class="wrap">
-    <h2>リリースをPackにする</h2>
-    <p>手元のリリースファイルで試せます。</p>
-    <div style="display:flex;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap">
-      <a href="demo/lens.html" class="btn btn--p btn--lg" target="_blank">Lensデモを開く</a>
-      <a href="cloud/" class="btn btn--s btn--lg" target="_blank">Cloud PXで作る</a>
-      <a href="https://github.com/px-registry/px" class="btn btn--s btn--lg" target="_blank">GitHub</a>
+<section class="cta-section">
+  <div class="reveal">
+    <h2>Try it with your release files.</h2>
+    <div class="cta-code">$ npx px-pack pack --profile=software-release-v1 --evidence=./dist/</div>
+    <p class="cta-or">Or see it in action.</p>
+    <div class="cta-buttons">
+      <a href="demo/lens-v2-pass.html" class="btn btn--primary" target="_blank">Open Lens demo</a>
+      <a href="https://github.com/px-registry/PX" class="btn btn--ghost" target="_blank">GitHub</a>
     </div>
   </div>
 </section>
 
 <!-- Footer -->
 <footer class="footer">
-  <div class="wrap">
-    <div class="footer__grid">
-      <div>
-        <div class="footer__brand">P<b>X</b></div>
-        <p class="footer__desc">まとめて、渡して、受け取った人がその場で確かめられる。</p>
-      </div>
-      <div class="footer__col">
-        <h4>Profile</h4>
-        <ul>
-          <li><a href="software.html">ソフトウェア</a></li>
-          <li><a href="compliance.html">質問票</a></li>
-          <li><a href="ai-ml.html">AI/ML</a></li>
-        </ul>
-      </div>
-      <div class="footer__col">
-        <h4>リソース</h4>
-        <ul>
-          <li><a href="examples.html">事例</a></li>
-          <li><a href="pricing.html">料金</a></li>
-          <li><a href="https://github.com/px-registry/PX" target="_blank">GitHub</a></li>
-          <li><a href="trust.html">信頼性</a></li>
-          <li><a href="pilot.html">パイロット</a></li>
-        </ul>
-      </div>
-      <div class="footer__col">
-        <h4>会社</h4>
-        <ul>
-          <li><a href="mailto:hello@px-registry.org">お問い合わせ</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer__bottom">
-      <span>&copy; 2026 PX Registry KK</span>
-      <span>MIT License</span>
-    </div>
-  </div>
+  <p class="footer__text">PX &middot; Tokyo &middot; MIT License</p>
 </footer>
 
 <script src="script.js"></script>
