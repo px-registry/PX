@@ -316,8 +316,8 @@ code, pre { font-family: var(--font-mono); }
   color: #fff;
   font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
   font-size: 14px;
-  padding: 12px 20px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 4px;
   text-align: left;
   max-width: 600px;
   margin: 0 auto 8px;
@@ -355,8 +355,8 @@ code, pre { font-family: var(--font-mono); }
 .cta-code--secondary {
   background: var(--ink);
   color: #fff;
-  padding: 12px 20px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 4px;
   text-align: left;
   max-width: 600px;
   margin: 0 auto 8px;
