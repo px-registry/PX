@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PX Lens v2 — PASS Demo</title>
+<title>PX Lens — PASS Demo</title>
 <style>
 :root {
   --pass: #1a1a1a; --pass-light: #3a3a3a; --pass-bg: #eef3f0;
@@ -14,8 +14,8 @@
   --ink20: rgba(17,24,39,0.2); --ink08: rgba(17,24,39,0.08); --ink04: rgba(17,24,39,0.03);
   --bg: #ffffff; --surface: #f9fafb; --border: #e5e7eb;
   --amber: #d97706; --amber-bg: #fffbeb;
-  --fd: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --fm: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  --fd: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --fm: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
   --r: 16px; --rs: 10px; --rr: 8px;
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -65,7 +65,7 @@ body.verdict-fail { background-color: var(--fail-bg); }
 .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; font-size: 14px; font-weight: 600; font-family: var(--fd); border: none; border-radius: var(--rs); cursor: pointer; transition: all 0.15s; }
 .btn--pass { background: var(--pass); color: #fff; }
-.btn--pass:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.3); }
+.btn--pass:hover { background: #333; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .btn--ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
 .btn--ghost:hover { background: var(--border); }
 .btn--disabled { opacity: 0.4; pointer-events: none; }
@@ -110,7 +110,12 @@ body.verdict-fail { background-color: var(--fail-bg); }
 .pull-cta { text-align: center; padding: 24px 0; margin-top: 20px; border-top: 1px solid var(--ink04); }
 .pull-cta__text { font-size: 12px; color: var(--ink20); }
 .pull-cta__text a { color: var(--ink45); text-decoration: none; font-weight: 600; }
-.pull-cta__text a:hover { color: var(--pass); }
+.pull-cta__text a:hover { color: var(--ink); }
+.pull-cta__buttons { display: flex; gap: 8px; justify-content: center; margin: 8px 0; flex-wrap: wrap; }
+.pull-cta__btn { font-size: 12px; color: var(--ink45); text-decoration: none; padding: 4px 12px; border: 1px solid var(--ink20); border-radius: 4px; transition: all 0.15s; }
+.pull-cta__btn:hover { color: var(--ink); border-color: var(--ink45); }
+.pull-cta__sub { font-size: 11px; color: var(--ink20); margin-top: 8px; }
+.pull-cta__sub a { color: var(--ink45); text-decoration: none; font-weight: 600; }
 .ft { padding: 20px 0; border-top: 1px solid var(--ink08); margin-top: 40px; }
 .ft__inner { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ink20); }
 @media (max-width: 640px) {
@@ -173,9 +178,9 @@ body.verdict-fail { background-color: var(--fail-bg); }
     <div id="verdict-actions"></div>
     <div class="acceptance" id="acceptance">
       <div class="acceptance__icon">&#10003;</div>
-      <div class="acceptance__title" id="acc-title">Accepted</div>
+      <div class="acceptance__title" id="acc-title">Acknowledged locally</div>
       <div class="acceptance__time" id="acc-time"></div>
-      <div class="acceptance__note">This acceptance record is tamper-evident.</div>
+      <div class="acceptance__note">This acknowledgement record is tamper-evident.</div>
       <div class="acceptance__id" id="acc-id"></div>
     </div>
     <div class="meta-line" id="meta-line"></div>
@@ -187,10 +192,16 @@ body.verdict-fail { background-color: var(--fail-bg); }
   </div>
 </div>
 <div class="pull-cta" id="pull-cta" style="display:none">
-  <div class="pull-cta__text">Verified via PX &mdash; <a href="https://px-registry.org" target="_blank" rel="noopener">Create your own pack</a></div>
+  <div class="pull-cta__text">Was this useful?</div>
+  <div class="pull-cta__buttons">
+    <a href="mailto:hello@px-registry.org?subject=Lens%20feedback%3A%20useful" class="pull-cta__btn">Useful</a>
+    <a href="mailto:hello@px-registry.org?subject=Lens%20feedback%3A%20questions" class="pull-cta__btn">Have questions</a>
+    <a href="mailto:hello@px-registry.org?subject=Lens%20feedback%3A%20not%20relevant" class="pull-cta__btn">Not for us</a>
+  </div>
+  <div class="pull-cta__sub">Verified via PX &mdash; <a href="https://px-registry.org" target="_blank" rel="noopener">Create your own pack</a></div>
 </div>
 <div class="wrap"><div class="ft"><div class="ft__inner">
-  <span>PX Lens v2</span><span>Runs entirely in your browser. No data leaves this page.</span>
+  <span>PX Lens</span><span>Runs entirely in your browser. No data leaves this page.</span>
 </div></div></div>
 <div class="toast" id="toast"></div>
 
@@ -271,18 +282,18 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Actions
   var actEl=document.getElementById('verdict-actions');
-  actEl.innerHTML='<div class="actions"><button class="btn btn--pass" id="btn-accept">Accept</button><button class="btn btn--ghost" onclick="switchTab(\'mapping\')">View contents</button></div>';
+  actEl.innerHTML='<div class="actions"><button class="btn btn--pass" id="btn-accept">Acknowledge locally</button><button class="btn btn--ghost" onclick="switchTab(\'mapping\')">View contents</button></div>';
   document.getElementById('btn-accept').addEventListener('click',function(){
     var now=new Date();var rid='ar-'+now.getFullYear()+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).substr(2,4);
-    var receipt={type:'acceptance_receipt',manifest_ref:MANIFEST.manifest_ref,accepted_at:now.toISOString(),receipt_id:rid,verdict:'PASS'};
-    document.getElementById('acc-title').textContent='Accepted';
+    var receipt={type:'acknowledgement_receipt',manifest_ref:MANIFEST.manifest_ref,acknowledged_at:now.toISOString(),receipt_id:rid,verdict:'PASS'};
+    document.getElementById('acc-title').textContent='Acknowledged locally';
     document.getElementById('acc-time').textContent=formatDate(now.toISOString());
     document.getElementById('acc-id').textContent='Receipt ID: '+rid;
     document.getElementById('acceptance').classList.add('show');
-    this.classList.add('btn--disabled');this.textContent='\u2713 Accepted';
+    this.classList.add('btn--disabled');this.textContent='\u2713 Acknowledged locally';
     var blob=new Blob([JSON.stringify(receipt,null,2)],{type:'application/json'});
-    var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='acceptance-receipt-'+rid+'.json';a.click();URL.revokeObjectURL(url);
-    showToast('\u2713 Acceptance receipt downloaded');
+    var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='acknowledgement-receipt-'+rid+'.json';a.click();URL.revokeObjectURL(url);
+    showToast('\u2713 Acknowledgement receipt downloaded');
   });
   document.getElementById('meta-line').textContent='Generated by '+MANIFEST.generator+' on '+formatDate(MANIFEST.created_at);
   document.getElementById('pull-cta').style.display='block';

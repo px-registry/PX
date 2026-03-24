@@ -693,7 +693,7 @@
       'bundled-evidence.json': JSON.stringify(evidenceData, null, 2),
     };
     if (lensHtml) {
-      packBundle['lens-v2.html'] = lensHtml;
+      packBundle['lens.html'] = lensHtml;
     }
 
     // Store for download
@@ -704,10 +704,10 @@
     $('pack-sub').textContent = seal + ' \u00b7 ' + state.files.length + ' files \u00b7 ' + passCount + '/' + totalCount + ' rules';
 
     // Show Lens as the primary artifact
-    var lensSize = packBundle['lens-v2.html'] ? new Blob([packBundle['lens-v2.html']]).size : 0;
+    var lensSize = packBundle['lens.html'] ? new Blob([packBundle['lens.html']]).size : 0;
     var mainHtml = '';
     if (lensSize > 0) {
-      mainHtml += '<div class="pack-file" style="background:var(--pass-card)"><span class="pack-file__name" style="font-weight:700">lens-v2.html</span><span class="pack-file__size">' + PXCore.formatBytes(lensSize) + '</span></div>';
+      mainHtml += '<div class="pack-file" style="background:var(--pass-card)"><span class="pack-file__name" style="font-weight:700">lens.html</span><span class="pack-file__size">' + PXCore.formatBytes(lensSize) + '</span></div>';
     }
     $('pack-files').innerHTML = mainHtml;
 
@@ -715,7 +715,7 @@
     var recordEl = $('record-files');
     if (recordEl) {
       var recHtml = '';
-      var recordKeys = Object.keys(packBundle).filter(function(k) { return k !== 'lens-v2.html'; });
+      var recordKeys = Object.keys(packBundle).filter(function(k) { return k !== 'lens.html'; });
       for (var i = 0; i < recordKeys.length; i++) {
         var rk = recordKeys[i];
         var rSize = new Blob([packBundle[rk]]).size;
@@ -740,8 +740,8 @@
   // Primary: download Lens only (self-contained, everything embedded)
   function downloadPack() {
     if (!state.packBundle) return;
-    if (state.packBundle['lens-v2.html']) {
-      downloadFile('lens-v2.html', state.packBundle['lens-v2.html'], 'text/html');
+    if (state.packBundle['lens.html']) {
+      downloadFile('lens.html', state.packBundle['lens.html'], 'text/html');
       showToast('\u2713 Lens downloaded — send this file to the recipient');
     } else {
       // Fallback: download manifest if no Lens
@@ -818,14 +818,14 @@
     var subject = encodeURIComponent(project + (framework ? ' ' + framework : '') + ' — verified pack (PX)');
     var body = encodeURIComponent(
       'Please find the verified pack attached.\n\n' +
-      'Open the attached lens-v2.html in your browser to review.\n' +
+      'Open the attached lens.html in your browser to review.\n' +
       'No installation needed — it runs entirely offline.\n\n' +
       (m ? 'Seal: ' + m.seal + '\n' : '') +
       'Created: ' + (m ? m.created_at : '') + '\n\n' +
       '— Sent via PX (https://px-registry.org)'
     );
     window.open('mailto:' + encodeURIComponent(email) + '?subject=' + subject + '&body=' + body, '_self');
-    showToast('Mail client opened — attach lens-v2.html');
+    showToast('Mail client opened — attach lens.html');
     // Also auto-download the Lens so they have it ready to attach
     downloadPack();
   });

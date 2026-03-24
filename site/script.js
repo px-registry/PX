@@ -1,5 +1,5 @@
-/* PX Site — Script v8
-   Nav, reveal, FAQ, copy, interactive demo
+/* PX Site — Script v9
+   Nav, reveal, FAQ, copy, demo
    ────────────────────────────────────────── */
 
 (function () {
@@ -39,7 +39,9 @@
   /* ── Copy to clipboard ── */
   document.querySelectorAll('.cta-code').forEach(function (el) {
     el.addEventListener('click', function () {
-      var text = el.textContent.replace(/^\$\s*/, '').trim();
+      var codeEl = el.querySelector('code');
+      var text = codeEl ? codeEl.textContent : el.textContent;
+      text = text.replace(/^\$\s*/, '').trim();
       navigator.clipboard.writeText(text).then(function () {
         el.classList.add('copied');
         setTimeout(function () { el.classList.remove('copied'); }, 1500);
@@ -68,84 +70,42 @@
   }
 
   /* ════════════════════════════════════
-     Interactive Demo — drag & drop → verify → Lens
+     Demo — button-triggered verification
      ════════════════════════════════════ */
   var demoFiles = document.getElementById('demo-files');
-  var demoPack = document.getElementById('demo-pack');
-  var packIdle = document.getElementById('pack-idle');
-  var packVerify = document.getElementById('pack-verify');
+  var demoRunBtn = document.getElementById('demo-run');
+  var demoVerify = document.getElementById('demo-verify');
   var demoResult = document.getElementById('demo-result');
-  var demoRan = false;
 
-  if (demoFiles && demoPack) {
-    // Drag events on individual files
-    demoFiles.querySelectorAll('.demo-file').forEach(function (file) {
-      file.addEventListener('dragstart', function (e) {
-        e.dataTransfer.setData('text/plain', 'px');
-        file.classList.add('dragging');
+  if (demoRunBtn && demoFiles && demoVerify && demoResult) {
+    demoRunBtn.addEventListener('click', function () {
+      // Hide button and dim files
+      demoRunBtn.classList.add('hidden');
+      demoFiles.classList.add('dimmed');
+
+      // Show verification panel
+      demoVerify.style.display = 'block';
+
+      // Animate checks in sequence
+      var checks = demoVerify.querySelectorAll('.demo-check');
+      var lastDelay = 0;
+      checks.forEach(function (check) {
+        var delay = parseInt(check.dataset.delay);
+        if (delay > lastDelay) lastDelay = delay;
+        setTimeout(function () {
+          check.classList.add('visible');
+        }, delay);
       });
-      file.addEventListener('dragend', function () {
-        file.classList.remove('dragging');
-      });
-    });
 
-    // Drop zone
-    demoPack.addEventListener('dragover', function (e) {
-      e.preventDefault();
-      if (!demoRan) demoPack.classList.add('drag-over');
-    });
-    demoPack.addEventListener('dragleave', function () {
-      demoPack.classList.remove('drag-over');
-    });
-    demoPack.addEventListener('drop', function (e) {
-      e.preventDefault();
-      demoPack.classList.remove('drag-over');
-      if (demoRan) return;
-      runDemo();
-    });
-
-    // Also allow clicking the drop zone
-    demoPack.addEventListener('click', function () {
-      if (demoRan) return;
-      runDemo();
-    });
-  }
-
-  function runDemo() {
-    demoRan = true;
-
-    // Dim file list
-    demoFiles.classList.add('dimmed');
-
-    // Show verification
-    packIdle.style.display = 'none';
-    packVerify.style.display = 'block';
-
-    var checks = packVerify.querySelectorAll('.demo-check');
-    checks.forEach(function (check) {
+      // Show result after checks complete
       setTimeout(function () {
-        check.classList.add('visible');
-      }, parseInt(check.dataset.delay));
+        demoVerify.style.display = 'none';
+        demoFiles.style.display = 'none';
+        demoResult.style.display = 'block';
+        demoResult.offsetHeight; // force reflow
+        demoResult.classList.add('visible');
+      }, lastDelay + 700);
     });
-
-    // After all checks, transition to result
-    var lastDelay = 0;
-    checks.forEach(function (c) {
-      var d = parseInt(c.dataset.delay);
-      if (d > lastDelay) lastDelay = d;
-    });
-
-    setTimeout(function () {
-      // Fade out left + right
-      demoFiles.style.display = 'none';
-      demoPack.classList.add('hidden');
-
-      // Show result
-      demoResult.style.display = 'block';
-      // Force reflow then add visible
-      demoResult.offsetHeight;
-      demoResult.classList.add('visible');
-    }, lastDelay + 800);
   }
 
 })();

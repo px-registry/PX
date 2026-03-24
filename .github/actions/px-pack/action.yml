@@ -96,4 +96,4 @@ runs:
 
         # Set output paths
         echo "manifest-path=${{ inputs.output-path }}/draft-manifest.json" >> $GITHUB_OUTPUT
-        echo "lens-path=${{ inputs.output-path }}/lens-v2.html" >> $GITHUB_OUTPUT
+        echo "lens-path=${{ inputs.output-path }}/lens.html" >> $GITHUB_OUTPUT

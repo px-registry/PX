@@ -402,13 +402,13 @@ function generateLensHtml(manifest, evidenceData, profileData, verifyResults) {
 }
 
 function generateLensV2Html(manifest, evidenceData, profileData, verifyResults) {
-  // Read the v2 template from lens-v2.html alongside cli.js
-  const v2Path = path.join(__dirname, 'lens-v2.html');
+  // Read the v2 template from lens.html alongside cli.js
+  const v2Path = path.join(__dirname, 'lens.html');
   let template;
   try {
     template = fs.readFileSync(v2Path, 'utf8');
   } catch (e) {
-    console.error('lens-v2.html not found, falling back to v1');
+    console.error('lens.html not found, falling back to v1');
     return generateLensHtml(manifest, evidenceData, profileData, verifyResults);
   }
   // Replace each data injection point: /*__NAME__*/<json-until-semicolon>
@@ -1249,7 +1249,7 @@ function cmdInit(args) {
     // Show ignition complete message
     log();
     log(`  ${CLR.bold}PX demo is ready.${CLR.reset}`);
-    log(`  Open ${CLR.cyan}${relativePx(OUTPUT_DIR, 'lens-v2.html')}${CLR.reset} in your browser.`);
+    log(`  Open ${CLR.cyan}${relativePx(OUTPUT_DIR, 'lens.html')}${CLR.reset} in your browser.`);
     log();
     log(`  You can re-run step by step with:`);
     log(`    ${CLR.cyan}px generate${CLR.reset}`);
@@ -2321,13 +2321,13 @@ function cmdPackClassBased(profileData, profilePath, evidencePath, flags, args) 
   fs.writeFileSync(path.join(outputDir, 'lens.html'), lensHtml, 'utf8');
   success(`Created ${outLabel}lens.html`);
 
-  // Generate Lens v2
+  // Generate Lens
   try {
     const lensV2Html = generateLensV2Html(manifest, evidenceData, lensProfile, lensResults);
-    fs.writeFileSync(path.join(outputDir, 'lens-v2.html'), lensV2Html, 'utf8');
-    success(`Created ${outLabel}lens-v2.html`);
+    fs.writeFileSync(path.join(outputDir, 'lens.html'), lensV2Html, 'utf8');
+    success(`Created ${outLabel}lens.html`);
   } catch (e) {
-    log(`  ${CLR.dim}Lens v2 skipped: ${e.message}${CLR.reset}`);
+    log(`  ${CLR.dim}Lens skipped: ${e.message}${CLR.reset}`);
   }
 
   // Summary
@@ -2344,7 +2344,7 @@ function cmdPackClassBased(profileData, profilePath, evidencePath, flags, args) 
     log(`  ${CLR.yellow}▸${CLR.reset} ${warnCount} recommendation(s) not met. Pack is valid but could be improved.`);
     log();
   }
-  log(`  ${CLR.bold}${CLR.green}Pack ready.${CLR.reset} Open ${CLR.reset}lens-v2.html${CLR.dim} to review.${CLR.reset}`);
+  log(`  ${CLR.bold}${CLR.green}Pack ready.${CLR.reset} Open ${CLR.reset}lens.html${CLR.dim} to review.${CLR.reset}`);
   log();
 }
 
@@ -2534,8 +2534,8 @@ function cmdPack(args) {
     success(`Created ${outLabel}lens.html`);
 
     const lensV2Html = generateLensV2Html(manifest, evidenceData, profileData, lensResults);
-    fs.writeFileSync(path.join(outputDir, 'lens-v2.html'), lensV2Html, 'utf8');
-    success(`Created ${outLabel}lens-v2.html`);
+    fs.writeFileSync(path.join(outputDir, 'lens.html'), lensV2Html, 'utf8');
+    success(`Created ${outLabel}lens.html`);
 
     // Generate summary.txt
     const summaryTxt = generateSummaryTxt(seal, profileData, lensResults, manifest);
@@ -2811,7 +2811,7 @@ Draft is fully functional for internal use today.
   });
   success(`Created ${relativePx(OUTPUT_DIR, 'bundled-evidence.json')}`);
 
-  // Generate Lens v2 HTML
+  // Generate Lens HTML
   // Workspace profiles use field/minimum/maximum structure, not path/operator.
   // Build a unified results array from the already-verified evidence.
   const lensV2AllResults = [];
@@ -2849,10 +2849,10 @@ Draft is fully functional for internal use today.
   }
   try {
     const lensV2Html = generateLensV2Html(manifest, lensV2BundledEvidence, lensV2BundledProfile, lensV2AllResults);
-    fs.writeFileSync(pxPath(OUTPUT_DIR, 'lens-v2.html'), lensV2Html, 'utf8');
-    success(`Created ${relativePx(OUTPUT_DIR, 'lens-v2.html')}`);
+    fs.writeFileSync(pxPath(OUTPUT_DIR, 'lens.html'), lensV2Html, 'utf8');
+    success(`Created ${relativePx(OUTPUT_DIR, 'lens.html')}`);
   } catch (e) {
-    log(`  ${CLR.dim}Lens v2 generation skipped: ${e.message}${CLR.reset}`);
+    log(`  ${CLR.dim}Lens generation skipped: ${e.message}${CLR.reset}`);
   }
 
   // ── Summary ──
@@ -3348,7 +3348,7 @@ function cmdPackDemo() {
   ]);
 
   // Open Lens in browser
-  const lensPath = path.join(outputDir, 'lens-v2.html');
+  const lensPath = path.join(outputDir, 'lens.html');
   if (fs.existsSync(lensPath)) {
     log();
     info(`Opening Lens: ${lensPath}`);

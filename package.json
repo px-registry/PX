@@ -9,7 +9,7 @@
   },
   "files": [
     "cli.js",
-    "lens-v2.html",
+    "lens.html",
     "collectors/",
     "profiles/",
     "README.md"

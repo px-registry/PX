@@ -323,10 +323,10 @@ var PXCore = (function() {
     };
   }
 
-  // ── Lens v2 HTML generation ──
+  // ── Lens HTML generation ──
 
   function generateLensHtml(manifest, evidence, profile, results) {
-    // Fetch the lens-v2 template and inject data
+    // Fetch the lens template and inject data
     // In browser, we use inline template stored in this module
     var html = LENS_TEMPLATE;
     html = injectData(html, '__MANIFEST__', manifest);
@@ -353,7 +353,7 @@ var PXCore = (function() {
   async function loadLensTemplate() {
     if (LENS_TEMPLATE) return;
     // Try multiple paths (works both locally and on deployed site)
-    var paths = ['lens-v2-template.html', '../lens-v2.html', '/lens-v2.html', '/cloud/lens-v2-template.html'];
+    var paths = ['lens-template.html', '../lens.html', '/lens.html', '/cloud/lens-template.html'];
     for (var i = 0; i < paths.length; i++) {
       try {
         var resp = await fetch(paths[i]);

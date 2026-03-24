@@ -42,7 +42,7 @@ jobs:
           echo "Result: ${{ steps.px-min.outputs.pack-result }}"
           echo "Warnings: ${{ steps.px-min.outputs.warnings }}"
           test -f ./px-output-min/draft-manifest.json
-          test -f ./px-output-min/lens-v2.html
+          test -f ./px-output-min/lens.html
           echo "Minimal pack OK."
 
       - name: Summary

@@ -30,72 +30,66 @@
 <!-- Hero -->
 <section class="hero">
   <div class="hero__inner reveal">
-    <h1><strong>Portable release packs</strong> for software you hand off.</h1>
-    <p class="hero__sub">
-      Bundle binary, SBOM, provenance, and signature
-      into one pack. Verified offline.
-    </p>
-    <div class="hero__cta">
-      <a href="https://github.com/px-registry/PX#quick-start" class="btn btn--primary" target="_blank">Create a pack</a>
-      <a href="https://github.com/px-registry/PX" class="btn btn--ghost" target="_blank">GitHub</a>
+    <div class="hero__text">
+      <h1><strong>Portable release packs</strong> for software you hand off.</h1>
+      <p class="hero__sub">
+        Bundle binary, SBOM, provenance, and signature
+        into one pack. Verified offline.
+      </p>
+      <div class="hero__cta">
+        <a href="https://github.com/px-registry/PX#quick-start" class="btn btn--primary" target="_blank">Create a pack</a>
+        <a href="https://github.com/px-registry/PX" class="btn btn--ghost" target="_blank">GitHub</a>
+      </div>
+    </div>
+    <div class="hero__visual">
+      <div class="hero__lens">
+        <div class="hero__lens-bar">
+          <span class="hero__lens-dot"></span>
+          <span class="hero__lens-dot"></span>
+          <span class="hero__lens-dot"></span>
+          <span class="hero__lens-title">lens.html</span>
+        </div>
+        <div class="hero__lens-body">
+          <p class="hero__lens-verdict">This pack is valid.</p>
+          <div class="hero__lens-checks">
+            <span>&#10003; 4 files hashed</span>
+            <span>&#10003; provenance bound</span>
+            <span>&#10003; Ed25519 signed</span>
+            <span class="hero__lens-score">7/7</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- Interactive Demo -->
+<!-- Demo -->
 <section class="demo" id="demo">
   <div class="demo__container reveal">
 
-    <!-- Left: files -->
+    <h2 class="demo__heading">What goes into a pack</h2>
+
     <div class="demo-files" id="demo-files">
-      <div class="demo-file" draggable="true" data-type="binary">
-        <span class="demo-file__name">myapp-v2.1.0.tar.gz</span>
-        <span class="demo-file__tag">binary</span>
-      </div>
-      <div class="demo-file" draggable="true" data-type="sbom">
-        <span class="demo-file__name">myapp-v2.1.0.spdx.json</span>
-        <span class="demo-file__tag">sbom</span>
-      </div>
-      <div class="demo-file" draggable="true" data-type="provenance">
-        <span class="demo-file__name">myapp-v2.1.0.intoto.jsonl</span>
-        <span class="demo-file__tag">provenance</span>
-      </div>
-      <div class="demo-file" draggable="true" data-type="signature">
-        <span class="demo-file__name">myapp-v2.1.0.sig</span>
-        <span class="demo-file__tag">signature</span>
-      </div>
-      <div class="demo-file" draggable="true" data-type="changelog">
-        <span class="demo-file__name">CHANGELOG.md</span>
-        <span class="demo-file__tag">changelog</span>
-      </div>
-      <div class="demo-file" draggable="true" data-type="license">
-        <span class="demo-file__name">LICENSE</span>
-        <span class="demo-file__tag">license</span>
-      </div>
+      <div class="demo-file"><span class="demo-file__name">myapp-v2.1.0.tar.gz</span><span class="demo-file__tag">binary</span></div>
+      <div class="demo-file"><span class="demo-file__name">myapp-v2.1.0.spdx.json</span><span class="demo-file__tag">sbom</span></div>
+      <div class="demo-file"><span class="demo-file__name">myapp-v2.1.0.intoto.jsonl</span><span class="demo-file__tag">provenance</span></div>
+      <div class="demo-file"><span class="demo-file__name">myapp-v2.1.0.sig</span><span class="demo-file__tag">signature</span></div>
     </div>
 
-    <!-- Right: pack zone -->
-    <div class="demo-pack" id="demo-pack">
-      <div class="demo-pack__idle" id="pack-idle">
-        <div class="demo-pack__border"></div>
-        <p class="demo-pack__text">Drop files here to pack</p>
-      </div>
-      <div class="demo-verify" id="pack-verify" style="display:none">
-        <div class="demo-check" data-delay="0"><span class="demo-check__mark">&#10003;</span> binary found &amp; hashed</div>
-        <div class="demo-check" data-delay="200"><span class="demo-check__mark">&#10003;</span> sbom found &amp; hashed</div>
-        <div class="demo-check" data-delay="400"><span class="demo-check__mark">&#10003;</span> provenance bound to binary</div>
-        <div class="demo-check" data-delay="600"><span class="demo-check__mark">&#10003;</span> signature found &amp; hashed</div>
-        <div class="demo-check" data-delay="800"><span class="demo-check__mark">&#10003;</span> Ed25519 signed</div>
-        <div class="demo-check" data-delay="1100"><span class="demo-check__mark" style="font-weight:700">7/7</span> passed</div>
-      </div>
+    <button class="demo-run" id="demo-run">Run demo pack</button>
+
+    <div class="demo-verify" id="demo-verify" style="display:none">
+      <div class="demo-check" data-delay="0"><span class="demo-check__mark">&#10003;</span> binary hashed</div>
+      <div class="demo-check" data-delay="200"><span class="demo-check__mark">&#10003;</span> sbom hashed</div>
+      <div class="demo-check" data-delay="400"><span class="demo-check__mark">&#10003;</span> provenance bound to binary</div>
+      <div class="demo-check" data-delay="600"><span class="demo-check__mark">&#10003;</span> Ed25519 signed</div>
+      <div class="demo-check" data-delay="900"><span class="demo-check__mark demo-check__mark--final">7/7</span> passed &middot; pack ready</div>
     </div>
 
-    <!-- Result: replaces both columns -->
-    <div class="demo-result" id="demo-result">
-      <p class="demo-result__score">7 / 7</p>
+    <div class="demo-result" id="demo-result" style="display:none">
       <p class="demo-result__verdict">This pack is valid.</p>
-      <p class="demo-result__sub">This is what your recipient sees.<br>One HTML file. No install. No account. Offline.</p>
-      <a href="demo/lens-v2-pass.html" class="demo-result__link" target="_blank">Open full Lens demo &rarr;</a>
+      <p class="demo-result__sub">Your recipient opens one HTML file to verify &mdash; offline.</p>
+      <a href="demo/lens-pass.html" class="demo-result__link" target="_blank">Open Lens demo &rarr;</a>
     </div>
 
   </div>
@@ -107,7 +101,7 @@
     <p class="statement__text">
       PX bundles your release artifacts into one portable pack.<br>
       A 4KB manifest records every hash, rule check, and Ed25519 signature.<br>
-      Recipients open one HTML file to review it all — offline.
+      Recipients open one HTML file to review it all &mdash; offline.
     </p>
     <p class="statement__note">
       The EU Cyber Resilience Act takes effect December 2027, with reporting obligations starting September 2026.
@@ -153,7 +147,7 @@
       </ul>
     </div>
     <div class="status-col">
-      <h3>What's next.</h3>
+      <h3>Roadmap</h3>
       <ul class="status-list status-list--next">
         <li>Signature chain of trust</li>
         <li>OCI registry integration</li>
@@ -166,16 +160,20 @@
 <!-- CTA -->
 <section class="cta-section">
   <div class="reveal reveal--slow">
-    <p class="cta-dogfood">PX v1 release artifacts are packed with PX. <a href="https://github.com/px-registry/PX/actions" target="_blank">CI status →</a></p>
     <h2>Try PX in 15 seconds.</h2>
-    <div class="cta-code">$ npx px-pack init --demo</div>
-    <p class="cta-or">or see it in action</p>
+    <div class="cta-code">
+      <code>$ npx px-pack init --demo</code>
+      <span class="cta-code__note">sample data &mdash; one command, zero dependencies</span>
+    </div>
+    <div class="cta-code cta-code--secondary">
+      <code>$ npx px-pack pack --evidence=./dist/ --sign</code>
+      <span class="cta-code__note">your release artifacts</span>
+    </div>
     <div class="cta-buttons">
-      <a href="demo/lens-v2-pass.html" class="btn btn--primary" target="_blank">Open Lens demo</a>
-      <a href="demo/lens-v2-fail.html" class="btn btn--ghost" target="_blank">FAIL demo</a>
+      <a href="demo/lens-pass.html" class="btn btn--primary" target="_blank">Open Lens demo</a>
       <a href="https://github.com/px-registry/PX" class="btn btn--ghost" target="_blank">GitHub</a>
     </div>
-    <p class="cta-email"><a href="mailto:hello@px-registry.org">hello@px-registry.org</a></p>
+    <p class="cta-dogfood">PX v1 release artifacts are packed with PX. <a href="https://github.com/px-registry/PX/actions" target="_blank">CI status &rarr;</a></p>
   </div>
 </section>
 

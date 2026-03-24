@@ -5,8 +5,8 @@ Portable release packs for software you hand off.
 Bundle binary, SBOM, provenance, and signature into one verifiable pack.
 Recipients open one HTML file to verify — offline, no install, no account.
 
-[Lens Demo (PASS)](https://px-registry.org/demo/lens-v2-pass.html) ·
-[Lens Demo (FAIL)](https://px-registry.org/demo/lens-v2-fail.html) ·
+[Lens Demo (PASS)](https://px-registry.org/demo/lens-pass.html) ·
+[Lens Demo (FAIL)](https://px-registry.org/demo/lens-fail.html) ·
 [Website](https://px-registry.org) ·
 [Cloud PX](https://px-registry.org/cloud/)
 
@@ -30,7 +30,7 @@ npx px-pack pack --profile=software-release-v1 --evidence=./dist/ --sign
 ```
 px/output/
   draft-manifest.json      4KB — hashes, rules, Ed25519 signature
-  lens-v2.html             Offline review UI (zero dependencies)
+  lens.html             Offline review UI (zero dependencies)
   bundled-evidence.json    All artifacts bundled
   bundled-profile.json     Profile rules used
 ```
