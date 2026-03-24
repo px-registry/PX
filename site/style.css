@@ -312,34 +312,35 @@ code, pre { font-family: var(--font-mono); }
 .cta-section h2 { font-family: var(--font-heading); font-size: clamp(18px, 2.5vw, 22px); font-weight: 400; color: var(--ink-80); margin-bottom: 32px; }
 
 .cta-code {
-  display: inline-block;
   background: var(--ink);
   color: #fff;
-  border-radius: var(--radius-sm);
-  padding: 14px 24px 26px;
-  cursor: pointer;
-  transition: all 0.25s var(--ease);
-  position: relative;
-  margin-bottom: 12px;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 6px;
   text-align: left;
+  max-width: 600px;
+  margin: 0 auto 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  position: relative;
 }
-.cta-code:hover { transform: scale(1.02); }
+.cta-code:hover { transform: none; }
 .cta-code code {
-  font-family: var(--font-mono);
-  font-size: 12px;
   color: #fff;
+  font-family: inherit;
+  font-size: inherit;
 }
 .cta-code__note {
-  display: block;
-  font-family: var(--font-body);
-  font-size: 10px;
-  color: rgba(255,255,255,0.6);
-  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 12px;
 }
 .cta-code::after {
   content: 'click to copy';
   position: absolute;
-  bottom: -20px;
+  bottom: -18px;
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-body);
@@ -354,12 +355,17 @@ code, pre { font-family: var(--font-mono); }
 .cta-code--secondary {
   background: var(--ink);
   color: #fff;
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 12px 24px 24px;
+  padding: 12px 20px;
+  border-radius: 6px;
+  text-align: left;
+  max-width: 600px;
+  margin: 0 auto 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-.cta-code--secondary code { color: #fff; }
-.cta-code--secondary .cta-code__note { color: rgba(255,255,255,0.6); }
-.cta-code--secondary:hover { border-color: var(--ink-20); }
+.cta-code--secondary code { color: #fff; font-family: inherit; }
+.cta-code--secondary .cta-code__note { color: rgba(255, 255, 255, 0.45); }
 
 .cta-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; margin-bottom: 40px; }
 .cta-dogfood { font-family: var(--font-body); font-size: 0.8125rem; color: #888; text-align: center; letter-spacing: 0.02em; }
