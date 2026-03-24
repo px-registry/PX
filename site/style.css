@@ -326,13 +326,13 @@ code, pre { font-family: var(--font-mono); }
 .cta-code code {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: rgba(255,255,255,0.55);
+  color: #fff;
 }
 .cta-code__note {
   display: block;
   font-family: var(--font-body);
   font-size: 10px;
-  color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.6);
   margin-top: 6px;
 }
 .cta-code::after {
@@ -351,12 +351,12 @@ code, pre { font-family: var(--font-mono); }
 .cta-code.copied::after { content: 'copied'; opacity: 1; color: var(--ink-70); }
 
 .cta-code--secondary {
-  background: transparent;
-  border: 1px solid var(--ink-12);
+  background: var(--ink);
+  border: 1px solid rgba(255,255,255,0.1);
   padding: 12px 24px 24px;
 }
-.cta-code--secondary code { color: var(--ink-40); }
-.cta-code--secondary .cta-code__note { color: var(--ink-20); }
+.cta-code--secondary code { color: #fff; }
+.cta-code--secondary .cta-code__note { color: rgba(255,255,255,0.6); }
 .cta-code--secondary:hover { border-color: var(--ink-20); }
 
 .cta-buttons { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; margin-bottom: 40px; }
