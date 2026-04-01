@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PX Core</title>
+<style>
+body{font-family:system-ui,-apple-system,sans-serif;background:#F7F6F3;color:#1A1A1A;max-width:560px;margin:0 auto;padding:40px 20px}
+#result{text-align:center;font-size:24px;font-weight:600;letter-spacing:.1em;margin:32px 0}
+#note{text-align:center;font-style:italic;color:#636360;margin-bottom:24px}
+.file{padding:8px 0;border-bottom:1px solid #E0DFDA;font-size:13px}
+.file-note{font-style:italic;color:#888;font-size:12px;margin-top:2px}
+.group-hdr{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#888884;padding:12px 0 4px;border-bottom:1px solid #E0DFDA}
+#drop{border:1px dashed #CCC;padding:48px;text-align:center;color:#888;cursor:pointer;border-radius:4px;transition:background .2s,border-color .2s}
+#drop.dragover{background:#E0DFDA;border-color:#1A1A1A}
+.pass{color:#1A1A1A}.fail{color:#C0392B}
+.ring{margin:0 auto 8px;display:block}
+#details{margin-top:16px}
+#details summary{font-size:12px;color:#888;cursor:pointer}
+#details pre{font-family:ui-monospace,monospace;font-size:10px;color:#636360;white-space:pre-wrap;word-break:break-all;margin-top:8px}
+#app{display:none}
+h1{font-size:18px;font-weight:500;text-align:center;letter-spacing:.04em;margin-bottom:24px}
+</style>
+</head>
+<body>
+<h1>PX</h1>
+<div id="drop">Drop .pack here</div>
+<div id="app">
+  <div id="ringWrap"></div>
+  <div id="result"></div>
+  <div id="note"></div>
+  <div id="tree"></div>
+  <details id="details"><summary>Verification details</summary><pre id="detailPre"></pre></details>
+</div>
+<div style="text-align:center;margin-top:48px;font-size:11px;color:#AAA">
+  <a href="https://px-registry.org" style="color:#888">PX</a>
+</div>
+<input type="file" id="fileInput" accept=".pack,.zip" style="display:none">
+<script>
+(function(){
+'use strict';
+var drop=document.getElementById('drop'),app=document.getElementById('app'),
+    resultEl=document.getElementById('result'),noteEl=document.getElementById('note'),
+    treeEl=document.getElementById('tree'),ringWrap=document.getElementById('ringWrap'),
+    detailPre=document.getElementById('detailPre'),fileInput=document.getElementById('fileInput');
+
+// Drag & drop (追補4)
+['dragenter','dragover'].forEach(function(ev){
+  drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add('dragover')});
+  document.body.addEventListener(ev,function(e){e.preventDefault()});
+});
+['dragleave','drop'].forEach(function(ev){
+  drop.addEventListener(ev,function(){drop.classList.remove('dragover')});
+});
+document.body.addEventListener('drop',function(e){e.preventDefault()});
+drop.addEventListener('drop',function(e){
+  e.preventDefault();
+  if(e.dataTransfer&&e.dataTransfer.files.length)processFile(e.dataTransfer.files[0]);
+});
+drop.addEventListener('click',function(){fileInput.click()});
+fileInput.addEventListener('change',function(e){if(e.target.files.length)processFile(e.target.files[0]);e.target.value=''});
+
+async function sha256hex(data){
+  var buf=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');
+}
+
+function canonicalJSON(o){
+  if(o===null||typeof o!=='object')return JSON.stringify(o);
+  if(Array.isArray(o))return'['+o.map(canonicalJSON).join(',')+']';
+  return'{'+Object.keys(o).sort().map(function(k){return JSON.stringify(k)+':'+canonicalJSON(o[k])}).join(',')+'}';
+}
+
+// ZIP parser: STORE + DEFLATE (追補7)
+async function readZip(ab){
+  var view=new DataView(ab);var files=[];var offset=0;
+  while(offset+30<=ab.byteLength){
+    var sig=view.getUint32(offset,true);
+    if(sig!==0x04034b50)break;
+    var compMethod=view.getUint16(offset+8,true);
+    var compSize=view.getUint32(offset+18,true);
+    var uncSize=view.getUint32(offset+22,true);
+    var fnLen=view.getUint16(offset+26,true);
+    var exLen=view.getUint16(offset+28,true);
+    var headerEnd=offset+30+fnLen+exLen;
+    var fnBytes=new Uint8Array(ab,offset+30,fnLen);
+    var filename=new TextDecoder().decode(fnBytes);
+    var rawData=new Uint8Array(ab,headerEnd,compSize);
+    var fileData;
+    if(compMethod===0){
+      fileData=rawData;
+    }else if(compMethod===8){
+      // DEFLATE — use DecompressionStream
+      try{
+        var ds=new DecompressionStream('deflate-raw');
+        var writer=ds.writable.getWriter();
+        var reader=ds.readable.getReader();
+        var chunks=[],totalLen=0;
+        writer.write(rawData);writer.close();
+        while(true){
+          var r=await reader.read();
+          if(r.done)break;
+          chunks.push(r.value);totalLen+=r.value.length;
+        }
+        fileData=new Uint8Array(totalLen);
+        var pos=0;
+        for(var ci=0;ci<chunks.length;ci++){fileData.set(chunks[ci],pos);pos+=chunks[ci].length;}
+      }catch(err){
+        throw new Error('DEFLATE decompression failed for '+filename+': '+err.message);
+      }
+    }else{
+      throw new Error('Unsupported compression method '+compMethod+' for '+filename);
+    }
+    files.push({path:filename,data:fileData,size:uncSize});
+    offset=headerEnd+compSize;
+  }
+  return files;
+}
+
+function findFile(files,name){
+  for(var i=0;i<files.length;i++){
+    if(files[i].path===name)return files[i];
+  }
+  return null;
+}
+
+function renderRing(pass){
+  var color=pass?'#1A1A1A':'#C0392B';
+  var svg='<svg class="ring" width="80" height="80" viewBox="0 0 140 140">';
+  svg+='<circle cx="70" cy="70" r="52" fill="none" stroke="'+color+'" stroke-width="1.8"/>';
+  if(pass)svg+='<circle cx="70" cy="70" r="46" fill="none" stroke="'+color+'" stroke-width="0.4"/>';
+  svg+='</svg>';
+  ringWrap.innerHTML=svg;
+}
+
+async function processFile(file){
+  drop.style.display='none';
+  app.style.display='block';
+  resultEl.textContent='Verifying...';resultEl.className='';
+  noteEl.textContent='';treeEl.innerHTML='';detailPre.textContent='';ringWrap.innerHTML='';
+
+  var log=[];
+  try{
+    var ab=await file.arrayBuffer();
+    if(ab.byteLength<30)throw new Error('pack.json not found');
+    var zipFiles=await readZip(ab);
+    if(zipFiles.length===0)throw new Error('pack.json not found');
+    log.push('ZIP entries: '+zipFiles.length);
+
+    // 1. Find pack.json
+    var packFile=findFile(zipFiles,'pack.json');
+    if(!packFile)throw new Error('pack.json not found');
+    var packJson=JSON.parse(new TextDecoder().decode(packFile.data));
+    log.push('pack.json parsed: format_version='+packJson.format_version);
+
+    // 2. Verify pack_id
+    var declared=packJson.pack_id||'';
+    var body={};var skipKeys={pack_id:1,signature:1,signer_public_key:1};
+    Object.keys(packJson).sort().forEach(function(k){if(!skipKeys[k])body[k]=packJson[k]});
+    var bodyHash=await sha256hex(new TextEncoder().encode(canonicalJSON(body)));
+    var expectedId='urn:pack:sha256:'+bodyHash;
+    if(declared!==expectedId){
+      log.push('FAIL: pack_id mismatch');
+      log.push('  declared: '+declared);
+      log.push('  computed: '+expectedId);
+      throw new Error('pack_id mismatch');
+    }
+    log.push('pack_id verified');
+
+    // 3. Read files index
+    var indexFile=findFile(zipFiles,'index/files.jsonl');
+    if(!indexFile)throw new Error('index/files.jsonl not found');
+    var indexText=new TextDecoder().decode(indexFile.data);
+    var indexLines=indexText.trim().split('\n').map(function(l){return JSON.parse(l)});
+    log.push('files.jsonl entries: '+indexLines.length);
+
+    // 4. Verify files_index_sha256
+    var indexHash=await sha256hex(new TextEncoder().encode(indexText));
+    if(packJson.files_index_sha256&&packJson.files_index_sha256!=='sha256:'+indexHash){
+      log.push('FAIL: files_index_sha256 mismatch');
+      throw new Error('files_index_sha256 mismatch');
+    }
+
+    // 5. Verify each file
+    var payloadPaths={};
+    for(var i=0;i<zipFiles.length;i++){
+      if(zipFiles[i].path.startsWith('payload/')&&!zipFiles[i].path.endsWith('/'))payloadPaths[zipFiles[i].path]=zipFiles[i];
+    }
+
+    var allPass=true;
+    for(var j=0;j<indexLines.length;j++){
+      var entry=indexLines[j];
+      var pf=payloadPaths[entry.path];
+      if(!pf){log.push('FAIL: missing '+entry.path);allPass=false;continue;}
+      var fh=await sha256hex(pf.data);
+      var expected=entry.sha256.replace(/^sha256:/,'');
+      if(fh!==expected){log.push('FAIL: hash mismatch '+entry.path);allPass=false;}
+      else{log.push('OK: '+entry.path);}
+      delete payloadPaths[entry.path];
+    }
+
+    // 6. Check for extra files
+    var extras=Object.keys(payloadPaths);
+    if(extras.length>0){
+      log.push('FAIL: extra files in payload: '+extras.join(', '));
+      allPass=false;
+    }
+
+    // Render result
+    if(allPass){
+      renderRing(true);
+      resultEl.textContent='PASS';resultEl.className='pass';
+    }else{
+      renderRing(false);
+      resultEl.textContent='FAIL';resultEl.className='fail';
+    }
+
+    // Note
+    if(packJson.note)noteEl.textContent=packJson.note;
+
+    // File tree (grouped)
+    var html='';
+    var groups={};var ungrouped=[];
+    indexLines.forEach(function(e){
+      if(e.group){
+        if(!groups[e.group])groups[e.group]=[];
+        groups[e.group].push(e);
+      }else{ungrouped.push(e)}
+    });
+    var groupNames=Object.keys(groups).sort();
+    groupNames.forEach(function(g){
+      html+='<div class="group-hdr">'+esc(g)+'</div>';
+      groups[g].forEach(function(e){html+=renderFile(e,packJson)});
+    });
+    ungrouped.forEach(function(e){html+=renderFile(e,packJson)});
+    treeEl.innerHTML=html;
+
+  }catch(err){
+    renderRing(false);
+    if(err.message==='pack.json not found'||err.message.indexOf('not found')>=0||err.message.indexOf('Not a local file')>=0||err.message.indexOf('0x04034b50')>=0){
+      resultEl.textContent='Not a pack';resultEl.className='fail';
+      noteEl.innerHTML='This file is not a .pack.<br><a href="https://px-registry.org" style="color:#636360;text-decoration:underline">Create one at px-registry.org</a>';
+    }else{
+      resultEl.textContent='FAIL';resultEl.className='fail';
+      noteEl.textContent=err.message;
+    }
+    log.push('ERROR: '+err.message);
+  }
+  detailPre.textContent=log.join('\n');
+}
+
+function renderFile(entry,packJson){
+  var name=entry.path.replace(/^payload\//,'');
+  var size=entry.size!=null?formatSize(entry.size):'';
+  var fnote='';
+  if(packJson.file_notes&&packJson.file_notes[name])fnote=packJson.file_notes[name];
+  var h='<div class="file"><strong>'+esc(name)+'</strong>';
+  if(size)h+=' <span style="color:#AAA">'+size+'</span>';
+  if(fnote)h+='<div class="file-note">'+esc(fnote)+'</div>';
+  h+='</div>';
+  return h;
+}
+
+function formatSize(b){
+  if(!b)return'0 B';
+  var k=1024,s=['B','KB','MB','GB'],i=Math.floor(Math.log(b)/Math.log(k));
+  return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i];
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+})();
+</script>
+</body>
+</html>

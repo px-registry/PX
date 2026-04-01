@@ -1,99 +1,66 @@
 # PX
 
-Portable release packs for software you hand off.
+Hand off files. Know they arrived.
 
-Bundle binary, SBOM, provenance, and signature into one verifiable pack.
-Recipients open one HTML file to verify — offline, no install, no account.
+---
 
-[Lens Demo (PASS)](https://px-registry.org/demo/lens-pass.html) ·
-[Lens Demo (FAIL)](https://px-registry.org/demo/lens-fail.html) ·
-[Website](https://px-registry.org) ·
-[Cloud PX](https://px-registry.org/cloud/)
+PX creates **.pack** files — portable, verified, self-contained.
 
-## Quick start
+A pack carries your files, your notes, your structure, and a manifest
+that proves nothing was changed. Your recipient opens it in a browser.
+Everything is clear.
 
-```sh
-npx px-pack init --demo
+No account. No server. No install.
+
+---
+
+## How it works
+
+**Create** — Drop files into PX. Add a note. Group by purpose.
+
+**Send** — Share the .pack however you like. Email, Slack, link.
+
+**Verify** — Your recipient opens the pack. Every file is checked
+against its SHA-256 hash. PASS means everything arrived intact.
+
+---
+
+## What's in a .pack
+
+```
+pack.json              manifest — metadata, hashes, pack_id
+index/files.jsonl      file index with per-file SHA-256
+payload/               your files
 ```
 
-One command. Creates a demo workspace, generates demo evidence, verifies it,
-builds a draft pack, and opens the path to Lens for offline review.
+---
 
-## With your own files
+## Verification rules
 
-```sh
-npx px-pack pack --profile=software-release-v1 --evidence=./dist/ --sign
-```
+A pack **passes** when:
 
-## What's in a pack
+1. `pack.json` exists and parses
+2. `pack_id` matches SHA-256 of canonical manifest
+3. Every file in the index exists in payload
+4. Every file's SHA-256 matches
+5. No extra files in payload
 
-```
-px/output/
-  draft-manifest.json      4KB — hashes, rules, Ed25519 signature
-  lens.html             Offline review UI (zero dependencies)
-  bundled-evidence.json    All artifacts bundled
-  bundled-profile.json     Profile rules used
-```
+A pack **fails** when any check fails. No partial pass.
 
-```json
-// package.json — Yes, really.
-"dependencies": {}
-```
+---
 
-## Current Limitations
+## PX is free.
 
-- **Lens is a review surface, not a verification engine.** It displays the manifest's recorded results.
-- **File-based, not OCI-native.** PX works with files on disk, not container registries.
-- **SBOM format check only.** PX verifies SBOM presence and format, not contents.
-- **Ephemeral keys by default.** `--sign` generates a one-time key pair unless `--key` is specified.
+Create packs. Open packs. Verify packs.
+Notes, structure, and integrity — in one handoff unit.
 
-## What PX is NOT
+Free during early access. No limits. No trial.
 
-- Not a replacement for Sigstore (PX consumes Sigstore output)
-- Not a SaaS (zero network, zero account, zero upload)
-- Not a container tool (files on disk, any ecosystem)
+---
 
-## GitHub Action
+## Project
 
-```yaml
-- uses: ./.github/actions/px-pack
-  with:
-    evidence-path: ./dist
-    profile: software-release-v1
-```
+**PX Registry KK** — Tokyo
 
-Self-test CI: Full release → **PASS** (7/7) · Minimal (binary + SBOM) → **WARN** (5/7 + 2)
-
-## Profiles
-
-| Profile | Required | Recommended |
-|---------|----------|-------------|
-| `software-release-v1` | binary, SBOM | provenance, signature |
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `px init --demo` | One-command demo (workspace + evidence + verify + pack + Lens) |
-| `px generate` | Generate evidence from system state |
-| `px verify` | Verify evidence against profiles |
-| `px pack` | Create a Draft Packet |
-| `px pack --sign --evidence=./dist/` | Create a signed pack |
-| `px pack --sign --key=path/to/key` | Sign with existing key |
-| `px verify --manifest=draft-manifest.json` | Verify a pack (hashes + signature) |
-| `px check --profile=<file>` | Collect + verify in one step |
-
-## Statement
-
-PX v1 release artifacts are packed with PX.
-
-## Technical
-
-- ~2,800 lines of vanilla Node.js
-- Zero external dependencies (`fs`, `path`, `crypto` only)
-- SHA-256 hash integrity + Ed25519 manifest signature
-- Lens: single HTML file, zero network calls, works on a USB drive
-
-## License
-
-MIT
+- Web: [px-registry.org](https://px-registry.org)
+- Email: hello@px-registry.org

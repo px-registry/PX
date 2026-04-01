@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PX</title>
-<meta name="description" content="Hand off files. Know they arrived.">
+<meta name="description" content="手放した仕事が、届いたとわかる。">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#1A1A1A">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -18,13 +18,13 @@
   --bg:#F7F6F3;--bg-warm:#EFEDE8;--surface:#FFFFFF;--surface-hover:#FAFAF8;
   --ink:#1A1A1A;--ink-2:#3D3D3D;--ink-3:#636360;--ink-4:#888884;--ink-5:#ADADA8;--ink-6:#D0D0CB;
   --rule:#CCCCC7;--rule-light:#E0DFDA;--radius:4px;--radius-sm:3px;
-  --font-display:'Cormorant Garamond',Georgia,serif;
-  --font-body:'DM Sans',Helvetica,sans-serif;
+  --font-display:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+  --font-body:'DM Sans','Hiragino Kaku Gothic ProN','Noto Sans JP','Meiryo',sans-serif;
   --font-mono:'JetBrains Mono',monospace;
   --ease:cubic-bezier(.4,0,.2,1);--ease-out:cubic-bezier(.16,1,.3,1);
   --max-w:580px;--du:20px;
 }
-html{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+html{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;line-height:1.8;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 24px}
 ::selection{background:rgba(26,26,26,.1)}
 input,textarea,button{font-family:inherit;font-size:inherit;color:inherit;border:none;outline:none;background:none}
@@ -154,7 +154,7 @@ input[type="file"]{display:none}
   <div class="brand"><div class="brand-mark">PX</div></div>
   <div class="sample-rx" id="sampleRx">
     <div class="greeting" id="greeting">A pack for you.</div>
-    <div class="tese" id="tese">When the way you hand off changes, the way it arrives changes.<br>When the way it arrives changes, the impression of your work changes.</div>
+    <div class="tese" id="tese">渡し方が変わると、届き方が変わる。<br>届き方が変わると、仕事の印象が変わる。</div>
     <div class="rx-ring-wrap" id="rxRing">
       <svg viewBox="0 0 140 140"><circle class="rx-ring-outer" id="rxOuter" cx="70" cy="70" r="52"/><circle class="rx-ring-inner" id="rxInner" cx="70" cy="70" r="46"/></svg>
       <div class="rx-center" id="rxCenter"><div class="rx-status">PASS</div><div class="rx-detail">10 files verified</div></div>
@@ -169,53 +169,53 @@ input[type="file"]{display:none}
 <div class="tf d0" onclick="TF(this)"><div class="tf-i"></div><span class="tf-n">About this pack</span><span class="tf-c">7</span><span class="tf-v">›</span></div>
 <div class="tc"><div class="d1">
 
-<div class="fi" onclick="FF('f1',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">README.md</div><div class="fi-d">What PX does</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f1',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">README.md</div><div class="fi-d">PXにできること</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f1"><div class="fc-in">
-<p class="fb fa">Hand off files. Know they arrived.</p>
-<p class="fb">PX bundles files into a .pack — with notes, structure, and cryptographic proof that nothing was changed.</p>
-<p class="fb">Your recipient opens it in a browser. Everything is clear.</p>
-<p class="fb fa">No account. No server. No install. Works offline.</p>
+<p class="fb fa">ファイルを渡す。届いたことがわかる。</p>
+<p class="fb">PXはファイルを .pack にまとめる。メモ、構造、そして「何ひとつ変わっていない」ことの暗号的な証明ごと。</p>
+<p class="fb">受け取った人がブラウザで開く。全部わかる。</p>
+<p class="fb fa">アカウント不要。サーバー不要。インストール不要。オフラインでも動く。</p>
 </div></div>
 
-<div class="fi" onclick="FF('f2',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">how-it-works.md</div><div class="fi-d">Inside a pack</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f2',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">how-it-works.md</div><div class="fi-d">packの中で起きていること</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f2"><div class="fc-in">
-<p class="fb">Every file gets a SHA-256 hash. Every hash goes into a manifest. The manifest gets its own hash — the <span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-2)">pack_id</span>。</p>
-<p class="fb fa">Change one byte in one file, and pack_id changes.</p>
+<p class="fb">すべてのファイルにSHA-256ハッシュが付く。すべてのハッシュがマニフェストに入る。マニフェスト自体にもハッシュが付く。それが<span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-2)">pack_id</span>。</p>
+<p class="fb fa">1ファイルの1バイトを変えれば、pack_idが変わる。</p>
 <div class="fr"></div>
-<p class="fb">PASS means every byte matches. FAIL means something changed. There is no maybe.</p>
+<p class="fb">PASSは全バイトが一致。FAILは何かが変わった。「たぶん」はない。</p>
 </div></div>
 
-<div class="fi" onclick="FF('f3',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">for-software.md</div><div class="fi-d">One verified bundle</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f3',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">for-software.md</div><div class="fi-d">ひとつの検証済みバンドル</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f3"><div class="fc-in">
-<div class="fh">Your release is scattered.</div>
-<p class="fb">Binary + SBOM + provenance + signature. Today these are in 4 places, verified by 4 tools. Most don't bother.</p>
-<p class="fb fa">PX puts the entire release in one .pack. One drop. Every hash checked. No CLI on the receiving side.</p>
+<div class="fh">リリースが、バラバラに届いている。</div>
+<p class="fb">バイナリ + SBOM + 来歴 + 署名。今は4箇所に散らばり、4つのツールで検証する。たいていの人は、やらない。</p>
+<p class="fb fa">PXならすべてが1つの .pack に入る。1回のドロップ。全ハッシュが一致。受け手にCLIは不要。</p>
 <div class="fr"></div>
-<div class="fh">"It's broken."</div>
-<div class="fq">"Is your PX screen PASS or FAIL?"<br>"...PASS."<br>"Please re-download."</div>
-<p class="ft">Resolution: 16 seconds. Faster than your AI assistant.</p>
+<div class="fh">「壊れてますけど」</div>
+<div class="fq">「PXの画面はPASSですか、FAILですか？」<br>「......PASSです」<br>「ありがとうございます。では再ダウンロードをお願いします」</div>
+<p class="ft">解決時間: 16秒。AIの返答より速い。</p>
 <div class="fr"></div>
-<p class="fb fa">The hash doesn&#x27;t lie.</p>
+<p class="fb fa">ハッシュは嘘をつかない。</p>
 <div class="fr"></div>
-<div class="fh">One line in your workflow.</div>
+<div class="fh">ワークフローに1行。</div>
 <div class="fcode">- uses: px-registry/px-pack-action@v1
   with:
     evidence-path: ./dist
     profile: software-release-v1</div>
 </div></div>
 
-<div class="fi" onclick="FF('f4',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">for-design.md</div><div class="fi-d">Sealed context</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f4',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">for-design.md</div><div class="fi-d">ファイルと意図を封じる</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f4"><div class="fc-in">
-<div class="fh">The impression is set the moment they open it.</div>
-<p class="fb">Files and context, sealed together. Your recipient sees the note before the files. The structure tells the story.</p>
+<div class="fh">渡した瞬間に、仕事の印象が決まる。</div>
+<p class="fb">ファイルと意図を、一緒に封じる。受け取った人は、ファイルの前にメモを見る。構造が意図を語る。メール本文の説明は要らない。</p>
 </div></div>
 
-<div class="fi" onclick="FF('f5',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">for-evidence.md</div><div class="fi-d">A closed unit of proof</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f5',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">for-evidence.md</div><div class="fi-d">閉じた、ひとつの証明</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f5"><div class="fc-in">
-<div class="fh">Not a dashboard. Not continuous monitoring.</div>
+<div class="fh">ダッシュボードではない。常時監視でもない。</div>
 <div class="fr"></div>
-<p class="fb fa">Don't trust the vendor. Trust the math.</p>
-<p class="fb">The .pack is the proof. It outlives the vendor.</p>
+<p class="fb fa">ベンダーを信用するな。数学を信用しろ。</p>
+<p class="fb">.packが証拠。ベンダーより長く生きる。</p>
 </div></div>
 
 <div class="fi" onclick="FF('f6',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">pricing.md</div></div><div class="fi-a">›</div></div>
@@ -223,11 +223,11 @@ input[type="file"]{display:none}
 <p class="fb fa">PX is free.</p>
 </div></div>
 
-<div class="fi" onclick="FF('f6b',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">px-core.md</div><div class="fi-d">PX at its smallest</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f6b',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">px-core.md</div><div class="fi-d">PXの最小形</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f6b"><div class="fc-in">
-<p class="fb fa">PX at its smallest. 15KB of HTML.</p>
-<p class="fb">A browser and this file — that's all you need to verify a pack. No network. No install. Works in air-gapped environments.</p>
-<p class="fb"><a href="#" style="color:var(--ink-3);border-bottom:1px solid var(--rule)">Download px-core.html</a></p>
+<p class="fb fa">PXの最小形。15KBのHTML。</p>
+<p class="fb">ブラウザとこのファイルだけで、packを検証できる。ネットワーク不要。インストール不要。エアギャップ環境でも動く。</p>
+<p class="fb"><a href="#" style="color:var(--ink-3);border-bottom:1px solid var(--rule)">px-core.html をダウンロード</a></p>
 </div></div>
 
 </div></div>
@@ -239,21 +239,21 @@ input[type="file"]{display:none}
 <!-- PASS mark subfolder -->
 <div class="tf d1" onclick="TF(this)"><div class="tf-i"></div><span class="tf-n">PASS mark</span><span class="tf-c">1</span><span class="tf-v">›</span></div>
 <div class="tc"><div class="d2">
-<div class="fi" onclick="FF('f7',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">the-ring.md</div><div class="fi-d">About this ring</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f7',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">the-ring.md</div><div class="fi-d">あのリングの話</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f7"><div class="fc-in">
-<p class="fb">Outer: 1.8px. Inner: 0.4px. Gap: 6px.<br>These three numbers took three days.</p>
-<p class="fb">One line didn&#x27;t look like a seal.<br>Two lines felt heavy.<br>Different weights made it a seal.</p>
-<p class="fb">FAIL is one line. No inner ring.<br>FAIL means something is missing.</p>
+<p class="fb">外側1.8px。内側0.4px。間隔6px。<br>この3つの数字に3日かかった。</p>
+<p class="fb">1本線だと検印に見えない。<br>2本線にすると重い。<br>太さを変えたら検印になった。</p>
+<p class="fb">FAILは1本線。内側がない。<br>つまりFAILは「足りない」。</p>
 </div></div>
 </div></div>
 
-<div class="fi" onclick="FF('f8',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">typography.md</div><div class="fi-d">Three typefaces, justified</div></div><div class="fi-a">›</div></div>
+<div class="fi" onclick="FF('f8',this)"><div class="fi-e">md</div><div class="fi-i"><div class="fi-n">typography.md</div><div class="fi-d">三書体の言い訳</div></div><div class="fi-a">›</div></div>
 <div class="fc" id="f8"><div class="fc-in">
-<div class="fh">Three typefaces, justified。</div>
-<p class="fb">Cormorant Garamond — headings.<br>To respect books.</p>
-<p class="fb">DM Sans — body.<br>A tool shouldn't draw attention to itself.</p>
-<p class="fb">JetBrains Mono — hashes.<br>There are maybe three fonts where sha256:a3f2... is readable. This is the quietest.</p>
-<p class="fb">Japanese edition uses Shippori Mincho.<br>The feel of an Iwanami Bunko colophon.<br>Reason: "It's calming."<br>That is the entire design theory.</p>
+<div class="fh">三書体の言い訳。</div>
+<p class="fb">Cormorant Garamond — 見出し。<br>書籍へのリスペクト。</p>
+<p class="fb">DM Sans — 本文。<br>道具は主張しない方がいい。</p>
+<p class="fb">JetBrains Mono — ハッシュ値。<br>sha256:a3f2... が読みやすいフォントは世界に3つしかない。これが一番静か。</p>
+<p class="fb">日本語版にはしっぽり明朝。<br>岩波文庫の奥付の感覚。<br>理由は「落ち着くから」。<br>これがデザインの全理論。</p>
 </div></div>
 
 </div></div>
@@ -266,26 +266,26 @@ input[type="file"]{display:none}
 
   <!-- Sender -->
   <div class="ss" id="ss">
-    <div class="dz" id="dz"><div class="dz-r"></div><div class="dz-t">Drop files to begin</div><div class="dz-s">or click to browse</div><input type="file" id="fi0" multiple></div>
+    <div class="dz" id="dz"><div class="dz-r"></div><div class="dz-t">ファイルをここに置く</div><div class="dz-s">またはクリックして選択</div><input type="file" id="fi0" multiple></div>
     <div class="ws" id="ws">
-      <div class="ns"><div class="sl">Pack Note</div><textarea class="ni" id="pn" placeholder="What is this delivery?" rows="1"></textarea><div class="nh">Appears first when opened</div></div>
-      <div><div class="sh"><span class="sl" style="margin-bottom:0">Contents</span><span class="sc" id="fcnt"></span></div><div id="fl"></div><div class="s-add-row"><button class="am" id="amb"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add files</button><button class="am" id="ambd"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add folder</button></div><input type="file" id="fi1" multiple><input type="file" id="fi1dir" webkitdirectory></div>
+      <div class="ns"><div class="sl">Pack Note</div><textarea class="ni" id="pn" placeholder="この納品は何ですか？" rows="1"></textarea><div class="nh">開いたとき最初に表示されます</div></div>
+      <div><div class="sh"><span class="sl" style="margin-bottom:0">Contents</span><span class="sc" id="fcnt"></span></div><div id="fl"></div><div class="s-add-row"><button class="am" id="amb"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>ファイルを追加</button><button class="am" id="ambd"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>フォルダを追加</button></div><input type="file" id="fi1" multiple><input type="file" id="fi1dir" webkitdirectory></div>
       <button class="cb" id="cbtn" disabled><span class="bt">Create .pack</span><span class="sp"></span></button>
     </div>
     <div class="ds" id="ds">
       <div class="dsl"><svg viewBox="0 0 80 80"><circle class="sc2" cx="40" cy="40" r="35" transform="rotate(-90 40 40)"/><polyline class="sch" points="28 40 36 48 52 32"/></svg></div>
-      <div class="dt">Pack ready</div><div class="dm" id="dmt"></div>
+      <div class="dt">Pack完成</div><div class="dm" id="dmt"></div>
       <a class="db" id="dlHtml" href="#"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Download .pack.html</a>
-      <div class="shn">Double-click to open. Send by email, Slack, or any way you share files.</div>
-      <button class="db" id="shareBtn" style="display:none;margin-top:8px"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>Send</button>
-      <button class="db" id="copyShareBtn" style="display:none;margin-top:8px"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2M9 2h6v4H9z"/></svg><span class="bt2">Copy share text</span></button>
+      <div class="shn">ダブルクリックで開けます。メール、Slack、いつもの方法で送れます。</div>
+      <button class="db" id="shareBtn" style="display:none;margin-top:8px"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>転送</button>
+      <button class="db" id="copyShareBtn" style="display:none;margin-top:8px"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2M9 2h6v4H9z"/></svg><span class="bt2">共有テキストをコピー</span></button>
       <a class="db-sec" id="dlZip" href="#"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>Download .pack (ZIP)</a>
       <details class="pack-det"><summary>Pack ID</summary><button class="pack-id-btn" id="packIdBtn"></button></details>
-      <button class="rb" id="rst">Create another</button>
+      <button class="rb" id="rst">もうひとつ作る</button>
     </div>
   </div>
 
-  <div class="sf"><div class="sf-l"><a href="/ja/">日本語</a><a href="https://github.com/px-registry/px" target="_blank" rel="noopener">GitHub</a><a href="mailto:hello&#64;px-registry.org">Contact</a></div><div class="sf-c">PX Registry KK</div></div>
+  <div class="sf"><div class="sf-l"><a href="/">English</a><a href="https://github.com/px-registry/px" target="_blank" rel="noopener">GitHub</a><a href="mailto:hello&#64;px-registry.org">Contact</a></div><div class="sf-c">PX Registry KK</div></div>
 </div>
 
 <script>
@@ -324,7 +324,7 @@ window.toggleSF=function(el){var ch=el.nextElementSibling;if(!ch)return;ch.class
 function escA(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
 function buildTree(files){var root={children:{},files:[]};files.forEach(function(item){var parts=item.path.split('/');if(parts.length===1){root.files.push(item)}else{var node=root;for(var i=0;i<parts.length-1;i++){var d=parts[i];if(!node.children[d])node.children[d]={children:{},files:[]};node=node.children[d]}node.files.push(item)}});return root}
 function countF(node){var c=node.files.length;Object.keys(node.children).forEach(function(k){c+=countF(node.children[k])});return c}
-function renderTree(node,depth,parentPath){var html='';var dc='sd'+Math.min(depth,3);var dirs=Object.keys(node.children).sort();dirs.forEach(function(dirName){var dir=node.children[dirName];var fc=countF(dir);var fp=parentPath?parentPath+'/'+dirName:dirName;html+='<div class="s-folder-hdr '+dc+'" onclick="toggleSF(this)"><span class="s-folder-icon"></span><span class="s-folder-name">'+EH(dirName)+'</span><span class="s-folder-count">'+fc+'</span><span class="s-folder-chevron rotated">\u203A</span><button class="frm" onclick="event.stopPropagation();rmDir(\''+escA(fp)+'\')"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="s-folder-children open">'+renderTree(dir,depth+1,fp)+'</div>'});node.files.forEach(function(item){var dn=item.path.split('/').pop();html+='<div class="sfr '+dc+'"><div class="se">'+GE(dn)+'</div><div class="fi-i"><div class="fi-n">'+EH(dn)+'</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--ink-4);margin-top:1px">'+FS(item.file.size)+'</div><textarea class="fni" placeholder="Note\u2026" rows="1" data-id="'+item.id+'">'+item.note+'</textarea></div><button class="frm" onclick="window._rm(\''+item.id+'\')"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>'});return html}
+function renderTree(node,depth,parentPath){var html='';var dc='sd'+Math.min(depth,3);var dirs=Object.keys(node.children).sort();dirs.forEach(function(dirName){var dir=node.children[dirName];var fc=countF(dir);var fp=parentPath?parentPath+'/'+dirName:dirName;html+='<div class="s-folder-hdr '+dc+'" onclick="toggleSF(this)"><span class="s-folder-icon"></span><span class="s-folder-name">'+EH(dirName)+'</span><span class="s-folder-count">'+fc+'</span><span class="s-folder-chevron rotated">\u203A</span><button class="frm" onclick="event.stopPropagation();rmDir(\''+escA(fp)+'\')"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div><div class="s-folder-children open">'+renderTree(dir,depth+1,fp)+'</div>'});node.files.forEach(function(item){var dn=item.path.split('/').pop();html+='<div class="sfr '+dc+'"><div class="se">'+GE(dn)+'</div><div class="fi-i"><div class="fi-n">'+EH(dn)+'</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--ink-4);margin-top:1px">'+FS(item.file.size)+'</div><textarea class="fni" placeholder="\u30E1\u30E2\u2026" rows="1" data-id="'+item.id+'">'+item.note+'</textarea></div><button class="frm" onclick="window._rm(\''+item.id+'\')"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>'});return html}
 function R(){fcnt.textContent=F.length+'';var tree=buildTree(F);fl.innerHTML=renderTree(tree,0,'');fl.querySelectorAll('.fni').forEach(function(ta){ta.addEventListener('input',function(e){e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px';var x=F.find(function(f){return f.id===e.target.dataset.id});if(x)x.note=e.target.value})});cbtn.disabled=!F.length}
 function toB64(ab){var u8=new Uint8Array(ab),b='',c=8192;for(var i=0;i<u8.length;i+=c)b+=String.fromCharCode.apply(null,u8.subarray(i,i+c));return btoa(b)}
 function EH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -407,7 +407,7 @@ return'<!DOCTYPE html>\n'
 +'<\/body><\/html>'}
 async function CP(){cbtn.classList.add('loading');cbtn.disabled=true;await new Promise(function(r){setTimeout(r,80)});try{var z=new JSZip(),idx=[],fn={},n2=new Date().toISOString();for(var i=0;i<F.length;i++){var it=F[i];var buf=await it.file.arrayBuffer();var h=await H(buf);var p=it.path;z.file('payload/'+p,buf);idx.push({path:'payload/'+p,scope:'payload',size:it.file.size,sha256:'sha256:'+h,media_type:GM(p)});if(it.note.trim())fn[p]=it.note.trim()}idx.sort(function(a,b){return a.path.localeCompare(b.path)});var jl=idx.map(function(f){return CJ(f)}).join('\n');z.file('index/files.jsonl',jl);var ih=await H(new TextEncoder().encode(jl));var lf=idx.map(function(f){return f.path+'\n'+f.size+'\n'+f.sha256}).join('\n');var rh=await H(new TextEncoder().encode(lf));var bs={created_at:n2,file_count:F.length,files_index_sha256:'sha256:'+ih,format_version:'0.1.0',generator:'px-pack/1.0',note:pn.value.trim()||'',pack_kind:'full',payload_root_sha256:'sha256:'+rh};if(Object.keys(fn).length>0)bs.file_notes=fn;var pi=await H(new TextEncoder().encode(CJ(bs)));var pj=Object.assign({},bs,{pack_id:'urn:pack:sha256:'+pi});z.file('pack.json',JSON.stringify(pj,null,2));PB=await z.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});PF=SF();var packAb=await PB.arrayBuffer();var b64=toB64(packAb);var htmlFn=PF.replace(/\.pack$/,'.pack.html');var packHtml=BPH(b64,htmlFn,pn.value.trim());var htmlBlob=new Blob([packHtml],{type:'text/html'});dmt.innerHTML='<span>'+F.length+'</span> file'+(F.length!==1?'s':'')+' \u00b7 <span>'+FS(PB.size)+'</span>';dlHtml.href=URL.createObjectURL(htmlBlob);dlHtml.download=htmlFn;dlZip.href=URL.createObjectURL(PB);dlZip.download=PF;
 packIdBtn.textContent='urn:pack:sha256:'+pi;
-if(navigator.share){shareBtn.style.display='';shareBtn.onclick=function(){var sf=new File([htmlBlob],htmlFn,{type:'text/html'});navigator.share({title:htmlFn,text:(pn.value.trim()||'A pack for you.')+'\nDouble-click to open.',files:[sf]}).catch(function(){navigator.share({title:'PX Pack',text:(pn.value.trim()||'A pack for you.')+'\nPack ID: urn:pack:sha256:'+pi.slice(0,16)+'...'}).catch(function(){})})}}else{copyShareBtn.style.display='';copyShareBtn.onclick=function(){var t=(pn.value.trim()||'A pack for you.')+'\n\nOpen with PX to verify.\nhttps://px-registry.org';navigator.clipboard.writeText(t).then(function(){copyShareBtn.querySelector('.bt2').textContent='Copied';setTimeout(function(){copyShareBtn.querySelector('.bt2').textContent='Copy share text'},2000)})}}
+if(navigator.share){shareBtn.style.display='';shareBtn.onclick=function(){var sf=new File([htmlBlob],htmlFn,{type:'text/html'});navigator.share({title:htmlFn,text:(pn.value.trim()||'A pack for you.')+'\nダブルクリックで開けます。',files:[sf]}).catch(function(){navigator.share({title:'PX Pack',text:(pn.value.trim()||'A pack for you.')+'\nPack ID: urn:pack:sha256:'+pi.slice(0,16)+'...'}).catch(function(){})})}}else{copyShareBtn.style.display='';copyShareBtn.onclick=function(){var t=(pn.value.trim()||'A pack for you.')+'\n\nPXで開くと内容を確認できます。\nhttps://px-registry.org';navigator.clipboard.writeText(t).then(function(){copyShareBtn.querySelector('.bt2').textContent='Copied';setTimeout(function(){copyShareBtn.querySelector('.bt2').textContent='\u5171\u6709\u30C6\u30AD\u30B9\u30C8\u3092\u30B3\u30D4\u30FC'},2000)})}}
 packIdBtn.onclick=function(){navigator.clipboard.writeText('urn:pack:sha256:'+pi).then(function(){packIdBtn.textContent='Copied';setTimeout(function(){packIdBtn.textContent='urn:pack:sha256:'+pi},2000)})};
 ws.classList.remove('active');ds.classList.add('active')}catch(err){console.error(err);alert('Failed: '+err.message)}cbtn.classList.remove('loading');cbtn.disabled=false}
 function RE(){F=[];PB=null;PF='';pn.value='';pn.style.height='auto';fl.innerHTML='';ds.classList.remove('active');ws.classList.remove('active');dz.style.display='';shareBtn.style.display='none';copyShareBtn.style.display='none'}
