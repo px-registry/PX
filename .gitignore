@@ -10,3 +10,7 @@ examples/draft-packet.json
 .env.*
 *.pem
 *.key
+
+.dev.vars*
+!.dev.vars.example
+!.env.example

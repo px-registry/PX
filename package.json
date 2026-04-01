@@ -15,7 +15,9 @@
     "README.md"
   ],
   "scripts": {
-    "start": "node cli.js"
+    "start": "node cli.js",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "keywords": [
     "proof",
@@ -26,8 +28,10 @@
     "soc2"
   ],
   "license": "MIT",
-  "dependencies": {},
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.79.0"
   }
 }
